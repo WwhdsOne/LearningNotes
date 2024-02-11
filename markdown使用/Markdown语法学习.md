@@ -303,7 +303,7 @@ _________
 
 # 9 Markdown 链接语法
 
-### 9.1标准链接语法
+### 9.1 标准链接语法
 
 链接文本放在中括号内，链接地址放在后面的括号中，链接title可选。
 
@@ -315,7 +315,7 @@ _________
 
 [不懂就去问百度](www.baidu.com)
 
-### 9.2带title的链接语法
+### 9.2 带title的链接语法
 
 ```
 [不懂就去问百度](www.baidu.com "这是百度哦😙")
@@ -349,8 +349,6 @@ I love supporting the **[EFF](https://eff.org)**.
 This is the *[Markdown Guide](https://www.markdownguide.org)*.
 See the section on [`code`](#code).
 
-
-
 ```
 [百度]: www.baidu.com "芝士百度"
 ```
@@ -362,6 +360,18 @@ See the section on [`code`](#code).
 | ✅ Do this                                           | ❌ Don't do this                                 |
 | --------------------------------------------------- | ----------------------------------------------- |
 | `[link](https://www.example.com/my%20great%20page)` | `[link](https://www.example.com/my great page)` |
+
+### 9.5 脚注
+
+```
+[^footnote]: 这是个脚注
+```
+
+您可以像这样创建脚注[^footnote]
+
+[^footnote]: 这是个脚注
+
+
 
 # 10 Markdown 图片语法
 
