@@ -302,15 +302,96 @@ public List<CourseCategoryDTO> queryTreeNodes(String id) {
 
 # 新增课程
 
+注意涉及到增删改查记得要添加**@Transactional**注解
 
+注意当事务回滚时ID仍然自增，因为innodb的auto_increament的计数器记录的当前值是保存在存内 存中的，并不是存在于磁盘上，当mysql server处于运行的时候，这个计数值只会随着 insert 改增长，不会随着delete而减少。
 
+所以最后要在courseMarket设置ID，而不是直接插入
 
+```
+@Transactional
+@Override
+public CourseBaseInfoDTO createCourseBaseInfo(Long companyId, AddCourseDTO addcourseDTO) {
+    //合法性校验
+    if (StringUtils.isBlank(addcourseDTO.getName())) {
+        throw new RuntimeException("课程名称为空");
+    }
 
+    if (StringUtils.isBlank(addcourseDTO.getMt())) {
+        throw new RuntimeException("课程分类为空");
+    }
 
+    if (StringUtils.isBlank(addcourseDTO.getSt())) {
+        throw new RuntimeException("课程分类为空");
+    }
 
+    if (StringUtils.isBlank(addcourseDTO.getGrade())) {
+        throw new RuntimeException("课程等级为空");
+    }
 
+    if (StringUtils.isBlank(addcourseDTO.getTeachmode())) {
+        throw new RuntimeException("教育模式为空");
+    }
 
+    if (StringUtils.isBlank(addcourseDTO.getUsers())) {
+        throw new RuntimeException("适应人群为空");
+    }
 
+    if (StringUtils.isBlank(addcourseDTO.getCharge())) {
+        throw new RuntimeException("收费规则为空");
+    }
+
+    //1.向课程信息表(course_Base)写入信息
+    CourseBase courseBase = new CourseBase();
+    BeanUtils.copyProperties(addcourseDTO,courseBase);
+    courseBase.setCompanyId(companyId);
+    courseBase.setCreateDate(LocalDateTime.now());
+    //审核状态默认未提交
+    courseBase.setAuditStatus("202002");
+    //发布状态为未发布
+    courseBase.setStatus("203001");
+    int insert = courseBaseMapper.insert(courseBase);
+    if(insert <= 0){
+        throw new RuntimeException("添加课程失败");
+    }
+    //2.向课程营销表(course_market)写入信息
+    //课程营销信息
+    CourseMarket courseMarket = new CourseMarket();
+    Long courseId = courseBase.getId();
+    BeanUtils.copyProperties(addcourseDTO,courseMarket);
+    courseMarket.setId(courseId);
+    int i = saveCourseMarket(courseMarket);
+    if(i<=0){
+        throw new RuntimeException("保存课程营销信息失败");
+    }
+    //查询课程基本信息及营销信息并返回
+    return getCourseBaseInfo(courseId);
+}
+```
+
+# 异常处理
+
+异常处理方法用的三个注解:
+
+```
+@ResponseBody		//将java对象转换成json格式
+@ExceptionHandler(XueChengPlusException.class)//利用字节码文件捕获对应异常
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//设置响应码
+```
+
+注意到类上用了
+
+```
+@ControllerAdvice
+```
+
+我们可以使用
+
+```
+@RestControllerAdvice
+```
+
+@RestControllerAdvice注解包含了@ControllerAdvice注解和@ResponseBody注解
 
 
 
