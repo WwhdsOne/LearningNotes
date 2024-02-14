@@ -88,4 +88,72 @@ private String name;
 
 详细内容可以查看[MyBatis之ResultMap的association和collection标签详解 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/572129887)学习
 
-笔记有待补充
+查询语句如下
+
+```
+<resultMap id="treeNodeResultMap" type="com.xuecheng.content.model.dto.TeachplanDTO">
+        <!-- 一级数据映射 -->
+        <id     column="one_id"        property="id" />
+        <result column="one_pname"      property="pname" />
+        <result column="one_parentid"     property="parentid" />
+        <result column="one_grade"  property="grade" />
+        <result column="one_mediaType"   property="mediaType" />
+        <result column="one_stratTime"   property="startTime" />
+        <result column="one_endTime"   property="endTime" />
+        <result column="one_orderby"   property="orderby" />
+        <result column="one_courseId"   property="courseId" />
+        <result column="one_coursePubId"   property="coursePubId" />
+        <!-- 一级中包含多个二级数据 -->
+        <collection property="teachPlanTreeNodes" ofType="com.xuecheng.content.model.dto.TeachplanDTO">
+            <!-- 二级数据映射 -->
+            <id     column="two_id"        property="id" />
+            <result column="two_pname"      property="pname" />
+            <result column="two_parentid"     property="parentid" />
+            <result column="two_grade"  property="grade" />
+            <result column="two_mediaType"   property="mediaType" />
+            <result column="two_stratTime"   property="startTime" />
+            <result column="two_endTime"   property="endTime" />
+            <result column="two_orderby"   property="orderby" />
+            <result column="two_courseId"   property="courseId" />
+            <result column="two_coursePubId"   property="coursePubId" />
+            <association property="teachplanMedia" javaType="com.xuecheng.content.model.po.TeachplanMedia">
+                <id column="teachplanMeidaId"   property="id" />
+                <result column="mediaFilename"   property="mediaFilename" />
+                <result column="mediaId"   property="mediaId" />
+            </association>
+        </collection>
+    </resultMap>
+```
+
+# 新增修改课程计划
+
+我们用一个SaveTeachPlanDTO类即可完成新增和修改相关操作，减少了操作量，提高了代码复用率
+
+```
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SaveTeachPlanDTO {
+    private Long id;
+    private String pname;
+    private Long parentid;
+    private Integer grade;
+    private String mediaType;
+    private Long courseId;
+    private Long coursePubId;
+    private String isPreview;
+}
+```
+
+当我们需要确定插入数据的orderBy时，我们可以通过统计同类课程的数量并将其+1即可
+
+```
+private Integer getTeachPlanCount(Long courseId,Long parentId){
+        LambdaQueryWrapper<Teachplan> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Teachplan::getCourseId,courseId);
+        lambdaQueryWrapper.eq(Teachplan::getParentid,parentId);
+        //计算个数
+        return teachplanMapper.selectCount(lambdaQueryWrapper);
+}
+```
+
