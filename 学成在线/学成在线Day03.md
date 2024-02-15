@@ -157,3 +157,19 @@ private Integer getTeachPlanCount(Long courseId,Long parentId){
 }
 ```
 
+注意当我们添加大章节时前端不显示，我们需要把sql语句中的
+
+```
+from teachplan one
+     inner join teachplan two on two.parentid = one.id
+     left join teachplan_media m1 on m1.teachplan_id = two.id
+```
+
+改为
+
+```
+from teachplan one
+     left join teachplan two on two.parentid = one.id
+     left join teachplan_media m1 on m1.teachplan_id = two.id
+```
+
