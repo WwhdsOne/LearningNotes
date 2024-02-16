@@ -38,4 +38,6 @@ free | grep Mem | awk '{print ($3-$7)/$2 * 100.0}'
 
 好想要一台高配MacBook
 
-学生包还是没下来麻了
+学生包下来咯emoji:smile:
+
+<img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/README/github%20copilot%E9%80%9A%E8%BF%87%E5%96%BD.jpeg" style="zoom: 67%;" />
