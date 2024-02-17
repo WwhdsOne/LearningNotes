@@ -41,3 +41,12 @@ free | grep Mem | awk '{print ($3-$7)/$2 * 100.0}'
 学生包下来咯emoji:smile:
 
 <img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/README/github%20copilot%E9%80%9A%E8%BF%87%E5%96%BD.jpeg" style="zoom: 67%;" />
+
+# 2024.2.17
+
+利用copilot自制了部分python教程，希望3月前能完成
+
+学成在线Day05完成，事务居然还能失效，学到了。
+
+Day06推进，学不动了快要，分块文件学完了，明天开始搭建断点续传后续内容
+

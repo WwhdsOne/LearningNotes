@@ -205,6 +205,8 @@ spring:
 
 简介请查看word中分布式文件系统这一章:[分布式简介](E:\学习资料\学成在线项目—资料\day05 媒资管理 Nacos Gateway MinIO\资料\第3章媒资管理模块v3.1.docx)
 
+我们使用Minio分布式文件存储系统
+
 ### SDK
 
 操作教程地址：https://docs.min.io/docs/java-client-quickstart-guide.html
@@ -228,3 +230,104 @@ Maven依赖:
 
 
 
+# 上传图片
+
+首先分析接口：
+
+请求地址：/media/upload/coursefile
+
+请求内容：**Content-Type:** multipart/form-data;
+
+form-data; name="filedata"; filename="具体的文件名称"
+
+```
+@ApiOperation("上传图片")
+@PostMapping(value = "/upload/coursefile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public UploadFileResultDTO upload(@RequestPart("file") MultipartFile file) {
+    //调用service上传文件
+    return null;
+}
+```
+
+`consumes` 请求提交内容类型，`MediaType`方式，如 `application/json`、`application/x-www-urlencode`、`multipart/form-data`等
+
+`@RequestPart`用于将`multipart/form-data`类型数据映射到控制器处理方法的参数中。除了`@RequestPart`注解外，`@RequestParam`同样可以用于此类操作。
+
+上传到Minio需要进行的操作
+
+```
+//1.文件上传到Minio
+String fileName = uploadFileParamsDto.getFilename();
+//获取文件拓展名
+String extension = StringUtils.substringAfterLast(fileName, ".");
+
+//根据拓展名获取媒体类型
+String mimeType = getMimeType(extension);
+
+String defaultFolderPath = getDefaultFolderPath();
+
+//获取MD5值
+String fileMd5 = getFileMd5(new File(localFilePath));
+
+//objectName以年月日作为名称存储
+String objectName = defaultFolderPath + fileMd5 + extension;
+
+boolean result = addMediaFilesToMinIO(localFilePath, mimeType, bucket_mediaFiles, objectName);
+if(!result){
+    XueChengPlusException.cast("文件上传失败");
+}
+```
+
+在Controller层，接收到文件后要创建暂时文件
+
+```
+//创建临时文件
+File tempFile = File.createTempFile("minio", "temp");
+file.transferTo(tempFile);
+```
+
+`File.createTempFile` 是 Java 中的一个方法，用于创建一个临时文件。这个方法是 `java.io.File` 类的一部分。
+
+`transferTo` 是 Java 中的一个方法，用于将文件的内容转移到另一个文件中。这个方法是 `java.nio.file.Files` 类的一部分，它使用了 Java 的 NIO（Non-blocking I/O）特性，可以更高效地处理文件操作。
+
+这个方法会在默认的临时文件目录中创建一个新的空文件，文件名是由给定的前缀和后缀生成的。这个临时文件的路径可以通过 `tempFile.getPath()` 获取。
+
+注意：创建的临时文件在 JVM 退出时不会自动删除，需要手动删除。如果你希望临时文件在 JVM 退出时自动删除，可以调用 `tempFile.deleteOnExit()` 方法。
+
+# Service事务优化
+
+上边的service方法优化后并测试通过，现在思考关于uploadFile方法的是否应该开启事务。
+
+目前是在uploadFile方法上添加@Transactional，当调用uploadFile方法前会开启数据库事务，如果上传文件过程时间较长那么数据库的事务持续时间就会变长，这样数据库链接释放就慢，最终导致数据库链接不够用。
+
+我们只将addMediaFilesToDb方法添加事务控制即可,uploadFile方法上的@Transactional注解去掉。
+
+我们人为在int insert = mediaFilesMapper.insert(mediaFiles);下边添加一个异常代码int a=1/0;
+
+测试是否事务控制。很遗憾，事务控制失败。
+
+方法上已经添加了@Transactional注解为什么该方法不能被事务控制呢？
+
+如果是在uploadFile方法上添加@Transactional注解就可以控制事务，去掉则不行。
+
+**现在的问题其实是一个非事务方法调同类一个事务方法，事务无法控制，这是为什么？**
+
+下边分析原因：
+
+如果在uploadFile方法上添加@Transactional注解，代理对象执行此方法前会开启事务，如下图：
+
+![image-20240217202502483](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240217202502483.png)
+
+如果在uploadFile方法上没有@Transactional注解，代理对象执行此方法前不进行事务控制，如下图：
+
+![image-20240217202523999](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240217202523999.png)
+
+所以判断该方法是否可以事务控制必须保证是通过代理对象调用此方法，且此方法上添加了@Transactional注解。
+
+现在在addMediaFilesToDb方法上添加@Transactional注解，也不会进行事务控制是因为并不是通过代理对象执行的addMediaFilesToDb方法。为了判断在uploadFile方法中去调用addMediaFilesToDb方法是否是通过代理对象去调用，我们可以打断点跟踪。
+
+我们发现在uploadFile方法中去调用addMediaFilesToDb方法不是通过代理对象去调用，**而是直接调用本类的方法**。
+
+简而言之：只有通过调用代理类来执行事务操作才可以控制事务
+
+那么解决方案就明了了，首先我们将这个方法在接口中创建，然后我们将service类代理对象注入其中，并利用代理对象调用数据库函数即可
