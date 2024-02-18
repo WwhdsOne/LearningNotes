@@ -300,3 +300,5 @@ xxl:
 ![image-20240218203347215](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240218203347215.png)
 
 xxl路由策略配置详细内容：[xxl-job（四）路由策略_xxl-job路由策略-CSDN博客](https://blog.csdn.net/w_t_y_y/article/details/117119864)
+
+xxl任务机制内容在Day07有待补充
