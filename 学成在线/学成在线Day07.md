@@ -378,3 +378,137 @@ mediaFiles.setFilePath(mp4Name);
 mediaFileService.updateById(mediaFiles);
 ```
 
+## 视频处理其他问题(待完善)
+
+### 1.任务补偿机制
+
+如果有线程抢占了某个视频的处理任务，如果线程处理过程中挂掉了，该视频的状态将会一直是处理中，其它线程将无法处理，这个问题需要用补偿机制。
+
+单独启动一个任务找到待处理任务表中超过执行期限但仍在处理中的任务，将任务的状态改为执行失败。
+
+任务执行期限是处理一个视频的最大时间，比如定为30分钟，通过任务的启动时间去判断任务是否超过执行期限。
+
+大家思考这个sql该如何实现？
+
+大家尝试自己实现此任务补偿机制。
+
+### 2.达到最大失败次数
+
+当任务达到最大失败次数时一般就说明程序处理此视频存在问题，这种情况就需要人工处理，在页面上会提示失败的信息，人工可手动执行该视频进行处理，或通过其它转码工具进行视频转码，转码后直接上传mp4视频。
+
+### 3.分块文件清理问题
+
+上传一个文件进行分块上传，上传一半不传了，之前上传到minio的分块文件要清理吗？怎么做的？
+
+1、在数据库中有一张文件表记录minio中存储的文件信息。
+
+2、文件开始上传时会写入文件表，状态为上传中，上传完成会更新状态为上传完成。
+
+3、当一个文件传了一半不再上传了说明该文件没有上传完成，会有定时任务去查询文件表中的记录，如果文件未上传完成则删除minio中没有上传成功的文件目录。
+
+# 绑定媒资
+
+基础增删改查内容，详细内容查看内容模块代码
+
+# 实战
+
+根据接口定义实现解除绑定功能。
+
+前端文件course-add-step2-outline.vue中作如下修改:
+
+```
+private async handleDeleteMedia(node: ICourseOutlineTreeNode) {
+    console.log(node)
+    console.log(node.id)
+    try {
+      if (
+        node.teachplanMedia === undefined ||
+        node.teachplanMedia.id === undefined
+      ) {
+        return
+      }
+      await this.showDeleteConfirm()
+      await mediaUnAssociation(
+        node.id,
+        node.teachplanMedia.mediaId,
+        this.courseBaseId
+      )
+      this.getList()
+    } catch (error) {}
+  }
+```
+
+后端基础增删查改即可
+
+# 课程发布
+
+作为课程制作方即教学机构，在课程发布前通过课程预览功能可以看到课程发布后的效果，哪里的课程信息存在问题方便查看，及时修改。
+
+下图是课程预览的效果图，也是课程正式发布后的课程详情界面：
+
+![image-20240220200205363](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240220200205363.png)
+
+教学机构确认课程内容无误，提交审核，平台运营人员对课程内容审核，审核通过后教学机构人员发布课程成功。
+
+课程发布模块共包括三块功能：
+
+1、课程预览
+
+2、课程审核
+
+3、课程发布
+
+## 模板引擎
+
+根据前边的数据模型分析，课程预览就是把课程的相关信息进行整合，在课程预览界面进行展示，课程预览界面与课程发布的课程详情界面一致。
+
+项目采用模板引擎技术实现课程预览界面。什么是模板引擎？
+
+早期我们采用的jsp技术就是一种模板引擎技术，如下图：
+
+![image-20240220200332744](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240220200332744.png)
+
+1、浏览器请求web服务器
+
+2、服务器渲染页面，渲染的过程就是向jsp页面(模板)内填充数据(模型)。
+
+3、服务器将渲染生成的页面返回给浏览器。
+
+所以模板引擎就是：模板+数据=输出，Jsp页面就是模板，页面中嵌入的jsp标签就是数据，两者相结合输出html网页。
+
+ 
+
+常用的java模板引擎还有哪些？
+
+Jsp、Freemarker、Thymeleaf 、Velocity 等。
+
+本项目采用Freemarker作为模板引擎技术。
+
+Freemarker官方地址：http://freemarker.foofun.cn/
+
+Maven依赖:
+
+```
+<!-- Spring Boot 对结果视图 Freemarker 集成 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-freemarker</artifactId>
+</dependency>
+```
+
+配置文件:
+
+```
+spring:
+  freemarker:
+    enabled: true
+    cache: false   #关闭模板缓存，方便测试
+    settings:
+      template_update_delay: 0
+    suffix: .ftl   #页面模板后缀名
+    charset: UTF-8
+    template-loader-path: classpath:/templates/   #页面模板位置(默认为 classpath:/templates/)
+    resources:
+      add-mappings: false   #关闭项目中的静态资源映射(static、resources文件夹下的资源)
+```
+
