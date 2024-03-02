@@ -8,7 +8,7 @@
 
 在xuecheng-plus-parent中添加依赖管理 
 
-```
+```xml
 <dependency>
     <groupId>com.alibaba.cloud</groupId>
     <artifactId>spring-cloud-alibaba-dependencies</artifactId>
@@ -20,7 +20,7 @@
 
 在内容管理模块的接口工程，因为api是启动Http服务，在其中添加如下依赖
 
-```
+```xml
 <dependency>
     <groupId>com.alibaba.cloud</groupId>
     <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -33,7 +33,7 @@
 
 在bootstrap.yml文件加入如下配置:
 
-```
+```yaml
 #微服务配置
 spring:
   application:
@@ -93,7 +93,7 @@ spring:
 
 在content-service工程的test/resources 中添加bootstrap.yaml，内容如下：
 
-```
+```yaml
 spring:
   application:
     name: content-service
@@ -115,7 +115,7 @@ spring:
 
 通过运行观察控制台打印出下边的信息，NacosRestTemplate.java通过Post方式与nacos服务端交互读取配置信息。
 
-```
+```java
 [NacosRestTemplate.java:476] - HTTP method: POST, url: http://192.168.101.65:8848/nacos/v1/cs/configs/listener, body: {Listening-Configs=content-service.yaml?xuecheng-plus-project??dev?content-service-dev.yaml?xuecheng-plus-project?88459b1483b8381eccc2ef462bd59182?dev?content-service?xuecheng-plus-project??dev?, tenant=dev}
 ```
 
@@ -123,7 +123,7 @@ spring:
 
 内容如下：
 
-```
+```yaml
 #微服务配置
 spring:
   application:
@@ -149,7 +149,7 @@ spring:
 
 通过这一部分，能让其引用service层的数据库连接配置：
 
-```
+```yaml
 extension-configs:
   - data-id: content-service-${spring.profiles.active}.yaml
     group: xuecheng-plus-project
@@ -158,7 +158,7 @@ extension-configs:
 
 将swagger配置和logging配置抽取到项目公共组，来让所有项目通用配置这部分内容
 
-```
+```yaml
 shared-configs:
   - data-id: swagger-${spring.profiles.active}.yaml       #swagger文件配置
     group: xuecheng-plus-common
@@ -194,7 +194,7 @@ nacos中并未对`extension-configs`和`shared-configs`的差别
 
 想让本地最优先，可以在nacos配置文件 中配置如下即可实现：
 
-```
+```yaml
 spring:
  cloud:
   config:
@@ -215,7 +215,7 @@ spring:
 
 Maven依赖:
 
-```
+```xml
 <dependency>
     <groupId>io.minio</groupId>
     <artifactId>minio</artifactId>
@@ -240,7 +240,7 @@ Maven依赖:
 
 form-data; name="filedata"; filename="具体的文件名称"
 
-```
+```java
 @ApiOperation("上传图片")
 @PostMapping(value = "/upload/coursefile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 public UploadFileResultDTO upload(@RequestPart("file") MultipartFile file) {
@@ -255,7 +255,7 @@ public UploadFileResultDTO upload(@RequestPart("file") MultipartFile file) {
 
 上传到Minio需要进行的操作
 
-```
+```java
 //1.文件上传到Minio
 String fileName = uploadFileParamsDto.getFilename();
 //获取文件拓展名
@@ -280,7 +280,7 @@ if(!result){
 
 在Controller层，接收到文件后要创建暂时文件
 
-```
+```java
 //创建临时文件
 File tempFile = File.createTempFile("minio", "temp");
 file.transferTo(tempFile);

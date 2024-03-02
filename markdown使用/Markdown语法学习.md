@@ -269,8 +269,8 @@ Typora快捷键: Crtl + Shift + Q
 
 ### 围栏式代码块
 
-~~~json
-```
+~~~markdown
+```json
 {
   "firstName": "John",
   "lastName": "Smith",
@@ -287,11 +287,13 @@ Typora快捷键: Crtl + Shift + Q
 }
 ```
 
+
+
 # 8 Markdown 分隔线语法
 
 要创建分隔线，请在单独一行上使用三个或多个星号 (`***`)、破折号 (`---`) 或下划线 (`___`) ，并且不能包含其他内容。
 
-```
+```markdown
 ***
 ---
 _________
@@ -407,8 +409,6 @@ Typora快捷键: Crtl + Shift + I
 
 
 
-
-
 # 11 Markdown 转义字符语法
 
 ### 11.1特殊字符用法
@@ -427,13 +427,13 @@ Typora快捷键: Crtl + Shift + I
 
 例如:
 
-```markdown
+```http
 http://images.google.com/images?num=30&q=larry+bird
 ```
 
 应该如此才能正常使用
 
-```markdown
+```http
 http://images.google.com/images?num=30&amp;q=larry+bird
 ```
 

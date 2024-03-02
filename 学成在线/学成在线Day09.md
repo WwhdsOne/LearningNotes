@@ -24,7 +24,7 @@
 
 maven依赖:
 
-```
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-freemarker</artifactId>
@@ -33,7 +33,7 @@ maven依赖:
 
 测试类代码:
 
-```
+```java
 @Test
     public void testGenerateHtmlByTemplate() throws IOException, TemplateException {
         //配置freemarker
@@ -74,7 +74,7 @@ maven依赖:
 
 maven依赖:
 
-```
+```xml
 <dependency>
     <groupId>com.alibaba.cloud</groupId>
     <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -103,7 +103,7 @@ maven依赖:
 
 feign-dev.yaml配置添加：
 
-```
+```yaml
 feign:
   hystrix:
     enabled: true
@@ -131,13 +131,13 @@ feign上的请求地址与原api有所差异，有时需要单独更改
 
 原api:
 
-```
+```java
 @RequestMapping(value = "/upload/coursefile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 ```
 
 feign客户端:
 
-```
+```java
 @PostMapping(value = "/media/upload/coursefile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 ```
 
@@ -151,7 +151,7 @@ MD其实并没有错，由于测试类和实际类名字相同，我启动了半
 
 我修改配置后使用：
 
-```
+```shell
 nginx.exe -s reload
 ```
 
@@ -161,13 +161,13 @@ nginx.exe -s reload
 
 应使用
 
-```
+```shell
 tasklist /fi "imagename eq nginx.exe"
 ```
 
 查询所有nginx进程并使用
 
-```
+```shell
 taskkill /pid PID /f
 ```
 
@@ -211,7 +211,7 @@ taskkill /pid PID /f
 
 1. fallback
 
-```
+```java
 @FeignClient(value = "media-api",configuration = MultipartSupportConfig.class,fallback = MediaServiceClientFallback.class)
 @RequestMapping("/media")
 public interface MediaServiceClient{
@@ -229,7 +229,7 @@ public interface MediaServiceClient{
 
    第二种方法在FeignClient中指定fallbackFactory ，如下：
 
-   ```
+   ```java
    @FeignClient(value = "media-api",configuration = MultipartSupportConfig.class,fallbackFactory = MediaServiceClientFallbackFactory.class)
    ```
 
@@ -241,7 +241,32 @@ public interface MediaServiceClient{
 
 ​	停止媒资管理服务或人为制造异常观察是否执行降级逻辑。
 
+fallbackFactory代码如下:
+
+```java
+@Slf4j
+@Component
+public class SearchServiceClientFallbackFactory implements FallbackFactory<SearchServiceClient> {
+    @Override
+    public SearchServiceClient create(Throwable throwable) {
+
+        return new SearchServiceClient() {
+
+            @Override
+            public Boolean add(CourseIndex courseIndex) {
+                throwable.printStackTrace();
+                log.debug("调用搜索发生熔断走降级方法,熔断异常:", throwable.getMessage());
+
+                return false;
+            }
+        };
+    }
+}
 ```
+
+
+
+```java
 //生成课程静态化页面并上传至文件系统
     public void generateCourseHtml(MqMessage mqMessage, long courseId) throws Exception {
         log.info("开始执行课程静态化任务,id:{}", mqMessage.getId());
@@ -465,7 +490,7 @@ Spring cloud Security： https://spring.io/projects/spring-cloud-security
 
 **maven**依赖：
 
-```
+```xml
 <dependency>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-starter-security</artifactId>
@@ -561,7 +586,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 在WebSecurityConfig类配置zhangsan拥有p1权限，lisi拥有p2权限。
 
-```
+```java
 @Bean
     public UserDetailsService userDetailsService() {
         //这里配置用户信息,这里暂时使用这种方式将用户存储在内存中
@@ -584,7 +609,7 @@ hasAuthority('p1')表示拥有p1权限方可访问。
 
 代码如下：
 
-```
+```java
 @RestController
 public class LoginController {
     ....
@@ -799,7 +824,7 @@ OAuth2的几个授权模式是根据不同的应用场景以不同的方式去�
 
 在WebSecurityConfig配置认证管理bean
 
-```
+```java
 @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
@@ -855,7 +880,7 @@ OAuth2的几个授权模式是根据不同的应用场景以不同的方式去�
 
 httpclient脚本如下：
 
-```
+```http
 ### 授权码模式
 ### 第一步申请授权码(浏览器请求)/oauth/authorize?client_id=c1&response_type=code&scope=all&redirect_uri=http://www.51xuecheng.cn
 ### 第二步申请令牌
@@ -864,7 +889,7 @@ POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&gr
 
 成功后返回结果如下:
 
-```
+```json
 {
   "access_token": "69abe6b8-7fe3-43d1-bfeb-7701a6fce80d",
   "token_type": "bearer",
@@ -876,7 +901,7 @@ POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&gr
 
 说明“：AuthorizationServer用 @EnableAuthorizationServer 注解标识并继承AuthorizationServerConfigurerAdapter来配置OAuth2.0 授权服务器。
 
-```
+```java
 package com.xuecheng.auth.config;
  @Configuration
  @EnableAuthorizationServer
@@ -885,7 +910,7 @@ package com.xuecheng.auth.config;
 
 AuthorizationServerConfigurerAdapter要求配置以下几个类：
 
-```
+```java
 public class AuthorizationServerConfigurerAdapter implements AuthorizationServerConfigurer {
     public AuthorizationServerConfigurerAdapter() {}
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {}
@@ -908,7 +933,7 @@ public class AuthorizationServerConfigurerAdapter implements AuthorizationServer
 
 暂时先使用InMemoryTokenStore在内存存储令牌，令牌的有效期等信息配置如下：
 
-```
+```java
  //令牌管理服务
     @Bean(name="authorizationServerTokenServicesCustom")
     public AuthorizationServerTokenServices tokenService() {
@@ -964,7 +989,7 @@ POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&gr
 
 返回：
 
-```
+```json
 {
   "access_token": "69abe6b8-7fe3-43d1-bfeb-7701a6fce80d",
   "token_type": "bearer",

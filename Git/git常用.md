@@ -1,6 +1,6 @@
 ### 常用语句
 
-```text
+```shell
 git init                                                  # 初始化本地git仓库（创建新仓库）
 git config --global user.name "xxx"                       # 配置用户名
 git config --global user.email "xxx@xxx.com"              # 配置邮件
@@ -91,7 +91,7 @@ git fsck
 
 ### 新建：创建一个新的 git 版本库。这个版本库的配置、存储等信息会被保存到git 文件夹中
 
-```text
+```shell
 # 初始化当前项目
 $ git init
 
@@ -109,7 +109,7 @@ $ git clone [url]
 
 ### 配置：更改设置。可以是版本库的设置，也可以是系统的或全局的
 
-```text
+```shell
 # 显示当前的Git配置
 $ git config --list
 
@@ -132,7 +132,7 @@ $ git config --system core.editor <editor>
 
 ### 状态：显示索引文件（也就是当前工作空间）和当前的头指针指向的提交的不同
 
-```text
+```shell
 # 显示分支，未跟踪文件，更改和其他不同
 $ git status
 
@@ -142,7 +142,7 @@ $ git help status
 
 ### 信息：获取某些文件，某些分支，某次提交等 git 信息
 
-```text
+```shell
 # 显示commit历史，以及每次commit发生变更的文件
 $ git log --stat
 
@@ -225,7 +225,7 @@ $ git br --no-merged
 
 ### 添加：添加文件到当前工作空间中。如果你不使用 git add 将文件添加进去，那么这些文件也不会添加到之后的提交之中
 
-```text
+```shell
 # 添加一个文件
 $ git add test.js
 
@@ -251,7 +251,7 @@ $ git add -p
 
 ### 删除：rm 和上面的 add 命令相反，从工作空间中去掉某个文件
 
-```text
+```shell
 # 移除 HelloWorld.js
 $ git rm HelloWorld.js
 
@@ -267,7 +267,7 @@ $ git rm --cached [file]
 
 ### 分支：管理分支，可以通过下列命令对分支进行增删改查切换等
 
-```text
+```shell
 # 查看所有的分支和远程分支
 $ git branch -a
 
@@ -345,7 +345,7 @@ $ git br -D <branch>
 
 ### 检出：将当前工作空间更新到索引所标识的或者某一特定的工作空间
 
-```text
+```shell
 # 检出一个版本库，默认将更新到master分支
 $ git checkout
 # 检出到一个特定的分支
@@ -356,7 +356,7 @@ $ git checkout -b newBranch
 
 ### 远程同步：远程同步的远端分支
 
-```text
+```shell
 # 下载远程仓库的所有变动
 $ git fetch [remote]
 
@@ -396,7 +396,7 @@ $ git push [remote] --all
 
 ### 撤销：
 
-```text
+```shell
 # 恢复暂存区的指定文件到工作区
 $ git checkout [file]
 
@@ -444,7 +444,7 @@ $ git stash drop
 
 ### 提交：commit 将当前索引的更改保存为一个新的提交，这个提交包括用户做出的更改与信息
 
-```text
+```shell
 # 提交暂存区到仓库区附带提交信息
 $ git commit -m [message]
 
@@ -467,7 +467,7 @@ $ git commit --amend [file1] [file2] ...
 
 ### diff: 显示当前工作空间和提交的不同
 
-```text
+```shell
 # 显示工作目录和索引的不同
 $ git diff
 
@@ -480,7 +480,7 @@ $ git diff HEAD
 
 ### grep：可以在版本库中快速查找
 
-```text
+```shell
 可选配置：
 # 感谢Travis Jeffery提供的以下用法：
 # 在搜索结果中显示行号
@@ -497,7 +497,7 @@ $ git grep -e 'arrayListName' --and \( -e add -e remove \)
 
 ### log: 显示这个版本库的所有提交
 
-```text
+```shell
 # 显示所有提交
 $ git log
 
@@ -522,7 +522,7 @@ $ git log --stat
 
 ### merge: 合并就是将外部的提交合并到自己的分支中
 
-```text
+```shell
 # 将其他分支合并到当前分支
 $ git merge branchName
 
@@ -533,7 +533,7 @@ $ git merge --no-ff branchName
 
 ### mv：重命名或移动一个文件
 
-```text
+```shell
 # 重命名
 $ git mv test.js test2.js
 
@@ -550,7 +550,7 @@ $ git mv -f myFile existingFile
 
 ### tag:
 
-```text
+```shell
 # 列出所有tag
 $ git tag
 
@@ -581,7 +581,7 @@ $ git checkout -b [branch] [tag]
 
 ### push：从远端版本库合并到当前分支
 
-```text
+```shell
 # 从远端origin的master分支更新版本库
 # git pull <远端> <分支>
 $ git pull origin master
@@ -592,7 +592,7 @@ $ git pull --no-ff
 
 ### ci：
 
-```text
+```shell
 $ git ci <file>
 $ git ci .
 # 将git add, git rm和git ci等操作都合并在一起做
@@ -604,7 +604,7 @@ $ git ci --amend
 
 ### rebase（谨慎使用）：将一个分支上所有的提交历史都应用到另一个分支上不要在一个已经公开的远端分支上使用 rebase.
 
-```text
+```shell
 # 将experimentBranch应用到master上面
 # git rebase <basebranch> <topicbranch>
 $ git rebase master experimentBranch
@@ -627,7 +627,7 @@ $ git reset --hard dha78as
 
 ### 其他：
 
-```text
+```shell
 # 生成一个可供发布的压缩包
 $ git archive
 

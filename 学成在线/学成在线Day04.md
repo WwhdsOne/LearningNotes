@@ -33,7 +33,7 @@
 
 可以使用SQl语句一次完成
 
-```
+```mysql
 <!--根据方向和ID修改顺序-->
     <update id="updateOrderByDirectionAndId">
         update teachplan T1,					# 先设置三个表用来更新和保存状态

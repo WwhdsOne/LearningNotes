@@ -30,7 +30,7 @@
 
 文件分块测试代码：
 
-```
+```java
 //分块测试
 @Test
 public void testChunk() throws IOException {
@@ -72,7 +72,7 @@ RandomAccessFile的一个重要使用场景就是网络请求中的多线程下�
 
 文件分块合并测试代码：
 
-```
+```java
 @Test
     public void testMerge() throws Exception {
         //找到分块文件路径
@@ -138,7 +138,7 @@ RandomAccessFile的一个重要使用场景就是网络请求中的多线程下�
 
 注意分块内容必须大于等于5M
 
-```
+```java
 List<ComposeSource> sources = Stream.iterate(0, i -> ++i)
                 .limit(42)
                 .map(i -> ComposeSource.builder()
@@ -154,7 +154,7 @@ stream流全新用法
 
 上传文件大小限制需要解除
 
-```
+```yaml
 spring:
   servlet:
     multipart:
@@ -267,7 +267,7 @@ XXL-JOB是一个轻量级分布式任务调度平台，其核心设计目标是�
 
 maven依赖：
 
-```
+```xml
 <dependency>
     <groupId>com.xuxueli</groupId>
     <artifactId>xxl-job-core</artifactId>
@@ -276,7 +276,7 @@ maven依赖：
 
 配置文件:
 
-```
+```yaml
 xxl:
   job:
     admin: 

@@ -8,7 +8,7 @@
 
 # 分页查询测试代码
 
-```
+```java
 @Test
 public void testCourseBaseMapper(){
     CourseBase courseBase = courseBaseMapper.selectById(18);
@@ -62,7 +62,7 @@ public void testCourseBaseMapper(){
 
 例如分页查询的请求可以这么写
 
-```
+```http
 ### 查询课程信息
 POST http://localhost:8080/course/list?pageNo=1&pageSize=2
 Content-Type: application/json
@@ -181,7 +181,7 @@ nginx到http://www.baidu.com:8601通过服务端通信，没有跨域。
 
 如果树的层级固定可以使用表的自链接去查询，比如：我们只查询两级课程分类，可以用下边的SQL
 
-```
+```mysql
 select *
 from course_category one
          inner join course_category two on one.id = two.parentid
@@ -197,7 +197,7 @@ order by one.orderby, two.orderby;
 
 此时可以使用MySQL递归实现，使用with语法，如下：
 
-```
+```mysql
 WITH RECURSIVE cte_name (column_list) AS (
     SELECT initial_query_result
     UNION [ALL]
@@ -222,7 +222,7 @@ MySQL with Recursive语法详解
 
 下边是一个递归的简单例子：
 
-```
+```mysql
 with RECURSIVE t1 AS   (    
 	SELECT 1 as n    
 	UNION ALL    
@@ -237,7 +237,7 @@ SELECT * FROM t1;
 
 课程分类表层级固定查询sql:
 
-```
+```mysql
 select *
 from course_category one
          inner join course_category two on one.id = two.parentid
@@ -249,7 +249,7 @@ order by one.orderby, two.orderby;
 
 课程分类表层级不固定查询sql:
 
-```
+```mysql
 with recursive t1 as (
     select * from course_category where id = '1'
     union all
@@ -270,7 +270,7 @@ mysql递归相当于在存储过程中执行若干次sql语句，java程序仅�
 
 ### service层处理
 
-```
+```java
 @Override
 public List<CourseCategoryDTO> queryTreeNodes(String id) {
     //调用mapper查询分类信息
@@ -308,7 +308,7 @@ public List<CourseCategoryDTO> queryTreeNodes(String id) {
 
 所以最后要在courseMarket设置ID，而不是直接插入
 
-```
+```java
 @Transactional
 @Override
 public CourseBaseInfoDTO createCourseBaseInfo(Long companyId, AddCourseDTO addcourseDTO) {
@@ -373,7 +373,7 @@ public CourseBaseInfoDTO createCourseBaseInfo(Long companyId, AddCourseDTO addco
 
 异常处理方法用的三个注解:
 
-```
+```java
 @ResponseBody		//将java对象转换成json格式
 @ExceptionHandler(XueChengPlusException.class)//利用字节码文件捕获对应异常
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//设置响应码
@@ -381,13 +381,13 @@ public CourseBaseInfoDTO createCourseBaseInfo(Long companyId, AddCourseDTO addco
 
 注意到类上用了
 
-```
+```java
 @ControllerAdvice
 ```
 
 我们可以使用
 
-```
+```java
 @RestControllerAdvice
 ```
 

@@ -67,7 +67,7 @@ Linux/Unix下载方法: [Git (git-scm.com)](https://git-scm.com/download/linux)
 
 邮箱可以是假邮箱
 
-```
+```shell
 git config --global user.name “wwhds”
 
 git config --global user.email “hello@wwhds.cn”
@@ -75,7 +75,7 @@ git config --global user.email “hello@wwhds.cn”
 
 3. 查看配置信息
 
-```
+```shell
 git config --global user.name
 
 git config --global user.email
@@ -89,19 +89,19 @@ git config --global user.email
 
 要定义 Git 的别名，请使用 `git config` 命令，加上别名和要替换的命令。例如，要为 `git push` 创建别名 `p`：
 
-```
+```shell
 $ git config --global alias.p 'push'
 ```
 
 你可以通过将别名作为 `git` 的参数来使用别名，就像其他命令一样：
 
-```text
+```shell
 $ git p
 ```
 
 要查看所有的别名，用 `git config` 列出你的配置：
 
-```text
+```shell
 $ git config --global -l
 user.name=ricardo
 user.email=ricardo@example.com
@@ -116,7 +116,7 @@ alias.p=push
 
    以单行方式显示你的提交，使输出更紧凑：
 
-   ```text
+   ```shell
    git config --global alias.ll 'log --pretty=oneline --all --graph --abbrev-commit'
    ```
 
@@ -127,7 +127,7 @@ alias.p=push
 
    使用这个别名可以提供所有提交的简短列表：
 
-   ```text
+   ```shell
    $ git ll
    * ea12179 (HEAD -> master, origin/master) 导出运营数据报表 后端开发结束
    * 96f64fd 数据统计功能开发
@@ -139,13 +139,13 @@ alias.p=push
 
    这将显示你最近一次提交的详细信息。这是扩展了《Git Book》中 [别名](https://link.zhihu.com/?target=https%3A//git-scm.com/book/en/v2/Git-Basics-Git-Aliases) 一章的例子：
 
-   ```text
+   ```shell
    $ git config --global alias.last 'log -1 HEAD --stat'
    ```
 
    用它来查看最后的提交：
 
-   ```text
+   ```shell
    $ git last
    commit f3dddcbaabb928f84f45131ea5be88dcf0692783 (HEAD -> branch1)
    Author: ricardo <ricardo@example.com>
@@ -162,7 +162,7 @@ alias.p=push
 
    `git remote -v` 命令列出了所有配置的远程仓库。用别名 `rv` 将其缩短：
 
-   ```text
+   ```shell
    $ git config --global alias.rv 'remote -v'
    ```
 
@@ -170,13 +170,13 @@ alias.p=push
 
    `gl` 别名可以更方便地列出所有用户配置：
 
-   ```text
+   ```shell
    $ git config --global alias.gl 'config --global -l'
    ```
 
    现在可以查看用户配置了
 
-   ```
+   ```shell
    user.name=Wwhds
    user.email=a1605691832@163.com
    core.quotepath=false
@@ -221,7 +221,7 @@ export LC_ALL="zh_CN.UTF-8"
 
 #### 4.5.1 查看修改状态 (status)
 
-```
+```shell
 $ git status
 ```
 
@@ -232,7 +232,7 @@ $ git status
 - Changes not staged for commit 修改并未添加至暂存区来提交
 - nothing to commit,working tree clean 提交后显示没有东西可以提交
 
-```
+```shell
 On branch master
 Changes not staged for commit:                                
   (use "git add <file>..." to update what will be committed)
@@ -247,7 +247,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 
 #### 4.5.1 添加工作区到暂存区(add)
 
-```
+```shell
 $ git add .
 ```
 
@@ -255,19 +255,19 @@ $ git add .
 
 将暂存区指定文件回退
 
-```
+```shell
 $ git reset "文件名"
 ```
 
 将暂存区全部文件回退
 
-```
+```shell
 $ git reset
 ```
 
 #### 4.5.2 提交暂存区到本地仓库(commit)
 
-```
+```shell
 git commit -m '注释内容'
 ```
 
@@ -280,25 +280,25 @@ git commit -m '注释内容'
 
 我们使用别名即可:
 
-```
+```shell
 $ git ll
 ```
 
 效果如下:
 
-```
+```shell
 * 34fa638 (HEAD -> master) file01
 ```
 
 若想获得更详细的信息:
 
-```
+```shell
 $ git log
 ```
 
 效果如下:
 
-```
+```shell
 commit 34fa638efcb9fbe96b997a0cab2fe2dd73f8f15b (HEAD -> master)
 Author: Wwhds <a1605691832@163.com>
 Date:   Wed Feb 7 15:26:15 2024 +0800
@@ -338,7 +338,7 @@ git reset --hard commitID既可以做版本回退，也可以做版本还原
 
 先创建一个.gitignore文件
 
-```
+```shell
 $ touch .gitignore
 ```
 
@@ -354,20 +354,20 @@ $ touch .gitignore
 
 1. 新建一个文件夹在其中初始化git仓库
 
-```
+```shell
 $ git init
 ```
 
 2. 创建file01.txt并在其中写入"12345"
 
-```
+```shell
 $ touch file01.txt
 $ vi file01.txt
 ```
 
 3. 查看工作目录状态
 
-```:
+```shell
 $ git status
 ```
 
@@ -387,32 +387,32 @@ nothing added to commit but untracked files present (use "git add" to track)
 
 4. 将file01.txt加入暂存区
 
-```
+```shell
 $ git add .
 ```
 
 5. 将暂存区的file01.txt提交到本地仓库
 
-```
+```shell
 $ git commit -m 'file01.txt'
 ```
 
 6. 修改file01.txt内容为"23333"并提交到本地仓库
 
-```
+```shell
 $ git add .
 $ git commit -m 'file01.txt update'
 ```
 
 7. 利用别名查看日志
 
-```
+```shell
 $ git ll
 ```
 
 8. 回退到第一次提交的版本
 
-```
+```shell
 $  git reset a8c40cb --hard
 ```
 
@@ -428,7 +428,7 @@ $  git reset a8c40cb --hard
 
 #### 4.6.1 查看本地分支
 
-```
+```shell
 $ git branch
 ```
 
@@ -436,7 +436,7 @@ $ git branch
 
 #### 4.6.2 创建本地分支(branch)
 
-```
+```shell
 $ git branch "分支名"
 ```
 
@@ -444,19 +444,19 @@ $ git branch "分支名"
 
 #### 4.6.3 切换分支(checkout)
 
-```
+```shell
 $ git checkout
 ```
 
 我们还可直接切换到一个不存在的分支（创建并切换)
 
-```
+```shell
 $ git checkout -b
 ```
 
 #### 4.6.4 合并分支(merge)
 
-```
+```shell
 $ git merge "分支名"
 ```
 
@@ -472,7 +472,7 @@ $ git merge "分支名"
 
 **不能删除当前分支，只能删除其他分支**
 
-```
+```shell
 git branch -d b1 删除分支时，需要做各种检查
 git branch -D b1 不做任何检查，强制删除
 ```

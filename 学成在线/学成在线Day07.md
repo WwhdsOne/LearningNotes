@@ -116,7 +116,7 @@ XXL-JOB并不直接提供数据处理的功能，它只会给执行器分配好�
 
 avi视频的MIME Type是video/x-msvideo
 
-```
+```java
 /**
  * 记录待处理任务
  * @param mediaFiles 文件信息
@@ -148,7 +148,7 @@ public void addWitingTask(MediaFiles mediaFiles) {
 
 编写根据分片参数获取待处理任务的DAO方法，定义DAO接口如下
 
-```
+```java
 @Select("select * from media_process m " +
             "where (m.status = 1 or m.status = 3) " +
             "and m.fail_count < 3 " +
@@ -162,7 +162,7 @@ public void addWitingTask(MediaFiles mediaFiles) {
 
 为了避免多线程去争抢同一个任务可以使用synchronized同步锁去解决，如下代码：
 
-```
+```java
 synchronized(锁对象){
    执行任务...
 }
@@ -220,13 +220,13 @@ zookeeper是一个分布式协调服务，主要解决分布式程序之间的�
 
 获取电脑核心数量：
 
-```
+```java
 int processors = Runtime.getRuntime().availableProcessors();
 ```
 
 视频处理任务代码:
 
-```
+```java
 @XxlJob("videoJobHandler")
     public void shardingJobHandler() throws Exception {
 
@@ -335,7 +335,7 @@ int processors = Runtime.getRuntime().availableProcessors();
 
 发现重大bug，由于获取文件类型错误，所以不会使mp4以外的视频格式的转码任务存储到数据库中，错误出现在：
 
-```
+```java
 private String getMimeType(String extension) {
         if ( extension == null ) {
             extension = "";
@@ -355,13 +355,13 @@ private String getMimeType(String extension) {
 
 应该为`ContentInfo mimeTypeMatch = ContentInfoUtil.findExtensionMatch(extension);`
 
-```
+```java
 b1 = mediaFileService.addMediaFilesToMinIO(mp4File.getAbsolutePath(), "video/mp4", bucket, objectName);
 ```
 
 修改为:
 
-```
+```java
 b1 = mediaFileService.addMediaFilesToMinIO(mp4File.getAbsolutePath(), "video/mp4", bucket, mp4Name);
 ```
 
@@ -369,7 +369,7 @@ b1 = mediaFileService.addMediaFilesToMinIO(mp4File.getAbsolutePath(), "video/mp4
 
 保存后更新media_file中的文件路径和url
 
-```
+```java
 //更新media_file中的url地址和文件路径
 MediaFiles mediaFiles = new MediaFiles();
 mediaFiles.setId(fileId);
@@ -416,7 +416,7 @@ mediaFileService.updateById(mediaFiles);
 
 前端文件course-add-step2-outline.vue中作如下修改:
 
-```
+```typescript
 private async handleDeleteMedia(node: ICourseOutlineTreeNode) {
     console.log(node)
     console.log(node.id)
@@ -488,7 +488,7 @@ Freemarker官方地址：http://freemarker.foofun.cn/
 
 Maven依赖:
 
-```
+```xml
 <!-- Spring Boot 对结果视图 Freemarker 集成 -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -498,7 +498,7 @@ Maven依赖:
 
 配置文件:
 
-```
+```yaml
 spring:
   freemarker:
     enabled: true

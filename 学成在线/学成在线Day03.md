@@ -6,7 +6,7 @@
 
 首先在Base工程添加spring-boot-starter-validation的依赖
 
-```
+```xml
 <dependency>       
 	<groupId>org.springframework.boot</groupId>      
     <artifactId>spring-boot-starter-validation</artifactId>   
@@ -17,8 +17,8 @@
 
 之后我们在数据传输类的属性直接添加注解即可，例如：
 
-```
-@NotEmpty(message = "课程名称不能为空")
+```java
+	@NotEmpty(message = "课程名称不能为空")
     @ApiModelProperty(value = "课程名称", required = true)
     private String name;
 
@@ -36,7 +36,7 @@
 
 我们用class类型来表示不同的分组，所以我们定义不同的接口类型（空接口）表示不同的分组，由于校验分组是公用的，所以定义在 base工程中。如下：
 
-```
+```java
 public class ValidationGroups {
 	public interface Inster{};
 	public interface Update{};
@@ -46,7 +46,7 @@ public class ValidationGroups {
 
 在校验规则的时候分组
 
-```
+```java
 @NotEmpty(groups = {ValidationGroups.Inster.class},message = "添加课程名称不能为空")
 @NotEmpty(groups = {ValidationGroups.Update.class},message = "修改课程名称不能为空")
 // @NotEmpty(message = "课程名称不能为空")
@@ -72,7 +72,7 @@ private String name;
 
 由于返回时数据并非符合要求，所以在select标签内使用resultMap来映射
 
-```
+```xml
 <resultMap id="treeNodeResultMap" type="">
 </resultMap>
 <select id="selectTreeNodes" resultMap="treeNodeResultMap" parameterType="java.lang.Long">
@@ -82,7 +82,7 @@ private String name;
 
 查询语句用到了
 
-```
+```xml
 <resultMap> <association> <collection>
 ```
 
@@ -90,7 +90,7 @@ private String name;
 
 查询语句如下
 
-```
+```xml
 <resultMap id="treeNodeResultMap" type="com.xuecheng.content.model.dto.TeachplanDTO">
         <!-- 一级数据映射 -->
         <id     column="one_id"        property="id" />
@@ -129,7 +129,7 @@ private String name;
 
 我们用一个SaveTeachPlanDTO类即可完成新增和修改相关操作，减少了操作量，提高了代码复用率
 
-```
+```java
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -147,7 +147,7 @@ public class SaveTeachPlanDTO {
 
 当我们需要确定插入数据的orderBy时，我们可以通过统计同类课程的数量并将其+1即可
 
-```
+```java
 private Integer getTeachPlanCount(Long courseId,Long parentId){
         LambdaQueryWrapper<Teachplan> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Teachplan::getCourseId,courseId);
@@ -159,7 +159,7 @@ private Integer getTeachPlanCount(Long courseId,Long parentId){
 
 注意当我们添加大章节时前端不显示，我们需要把sql语句中的
 
-```
+```mysql
 from teachplan one
      inner join teachplan two on two.parentid = one.id
      left join teachplan_media m1 on m1.teachplan_id = two.id
@@ -167,7 +167,7 @@ from teachplan one
 
 改为
 
-```
+```mysql
 from teachplan one
      left join teachplan two on two.parentid = one.id
      left join teachplan_media m1 on m1.teachplan_id = two.id

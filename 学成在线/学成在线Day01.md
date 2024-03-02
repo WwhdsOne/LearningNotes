@@ -62,13 +62,13 @@ xuecheng-plus-content：内容管理模块工程，负责聚合xuecheng-plus-con
 
 百度后发现是因为父级的pom.xml中对
 
-```
+```xml
 <packaging>xxx</packaging>
 ```
 
 节点定义不正确,或者没有定义，应该定义成
 
-```
+```xml
 <packaging>pom</packaging>
 ```
 

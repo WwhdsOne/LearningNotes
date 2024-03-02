@@ -22,7 +22,7 @@ nginx: [error] OpenEvent("Global\ngx_reload_34084") failed (2: The system cannot
 
 预览网页:
 
-```
+```java
 @ApiOperation("预览文件")
     @GetMapping("/preview/{mediaId}")
     public RestResponse<String> getPlayUrlByMediaId(@PathVariable String mediaId) {
@@ -64,7 +64,7 @@ nginx: [error] OpenEvent("Global\ngx_reload_34084") failed (2: The system cannot
 
 代码如下:
 
-```
+```java
 @Override
     @Transactional
     public void commitAudit(Long companyId, Long courseId) {
@@ -159,7 +159,7 @@ nginx: [error] OpenEvent("Global\ngx_reload_34084") failed (2: The system cannot
 
 我们知道本地事务依赖数据库本身提供的事务特性来实现，因此以下逻辑可以控制本地事务：
 
-```
+```mysql
 begin transaction； 
 //1.本地数据库操作：张三减少金额 
 //2.本地数据库操作：李四增加金额 
@@ -168,7 +168,7 @@ commit transation;
 
 但是在分布式环境下，会变成下边这样:
 
-```
+```mysql
 begin transaction； 
 //1.本地数据库操作：张三减少金额 
 //2.远程调用：让李四增加金额 
@@ -256,7 +256,7 @@ BASE 是 `Basically Available(基本可用)`、`Soft state(软状态)`和 `Event
 
 service代码如下,有待完善:
 
-```
+```java
 @Override
     public void publish(Long companyId, Long courseId) {
         //查询课程预发布信息
@@ -357,7 +357,7 @@ service代码如下,有待完善:
 
 调整配置文件后发现无法启动content的api，原因是在nacos中有如下代码片段:
 
-```
+```yaml
 # 配置本地优先
 spring:
   cloud:
