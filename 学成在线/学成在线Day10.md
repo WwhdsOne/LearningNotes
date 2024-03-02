@@ -1,3 +1,5 @@
+
+
 # 学成在线Day10
 
 
@@ -271,3 +273,423 @@ public CourseBaseInfoDto getCourseBaseById(@PathVariable("courseId") Long course
 1. 提供路由功能
 2. 提供白名单
 3. 校验jwt`合法性`
+
+# 用户认证
+
+## 需求分析
+
+至此我们了解了使用Spring Security进行认证授权的过程，本节实现用户认证功能。
+
+目前各大网站的认证方式非常丰富：账号密码认证、手机验证码认证、扫码登录等。
+
+本项目也要支持多种认证
+
+## 连接用户中心数据库
+
+### 连接数据库认证
+
+基于的认证流程在研究Spring Security过程中已经测试通过，到目前为止用户认证流程如下：
+
+![image-20240302100509537](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302100509537.png)
+
+认证所需要的用户信息存储在用户中心数据库，现在需要将认证服务连接数据库查询用户信息。
+
+在研究Spring Security的过程中是将用户信息硬编码
+
+我们要认证服务中连接用户中心数据库查询用户信息。
+
+如何使用Spring Security连接数据库认证吗？
+
+前边学习Spring Security工作原理时有一张执行流程图，如下图：
+
+![image-20240302100805726](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302100805726.png)
+
+用户提交账号和密码由DaoAuthenticationProvider调用UserDetailsService的loadUserByUsername()方法获取UserDetails用户信息。
+
+UserDetailService是一个接口：
+
+```java
+package org.springframework.security.core.userdetails;
+
+public interface UserDetailsService {
+    UserDetails loadUserByUsername(String var1) throws UsernameNotFoundException;
+}
+```
+
+UserDetails是用户信息接口:
+
+```java
+public interface UserDetails extends Serializable {
+    Collection<? extends GrantedAuthority> getAuthorities();
+
+    String getPassword();
+
+    String getUsername();
+
+    boolean isAccountNonExpired();
+
+    boolean isAccountNonLocked();
+
+    boolean isCredentialsNonExpired();
+
+    boolean isEnabled();
+}
+
+```
+
+我们只要实现UserDetailsService 接口查询数据库得到用户信息返回UserDetails 类型的用户信息即可,框架调用loadUserByUsername()方法拿到用户信息之后是如何执行的，见下图：
+
+![image-20240302103505430](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302103505430.png)
+
+首先屏蔽原有的UserService
+
+然后新建软件包写下如下内容:
+
+
+```java
+public class UserServiceImpl implements UserDetailsService {
+
+    //用户中心dao层
+    @Autowired
+    XcUserMapper xcUserMapper;
+
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        //查询数据库
+        XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, s));
+
+        //查询用户不存在,返回null即可,spring security同时抛出异常提示用户不存在
+        if ( xcUser == null ) {
+            return null;
+        }
+        //如果查到了正确的用户拿到了正确的密码,返回UserDetails对象给spring security框架,由框架进行密码比对
+        String password = xcUser.getPassword();
+        //权限
+        String[] authorities = {"test"};
+        UserDetails userDetails = User
+                .builder()
+                .username(xcUser.getUsername())
+                .password(password)
+                .authorities(authorities).build();
+        return userDetails;
+    }
+}
+```
+
+数据库中的密码加过密的，用户输入的密码是明文，我们需要修改密码格式器PasswordEncoder，原来使用的是NoOpPasswordEncoder，它是通过明文方式比较密码，现在我们修改为BCryptPasswordEncoder，它是将用户输入的密码编码为BCrypt格式与数据库中的密码进行比对。
+
+```java
+public static void main(String[] args) {
+        String password = "123456";
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        //生成密码
+        for ( int i = 0; i < 5; i++ ) {
+            String encode = passwordEncoder.encode(password);
+            System.out.println(encode);
+            System.out.println(passwordEncoder.matches(password, encode));
+        }
+    }
+```
+
+修改数据库中的密码为Bcrypt格式，并且记录明文密码，稍后申请令牌时需要。
+
+由于修改密码编码方式还需要将客户端的密钥更改为Bcrypt格式.
+
+在AuthorizationServer中修改
+
+### **扩展用户身份信息**
+
+我们需要扩展用户身份的信息，在jwt令牌中存储用户的昵称、头像、qq等信息。
+
+如何扩展Spring Security的用户身份信息呢？
+
+在认证阶段DaoAuthenticationProvider会调用UserDetailService查询用户的信息，这里是可以获取到齐全的用户信息的。由于JWT令牌中用户身份信息来源于UserDetails，UserDetails中仅定义了username为用户的身份信息，这里有两个思路：第一是可以扩展UserDetails，使之包括更多的自定义属性，第二也可以扩展username的内容 ，比如存入json数据内容作为username的内容。相比较而言，方案二比较简单还不用破坏UserDetails的结构，我们采用方案二。
+
+```java
+@Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        //查询数据库
+        XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, s));
+
+        //查询用户不存在,返回null即可,spring security同时抛出异常提示用户不存在
+        if ( xcUser == null ) {
+            return null;
+        }
+        //如果查到了正确的用户拿到了正确的密码,返回UserDetails对象给spring security框架,由框架进行密码比对
+        String password = xcUser.getPassword();
+        //权限
+        String[] authorities = {"test"};
+        xcUser.setPassword(null);
+        //将用户信息转json
+        String userJson = JSON.toJSONString(xcUser);
+        UserDetails userDetails = User
+                .builder()
+                .username(userJson)
+                .password(password)
+                .authorities(authorities).build();
+        return userDetails;
+    }
+```
+
+密码置空可以保证安全性
+
+在资源服务中就可以通过`SecurityUtil`工具类获取用户信息
+
+## 支持认证方式多样化
+
+### 统一认证入口
+
+目前各大网站的认证方式非常丰富：账号密码认证、手机验证码认证、扫码登录等。基于当前研究的Spring Security认证流程如何支持多样化的认证方式呢？
+
+1、支持账号和密码认证
+
+采用OAuth2协议的密码模式即可实现。
+
+2、支持手机号加验证码认证
+
+用户认证提交的是手机号和验证码，并不是账号和密码。
+
+3、微信扫码认证
+
+基于OAuth2协议与微信交互，学成在线网站向微信服务器申请到一个令牌，然后携带令牌去微信查询用户信息，查询成功则用户在学成在线项目认证通过。
+
+ 
+
+目前我们测试通过OAuth2的密码模式，用户认证会提交账号和密码，由DaoAuthenticationProvider调用UserDetailsService的loadUserByUsername()方法获取UserDetails用户信息。
+
+在前边我们自定义了UserDetailsService接口实现类，通过loadUserByUsername()方法根据账号查询用户信息。
+
+而不同的认证方式提交的数据不一样，比如：手机加验证码方式会提交手机号和验证码，账号密码方式会提交账号、密码、验证码。
+
+我们可以在loadUserByUsername()方法上作文章，将用户原来提交的账号数据改为提交json数据，json数据可以扩展不同认证方式所提交的各种参数。
+
+首先创建一个DTO类表示认证的参数：
+
+```java
+@Data
+public class AuthParamsDto {
+
+    private String username; //用户名
+    private String password; //域  用于扩展
+    private String cellphone;//手机号
+    private String checkcode;//验证码
+    private String checkcodekey;//验证码key
+    private String authType; // 认证的类型   password:用户名密码模式类型    sms:短信模式类型
+    private Map<String, Object> payload = new HashMap<>();//附加数据，作为扩展，不同认证类型可拥有不同的附加数据。如认证类型为短信时包含smsKey : sms:3d21042d054548b08477142bbca95cfa; 所有情况下都包含clientId
+}
+```
+
+UserServiceImpl修改如下：
+
+```java
+@Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+
+        AuthParamsDto authParamsDto = null;
+        try {
+            //将认证参数转为AuthParamsDto类型
+            authParamsDto = JSON.parseObject(s, AuthParamsDto.class);
+        } catch (Exception e) {
+            log.info("认证请求不符合项目要求:{}",s);
+            throw new RuntimeException("认证请求数据格式不对");
+        }
+        //账号
+        String username = authParamsDto.getUsername();
+        XcUser user = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
+        if(user==null){
+            //返回空表示用户不存在
+            return null;
+        }
+        //取出数据库存储的正确密码
+        String password  =user.getPassword();
+        //用户权限,如果不加报Cannot pass a null GrantedAuthority collection
+        String[] authorities = {"p1"};
+        //将user对象转json
+        String userString = JSON.toJSONString(user);
+        //创建UserDetails对象
+        UserDetails userDetails = User.withUsername(userString).password(password).authorities(authorities).build();
+        return userDetails;
+    }
+}
+```
+
+原来的DaoAuthenticationProvider 会进行密码校验，现在重新定义DaoAuthenticationProviderCustom类，重写类的additionalAuthenticationChecks方法。因为有一些方式，比如`微信扫码`和`手机验证码`**不需要校验密码**，所以我们自定义校验方式
+
+```java
+@Slf4j
+@Component
+public class DaoAuthenticationProviderCustom extends DaoAuthenticationProvider {
+
+
+    @Autowired
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
+        super.setUserDetailsService(userDetailsService);
+    }
+
+
+    //屏蔽密码对比
+    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+
+
+    }
+
+}
+```
+
+在WebSecurityConfig中注入DaoAuthenticationProviderCustom
+
+```java
+@Autowired
+DaoAuthenticationProviderCustom daoAuthenticationProviderCustom;
+
+
+@Override
+protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.authenticationProvider(daoAuthenticationProviderCustom);
+}
+
+```
+
+此时可以重启认证服务，测试申请令牌接口，传入的账号信息改为json数据，如下：
+
+```http
+################扩展认证请求参数后######################
+###密码模式
+POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username={"username":"stu1","authType":"password","password":"111111"}
+
+```
+
+定义统一认证接口
+
+```java
+public interface AuthService {
+
+   /**
+    * @description 认证方法
+    * @param authParamsDto 认证参数
+    * @return com.xuecheng.ucenter.model.po.XcUser 用户信息
+    * @author Mr.M
+    * @date 2022/9/29 12:11
+   */
+   XcUserExt execute(AuthParamsDto authParamsDto);
+
+}
+```
+
+定义账号密码认证接口：
+
+```java
+@Service("password_authService")
+public class PasswordAuthServiceImpl implements AuthService {
+    @Override
+    public XcUserExt execute(AuthParamsDto authParamsDto) {
+        return null;
+    }
+}
+```
+
+定义微信扫码认证接口：
+
+```java
+@Service("wx_authService")
+public class WxAuthServiceImpl implements AuthService {
+    @Override
+    public XcUserExt execute(AuthParamsDto authParamsDto) {
+        return null;
+    }
+}
+```
+
+### 实现账号密码认证
+
+账号密码实现类代码如下：
+
+```java
+@Override
+    public XcUserExt execute(AuthParamsDto authParamsDto) {
+        //账号
+        String username = authParamsDto.getUsername();
+
+        //验证码 TODO
+
+
+        //查询数据库
+        XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
+
+        //查询用户不存在,返回null即可,spring security同时抛出异常提示用户不存在
+        if ( xcUser == null ) {
+            throw new RuntimeException("账号不存在");
+        }
+        //验证密码是否正确
+        //如果查到了正确的用户拿到了正确的密码,返回UserDetails对象给spring security框架,由框架进行密码比对
+        //数据库密码
+        String passwordDB = xcUser.getPassword();
+        //用户输入密码
+        String passwordForm = authParamsDto.getPassword();
+
+        boolean matches = passwordEncoder.matches(passwordForm, passwordDB);
+        if ( !matches ) {
+            throw new RuntimeException("账号或密码错误");
+        }
+        XcUserExt xcUserExt = new XcUserExt();
+        BeanUtils.copyProperties(xcUser, xcUserExt);
+        return xcUserExt;
+    }
+```
+
+## 验证码服务
+
+### 验证码作用
+
+在认证时一般都需要输入验证码，验证码有什么用？
+
+验证码可以防止恶性攻击，比如：XSS跨站脚本攻击、CSRF跨站请求伪造攻击，一些比较复杂的图形验证码可以有效的防止恶性攻击。
+
+为了保护系统的安全在一些比较重要的操作都需要验证码。
+
+### **验证码接口测试**
+
+验证码服务对外提供的接口有：
+
+1、生成验证码
+
+2、校验验证码。
+
+如下：
+
+![image-20240302122054930](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302122054930.png)
+
+验证码服务如何生成并校验验证码？
+
+拿图片验证码举例：
+
+1、先生成一个指定位数的验证码，根据需要可能是数字、数字字母组合或文字。
+
+2、根据生成的验证码生成一个图片并返回给页面
+
+3、给生成的验证码分配一个key，将key和验证码一同存入缓存。这个key和图片一同返回给页面。
+
+4、用户输入验证码，连同key一同提交至认证服务。
+
+5、认证服务拿key和输入的验证码请求验证码服务去校验
+
+6、验证码服务根据key从缓存取出正确的验证码和用户输入的验证码进行比对，如果相同则校验通过，否则不通过。
+
+![image-20240302122129225](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302122129225.png)
+
+1、生成验证码接口
+
+```http
+### 申请验证码
+POST {{checkcode_host}}/checkcode/pic
+```
+
+2、校验验证码接口
+
+根据生成验证码返回的key以及日志中输出正确的验证码去测试。
+
+```http
+### 校验验证码
+POST {{checkcode_host}}/checkcode/verify?key=checkcode4506b95bddbe46cdb0d56810b747db1b&code=70dl
+```
+
