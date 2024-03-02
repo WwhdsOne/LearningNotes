@@ -693,3 +693,413 @@ POST {{checkcode_host}}/checkcode/pic
 POST {{checkcode_host}}/checkcode/verify?key=checkcode4506b95bddbe46cdb0d56810b747db1b&code=70dl
 ```
 
+## 账号密码认证
+
+### **需求分析**
+
+到目前为止账号和密码认证所需要的技术、组件都已开发完毕，下边实现账号密码认证，输出如下图：
+
+![image-20240302161407938](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302161407938.png)
+
+流程如下：
+
+![image-20240302161427234](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302161427234.png)
+
+### **账号密码认证开发**
+
+1. 在认证服务定义远程调用验证码服务的接口
+
+2. 完善PasswordAuthServiceImpl
+
+   ```java
+   //远程调用验证码校验接口认证服务
+   //校验验证码
+   String checkcode = authParamsDto.getCheckcode();
+   String checkcodekey = authParamsDto.getCheckcodekey();
+   
+   if(StringUtils.isEmpty(checkcodekey) || StringUtils.isEmpty(checkcode)){
+       throw new RuntimeException("验证码为空");
+   }
+   Boolean verify = checkCodeClient.verify(checkcodekey, checkcode);
+   if(!verify){
+       throw new RuntimeException("验证码输入错误");
+   }
+   ```
+
+   
+
+# **微信扫码登录**
+
+## 接入规范
+
+### 接入流程
+
+微信扫码登录基于OAuth2协议的授权码模式，
+
+接口文档：
+
+https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html
+
+流程如下：
+
+![image-20240302172032467](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302172032467.png)
+
+第三方应用获取access_token令牌后即可请求微信获取用户的信息，成功获取到用户的信息表示用户在第三方应用认证成功。
+
+### **请求获取授权码**
+
+第三方使用网站应用授权登录前请注意已获取相应网页授权作用域（scope=snsapi_login），则可以通过在 PC 端打开以下链接： https://open.weixin.qq.com/connect/qrconnect?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect 若提示“该链接无法访问”，请检查参数是否填写错误，如redirect_uri的域名与审核时填写的授权域名不一致或 scope 不为snsapi_login。
+
+**返回说明**
+
+用户允许授权后，将会重定向到redirect_uri的网址上，并且带上 code 和state参数
+
+```http
+redirect_uri?code=CODE&state=STATE
+```
+
+若用户禁止授权，则不会发生重定向。
+
+登录一号店网站应用 https://test.yhd.com/wechat/login.do 打开后，一号店会生成 state 参数，跳转到 https://open.weixin.qq.com/connect/qrconnect?appid=wxbdc5610cc59c1631&redirect_uri=https%3A%2F%2Fpassport.yhd.com%2Fwechat%2Fcallback.do&response_type=code&scope=snsapi_login&state=3d6be0a4035d839573b04816624a415e#wechat_redirect 微信用户使用微信扫描二维码并且确认登录后，PC端会跳转到 https://test.yhd.com/wechat/callback.do?code=CODE&state=3d6be0a40sssssxxxxx6624a415e 为了满足网站更定制化的需求，我们还提供了第二种获取 code 的方式，支持网站将微信登录二维码内嵌到自己页面中，用户使用微信扫码授权后通过 JS 将code返回给网站。 JS微信登录主要用途：网站希望用户在网站内就能完成登录，无需跳转到微信域下登录后再返回，提升微信登录的流畅性与成功率。 网站内嵌二维码微信登录 JS 实现办法：
+
+步骤1：在页面中先引入如下 JS 文件（支持https）：
+
+```http
+http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js
+```
+
+步骤2：在需要使用微信登录的地方实例以下 JS 对象：
+
+```javascript
+var obj = new WxLogin({
+    self_redirect:true,
+    id:"login_container", 
+    appid: "", 
+    scope: "", 
+    redirect_uri: "",
+    state: "",
+    style: "",
+    href: ""
+});
+```
+
+### **通过** **code** 获取access_token
+
+```http
+https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
+```
+
+正确返回:
+
+```json
+{ 
+    "access_token":"ACCESS_TOKEN", 
+    "expires_in":7200, 
+    "refresh_token":"REFRESH_TOKEN",
+    "openid":"OPENID", 
+    "scope":"SCOPE",
+    "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
+}
+
+```
+
+错误返回:
+
+```json
+{
+    "errcode":40029,
+    "errmsg":"invalid code"
+}
+```
+
+### **通过access_token调用接口**
+
+```
+access_token有效且未超时；
+微信用户已授权给第三方应用帐号相应接口作用域（scope）。
+```
+
+获取用户信息接口文档：https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Authorized_Interface_Calling_UnionID.html
+
+> 接口地址：http请求方式: GET
+> https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID
+
+正确响应:
+
+```json
+{
+    "openid":"OPENID",
+    "nickname":"NICKNAME",
+    "sex":1,
+    "province":"PROVINCE",
+    "city":"CITY",
+    "country":"COUNTRY",
+    "headimgurl": "https://thirdwx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/0",
+    "privilege":[
+        "PRIVILEGE1",
+        "PRIVILEGE2"
+    ],
+    "unionid": " o6_bmasdasdsad6_2sgVt7hMZOPfL"
+}
+```
+
+微信登录部分的请求只能用别人的
+
+```text
+weixin:
+appid: wxed9954c01bb89b47
+secret: a7482517235173ddb4083788de60b90e
+```
+
+在html文件中修改
+
+```javascript
+var wxObj = new WxLogin({
+    self_redirect:true,
+    id:"login_container", 
+    appid: "wxed9954c01bb89b47", 
+    scope: "snsapi_login", 
+    redirect_uri: "http://localhost:8160/auth/wxLogin",
+    // redirect_uri: "http://tjxt-user-t.itheima.net/xuecheng/auth/wxLogin",
+    state: token,
+    style: "",
+    href: ""
+});
+```
+
+## 接入微信登录
+
+### 接入分析
+
+本部分内容涉及到的请求url请查看微信帮助文档
+
+![image-20240302181509670](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302181509670.png)
+
+本项目认证服务需要做哪些事？
+
+1、需要定义接口接收微信下发的授权码。
+
+2、收到授权码调用微信接口申请令牌。
+
+3、申请到令牌调用微信获取用户信息
+
+4、获取用户信息成功将其写入本项目用户中心数据库。
+
+5、最后重定向到浏览器自动登录。
+
+### 定义接口
+
+```java
+@Slf4j
+@Controller
+public class WxLoginController {
+
+    @RequestMapping("/wxLogin")
+    public String wxLogin(String code, String state) throws IOException {
+        log.debug("微信扫码回调,code:{},state:{}", code, state);
+        //请求微信申请令牌，拿到令牌查询用户信息，将用户信息写入本项目数据库
+        XcUser xcUser = new XcUser();
+        //暂时硬编写，目的是调试环境
+        xcUser.setUsername("t1");
+        if ( xcUser == null ) {
+            return "redirect:http://www.51xuecheng.cn/error.html";
+        }
+        String username = xcUser.getUsername();
+        return "redirect:http://www.51xuecheng.cn/sign.html?username=" + username + "&authType=wx";
+    }
+}
+```
+
+### 接入微信认证
+
+1. 使用restTemplate请求微信，配置RestTemplate bean
+
+在启动类配置restTemplate
+
+```java
+@Bean
+RestTemplate restTemplate(){
+    RestTemplate restTemplate = new RestTemplate(new OkHttp3ClientHttpRequestFactory());
+    return  restTemplate;
+}
+```
+
+2. 定义与微信认证的service接口:
+
+```java
+public interface WxAuthService {
+    public XcUser wxAuth(String code);
+}
+```
+
+**远程调用微信url获取令牌:**
+
+```java
+//携带授权码申请令牌
+/**    url:https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code
+     * 申请访问令牌,响应示例
+     * {
+     * "access_token":"ACCESS_TOKEN",
+     * "expires_in":7200,
+     * "refresh_token":"REFRESH_TOKEN",
+     * "openid":"OPENID",
+     * "scope":"SCOPE",
+     * "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
+     * }
+     */
+private Map<String, String> getAccess_token(String code) {
+    //请求地址
+    String wxUrl_template = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code";
+    //最终请求路径
+    String wxUrl = String.format(wxUrl_template, appid, secret, code);
+
+    //远程调用
+    ResponseEntity<String> exchange = restTemplate.exchange(wxUrl, HttpMethod.POST, null, String.class);
+    //获取响应结果
+    String result = exchange.getBody();
+    //解析json
+    Map<String,String> map = JSON.parseObject(result, Map.class);
+    return map;
+}
+```
+
+**根据令牌获取用户信息:**
+
+```java
+/**
+     * url:https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s
+     * 获取用户信息，示例如下：
+     {
+     "openid":"OPENID",
+     "nickname":"NICKNAME",
+     "sex":1,
+     "province":"PROVINCE",
+     "city":"CITY",
+     "country":"COUNTRY",
+     "headimgurl": "https://thirdwx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/0",
+     "privilege":[
+     "PRIVILEGE1",
+     "PRIVILEGE2"
+     ],
+     "unionid": " o6_bmasdasdsad6_2sgVt7hMZOPfL"
+     }
+     */
+private Map<String,String> getUserinfo(String access_token,String openid) {
+    //请求地址
+    String wxUrl_template = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s";
+    //最终请求路径
+    String wxUrl = String.format(wxUrl_template, access_token, openid);
+    //请求数据
+    ResponseEntity<String> exchange = restTemplate.exchange(wxUrl, HttpMethod.GET, null, String.class);
+    //获取响应结果
+    String result = new String(exchange.getBody().getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+    //解析json
+    Map<String,String> map = JSON.parseObject(result, Map.class);
+    return map;
+}
+```
+
+**数据库保存用户信息:**
+
+```java
+/**
+     * 向数据库添加微信用户
+     * @param userInfo_map 用户信息
+     * @return 用户信息
+     */
+@Transactional
+public XcUser addWxUser(Map<String,String> userInfo_map) {
+    String nickname = userInfo_map.get("nickname");
+    String unionid = userInfo_map.get("unionid");
+    XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getWxUnionid, unionid));
+    if (xcUser != null) {
+        return xcUser;
+    }
+    //向数据库新增记录
+    String userId = UUID.randomUUID().toString();
+    xcUser = new XcUser();
+    xcUser.setNickname(userInfo_map.get("nickname"));
+    xcUser.setUserpic(userInfo_map.get("headimgurl"));
+    xcUser.setName(userInfo_map.get("nickname"));
+    xcUser.setUsername(unionid);
+    xcUser.setPassword(unionid);
+    xcUser.setUtype("101001");//学生类型
+    xcUser.setStatus("1");//用户状态
+    xcUser.setCreateTime(LocalDateTime.now());
+    xcUserMapper.insert(xcUser);
+    XcUserRole xcUserRole = new XcUserRole();
+    xcUserRole.setId(UUID.randomUUID().toString());
+    xcUserRole.setUserId(userId);
+    xcUserRole.setRoleId("17");//学生角色
+    xcUserRoleMapper.insert(xcUserRole);
+    return xcUser;
+}
+```
+
+**controller调用微信扫码认证方法：**
+
+```java
+/**
+     * 微信扫码认证
+     * @param code 微信授权码
+     * @return 用户信息
+     */
+@Override
+public XcUser wxAuth(String code) {
+    //申请令牌
+    Map<String, String> accessToken = getAccess_token(code);
+
+    //携带令牌查询用户信息
+    String access_token = accessToken.get("access_token");
+    String openid = accessToken.get("openid");
+    Map<String, String> userinfo = getUserinfo(access_token, openid);
+
+    XcUser xcUser = currentProxy.addWxUser(userinfo);
+
+    return xcUser;
+}
+```
+
+**excute验证方法:**
+
+```java
+@Override
+public XcUserExt execute(AuthParamsDto authParamsDto) {
+    String username = authParamsDto.getUsername();
+    //查询数据库
+    XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
+    if(xcUser == null){
+        throw new RuntimeException("账号不存在");
+    }
+    XcUserExt xcUserExt = new XcUserExt();
+    BeanUtils.copyProperties(xcUser, xcUserExt);
+    return xcUserExt;
+}
+```
+
+
+
+3. 下边在controller中调用wxAuth接口：
+
+```java
+@Slf4j
+@Controller
+public class WxLoginController {
+
+    @Autowired
+    WxAuthService wxAuthService;
+
+    @RequestMapping("/wxLogin")
+    public String wxLogin(String code, String state) throws IOException {
+        log.debug("微信扫码回调,code:{},state:{}",code,state);
+        //请求微信申请令牌，拿到令牌查询用户信息，将用户信息写入本项目数据库
+        XcUser xcUser = wxAuthService.wxAuth(code);
+        if(xcUser==null){
+            return "redirect:http://www.51xuecheng.cn/error.html";
+        }
+        String username = xcUser.getUsername();
+        return "redirect:http://www.51xuecheng.cn/sign.html?username="+username+"&authType=wx";
+    }
+}
+```
+

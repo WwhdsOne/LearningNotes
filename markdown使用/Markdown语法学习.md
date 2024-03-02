@@ -388,10 +388,10 @@ See the section on [`code`](#code).
 要添加图像，请使用感叹号 (`!`), 然后在方括号增加替代文本，图片链接放在圆括号里，括号里的链接后可以增加一个可选的图片标题文本。
 
 ```markdown
-<img src="https://wwhds-blog.oss-cn-beijing.aliyuncs.com/avatar/w.jpg" alt="个人头像" style="zoom:50%;" />
+![W!](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/Markdown%E4%BD%BF%E7%94%A8/w.jpg)
 ```
 
-<img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/Markdown%E4%BD%BF%E7%94%A8/w.jpg" alt="个人头像" style="zoom:50%;" />
+![W!](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/Markdown%E4%BD%BF%E7%94%A8/w.jpg)
 
 Typora快捷键: Crtl + Shift + I
 
@@ -409,7 +409,7 @@ Typora快捷键: Crtl + Shift + I
 
 # 11 Markdown 转义字符语法
 
-### 11.1特殊字符用法
+### 11.1 特殊字符用法
 
 要显示原本用于格式化 Markdown 文档的字符，请在字符前面添加反斜杠字符 \ 。
 
@@ -419,7 +419,7 @@ Typora快捷键: Crtl + Shift + I
 
 \* Without the backslash, this would be a bullet in an unordered list.
 
-### 11.2特殊字符自动转义
+### 11.2 特殊字符自动转义
 
 在 HTML 文件中，有两个字符需要特殊处理： `<` 和 `&` 。 `<` 符号用于起始标签，`&` 符号则用于标记 HTML 实体，如果你只是想要使用这些符号，你必须要使用实体的形式，像是 `<` 和 `&`。
 
