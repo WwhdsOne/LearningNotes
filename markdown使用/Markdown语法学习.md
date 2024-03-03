@@ -1,5 +1,3 @@
-
-
 # 1 Markdown标题语法
 
 创建标题需要在单词或短语面前添加(#),#号数量代表标题级别,最多添加6个#
@@ -513,15 +511,60 @@ Mermaid 是一个基于 JavaScript 的图表绘制工具，它使用 Markdown �
 
 Mermaid中文网:[关于 Mermaid | Mermaid 中文网 (nodejs.cn)](https://mermaid.nodejs.cn/intro/)
 
+**流程图:**
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+**时序图:**
+
+```mermaid
+sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>John: Hello John, how are you?
+    loop Healthcheck
+        John->>John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts <br/>prevail!
+    John-->>Alice: Great!
+    John->>Bob: How about you?
+    Bob-->>John: Jolly good!
+```
+
+**甘特图:**
+
+```mermaid
+gantt
+dateFormat  YYYY-MM-DD
+title Adding GANTT diagram to mermaid
+excludes weekdays 2014-01-10
+
+section A section
+Completed task            :done,    des1, 2014-01-06,2014-01-08
+Active task               :active,  des2, 2014-01-09, 3d
+Future task               :         des3, after des2, 5d
+Future task2               :         des4, after des3, 5d
+```
+
+等等
+
 ### 13.2 LaTex
 
 LaTeX 是一个让你的文档看起来更专业的排版系统，而不是文字处理器。它尤其适合处理篇幅较长、结构严谨的文档，并且十分擅长处理公式表达。它是免费的软件，对大多数操作系统都适用。
 
 LaTex [LaTeX 入门 - OI Wiki (oi-wiki.org)](https://oi-wiki.org/tools/latex/)
 
-
-
-
+$$
+\begin{equation}
+CPI = \frac{m}{IC}\tag{1}
+\end{equation}
+$$
 
 [^footnote]: 这是个脚注
 
