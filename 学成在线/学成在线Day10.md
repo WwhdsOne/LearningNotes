@@ -16,7 +16,7 @@
 
 我们以OAuth2的密码模式为例进行说明：
 
-![image-20240301171801030](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301171801030.png)
+![image-20240301171801030](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301171801030.png)
 
 从第4步开始说明：
 
@@ -32,7 +32,7 @@
 
 如果能够让资源服务自己校验令牌的合法性将省去远程请求认证服务的成本，提高了性能。如下图：
 
-![image-20240301171855970](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301171855970.png)
+![image-20240301171855970](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301171855970.png)
 
 如何解决上边的问题，实现资源服务自行校验令牌。
 
@@ -45,25 +45,6 @@ JSON Web Token（JWT）是一种使用JSON格式传递数据的网络令牌技�
 使用JWT可以实现无状态认证。
 
 ```java
-package com.xuecheng.auth.config;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
-import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-
-import java.util.Arrays;
-
-/**
- * @author Administrator
- * @version 1.0
- **/
 @Configuration
 public class TokenConfig {
 
@@ -221,10 +202,11 @@ public CourseBaseInfoDto getCourseBaseById(@PathVariable("courseId") Long course
 配置白名单文件security-whitelist.properties
 
 ```properties
-/**=\u4E34\u65F6\u5168\u90E8\u653E\u884C
-/auth/**=\u8BA4\u8BC1\u5730\u5740
-/content/open/**=\u5185\u5BB9\u7BA1\u7406\u516C\u5F00\u8BBF\u95EE\u63A5\u53E3
-/media/open/**=\u5A92\u8D44\u7BA1\u7406\u516C\u5F00\u8BBF\u95EE\u63A5\u53E3
+# 后续记得关闭
+/**=临时全部放行
+/auth/**=认证地址
+/content/open/**=内容管理公开访问接口
+/media/open/**=媒资管理公开访问接口
 ```
 
 导入了四个文件，其中最重要的的是GatewayAuthFilter
@@ -234,21 +216,83 @@ public CourseBaseInfoDto getCourseBaseById(@PathVariable("courseId") Long course
 过滤器代码
 
 ```java
-@Override
+package com.xuecheng.gateway.config;
+
+import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+/**
+ * @author Mr.M
+ * @version 1.0
+ * @description 网关认证过虑器
+ * @date 2022/9/27 12:10
+ */
+@Component
+@Slf4j
+public class GatewayAuthFilter implements GlobalFilter, Ordered {
+
+
+    //白名单
+    private static List<String> whitelist = null;
+
+    static {
+        //加载白名单
+        try (
+                InputStream resourceAsStream = GatewayAuthFilter.class.getResourceAsStream("/security-whitelist.properties");
+        ) {
+            Properties properties = new Properties();
+            properties.load(resourceAsStream);
+            Set<String> strings = properties.stringPropertyNames();
+            whitelist = new ArrayList<>(strings);
+
+        } catch (Exception e) {
+            log.error("加载/security-whitelist.properties出错:{}", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Autowired
+    private TokenStore tokenStore;
+
+
+    //认证过滤器
+    @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String requestUrl = exchange.getRequest().getPath().value();
         AntPathMatcher pathMatcher = new AntPathMatcher();
         //白名单放行
-        for (String url : whitelist) {
-            if (pathMatcher.match(url, requestUrl)) {
+        for ( String url : whitelist ) {
+            if ( pathMatcher.match(url, requestUrl) ) {
                 return chain.filter(exchange);
             }
         }
 
         //检查token是否存在
         String token = getToken(exchange);
-        if (StringUtils.isBlank(token)) {
-            return buildReturnMono("没有认证",exchange);
+        if ( StringUtils.isBlank(token) ) {
+            return buildReturnMono("没有认证", exchange);
         }
         //判断是否是有效的token
         OAuth2AccessToken oAuth2AccessToken;
@@ -256,16 +300,50 @@ public CourseBaseInfoDto getCourseBaseById(@PathVariable("courseId") Long course
             oAuth2AccessToken = tokenStore.readAccessToken(token);
 
             boolean expired = oAuth2AccessToken.isExpired();
-            if (expired) {
-                return buildReturnMono("认证令牌已过期",exchange);
+            if ( expired ) {
+                return buildReturnMono("认证令牌已过期", exchange);
             }
             return chain.filter(exchange);
         } catch (InvalidTokenException e) {
             log.info("认证令牌无效: {}", token);
-            return buildReturnMono("认证令牌无效",exchange);
+            return buildReturnMono("认证令牌无效", exchange);
         }
 
     }
+
+    /**
+     * 获取token
+     */
+    private String getToken(ServerWebExchange exchange) {
+        String tokenStr = exchange.getRequest().getHeaders().getFirst("Authorization");
+        if ( StringUtils.isBlank(tokenStr) ) {
+            return null;
+        }
+        String token = tokenStr.split(" ")[1];
+        if ( StringUtils.isBlank(token) ) {
+            return null;
+        }
+        return token;
+    }
+
+
+    private Mono<Void> buildReturnMono(String error, ServerWebExchange exchange) {
+        ServerHttpResponse response = exchange.getResponse();
+        String jsonString = JSON.toJSONString(new RestErrorResponse(error));
+        byte[] bits = jsonString.getBytes(StandardCharsets.UTF_8);
+        DataBuffer buffer = response.bufferFactory().wrap(bits);
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
+        return response.writeWith(Mono.just(buffer));
+    }
+
+
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+}
+
 ```
 
 网关的三个主要功能：
@@ -302,7 +380,20 @@ public CourseBaseInfoDto getCourseBaseById(@PathVariable("courseId") Long course
 
 前边学习Spring Security工作原理时有一张执行流程图，如下图：
 
-![image-20240302100805726](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302100805726.png)
+```mermaid
+sequenceDiagram
+	actor User
+	User->>+UsernamePasswordAuthenticationFilter: 1. 用户提交用户名,密码
+	UsernamePasswordAuthenticationFilter->>UsernamePasswordAuthenticationFilter: 2. 将请求信息封装为Authentication<br>实现类为UsernamePasswordAuthenticationToken
+	UsernamePasswordAuthenticationFilter->>AuthenticationManager: 3. 认证authenticate()
+	AuthenticationManager->>+DaoAuthenticationProvider: 4.委托认证authenticate()
+	DaoAuthenticationProvider->>+UserDetailsService: 5.获取用户信息loadUserByUsername()
+	UserDetailsService->>-DaoAuthenticationProvider: 6.返回UserDetails
+	DaoAuthenticationProvider->>DaoAuthenticationProvider: 7.通过PasswordEncoder对比UserDetails中的密码与Authentication中密码是否一致
+	DaoAuthenticationProvider->>-DaoAuthenticationProvider: 8.填充Authentication,如权限信息
+	DaoAuthenticationProvider->>UsernamePasswordAuthenticationFilter: 9.返回Authentication
+	UsernamePasswordAuthenticationFilter->>-SecurityContextHolder: 10.SecurityContextHolder.getContext().setAuthentication(…)方法将Authentication保存至安全上下文
+```
 
 用户提交账号和密码由DaoAuthenticationProvider调用UserDetailsService的loadUserByUsername()方法获取UserDetails用户信息。
 
@@ -367,10 +458,10 @@ public class UserServiceImpl implements UserDetailsService {
         //权限
         String[] authorities = {"test"};
         UserDetails userDetails = User
-                .builder()
-                .username(xcUser.getUsername())
-                .password(password)
-                .authorities(authorities).build();
+            .builder()
+            .username(xcUser.getUsername())
+            .password(password)
+            .authorities(authorities).build();
         return userDetails;
     }
 }
@@ -403,32 +494,36 @@ public static void main(String[] args) {
 
 如何扩展Spring Security的用户身份信息呢？
 
-在认证阶段DaoAuthenticationProvider会调用UserDetailService查询用户的信息，这里是可以获取到齐全的用户信息的。由于JWT令牌中用户身份信息来源于UserDetails，UserDetails中仅定义了username为用户的身份信息，这里有两个思路：第一是可以扩展UserDetails，使之包括更多的自定义属性，第二也可以扩展username的内容 ，比如存入json数据内容作为username的内容。相比较而言，方案二比较简单还不用破坏UserDetails的结构，我们采用方案二。
+在认证阶段DaoAuthenticationProvider会调用UserDetailService查询用户的信息，这里是可以获取到齐全的用户信息的。由于JWT令牌中用户身份信息来源于UserDetails，UserDetails中仅定义了username为用户的身份信息，这里有两个思路：
+
+1. 是可以扩展UserDetails，使之包括更多的自定义属性
+
+2. 也可以扩展username的内容 ，比如存入json数据内容作为username的内容。相比较而言，方案二比较简单还不用破坏UserDetails的结构，我们采用方案二。
 
 ```java
 @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        //查询数据库
-        XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, s));
+public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+    //查询数据库
+    XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, s));
 
-        //查询用户不存在,返回null即可,spring security同时抛出异常提示用户不存在
-        if ( xcUser == null ) {
-            return null;
-        }
-        //如果查到了正确的用户拿到了正确的密码,返回UserDetails对象给spring security框架,由框架进行密码比对
-        String password = xcUser.getPassword();
-        //权限
-        String[] authorities = {"test"};
-        xcUser.setPassword(null);
-        //将用户信息转json
-        String userJson = JSON.toJSONString(xcUser);
-        UserDetails userDetails = User
-                .builder()
-                .username(userJson)
-                .password(password)
-                .authorities(authorities).build();
-        return userDetails;
+    //查询用户不存在,返回null即可,spring security同时抛出异常提示用户不存在
+    if ( xcUser == null ) {
+        return null;
     }
+    //如果查到了正确的用户拿到了正确的密码,返回UserDetails对象给spring security框架,由框架进行密码比对
+    String password = xcUser.getPassword();
+    //权限
+    String[] authorities = {"test"};
+    xcUser.setPassword(null);
+    //将用户信息转json
+    String userJson = JSON.toJSONString(xcUser);
+    UserDetails userDetails = User
+        .builder()
+        .username(userJson)
+        .password(password)
+        .authorities(authorities).build();
+    return userDetails;
+}
 ```
 
 密码置空可以保证安全性
@@ -452,8 +547,6 @@ public static void main(String[] args) {
 3、微信扫码认证
 
 基于OAuth2协议与微信交互，学成在线网站向微信服务器申请到一个令牌，然后携带令牌去微信查询用户信息，查询成功则用户在学成在线项目认证通过。
-
- 
 
 目前我们测试通过OAuth2的密码模式，用户认证会提交账号和密码，由DaoAuthenticationProvider调用UserDetailsService的loadUserByUsername()方法获取UserDetails用户信息。
 
@@ -483,33 +576,32 @@ UserServiceImpl修改如下：
 
 ```java
 @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
-        AuthParamsDto authParamsDto = null;
-        try {
-            //将认证参数转为AuthParamsDto类型
-            authParamsDto = JSON.parseObject(s, AuthParamsDto.class);
-        } catch (Exception e) {
-            log.info("认证请求不符合项目要求:{}",s);
-            throw new RuntimeException("认证请求数据格式不对");
-        }
-        //账号
-        String username = authParamsDto.getUsername();
-        XcUser user = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
-        if(user==null){
-            //返回空表示用户不存在
-            return null;
-        }
-        //取出数据库存储的正确密码
-        String password  =user.getPassword();
-        //用户权限,如果不加报Cannot pass a null GrantedAuthority collection
-        String[] authorities = {"p1"};
-        //将user对象转json
-        String userString = JSON.toJSONString(user);
-        //创建UserDetails对象
-        UserDetails userDetails = User.withUsername(userString).password(password).authorities(authorities).build();
-        return userDetails;
+    AuthParamsDto authParamsDto = null;
+    try {
+        //将认证参数转为AuthParamsDto类型
+        authParamsDto = JSON.parseObject(s, AuthParamsDto.class);
+    } catch (Exception e) {
+        log.info("认证请求不符合项目要求:{}",s);
+        throw new RuntimeException("认证请求数据格式不对");
     }
+    //账号
+    String username = authParamsDto.getUsername();
+    XcUser user = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
+    if(user==null){
+        //返回空表示用户不存在
+        return null;
+    }
+    //取出数据库存储的正确密码
+    String password  =user.getPassword();
+    //用户权限,如果不加报Cannot pass a null GrantedAuthority collection
+    String[] authorities = {"p1"};
+    //将user对象转json
+    String userString = JSON.toJSONString(user);
+    //创建UserDetails对象
+    UserDetails userDetails = User.withUsername(userString).password(password).authorities(authorities).build();
+    return userDetails;
 }
 ```
 
@@ -529,10 +621,7 @@ public class DaoAuthenticationProviderCustom extends DaoAuthenticationProvider {
 
     //屏蔽密码对比
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-
-
     }
-
 }
 ```
 
@@ -542,12 +631,10 @@ public class DaoAuthenticationProviderCustom extends DaoAuthenticationProvider {
 @Autowired
 DaoAuthenticationProviderCustom daoAuthenticationProviderCustom;
 
-
 @Override
 protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth.authenticationProvider(daoAuthenticationProviderCustom);
 }
-
 ```
 
 此时可以重启认证服务，测试申请令牌接口，传入的账号信息改为json数据，如下：
@@ -556,7 +643,6 @@ protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 ################扩展认证请求参数后######################
 ###密码模式
 POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username={"username":"stu1","authType":"password","password":"111111"}
-
 ```
 
 定义统一认证接口
@@ -564,15 +650,13 @@ POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&gr
 ```java
 public interface AuthService {
 
-   /**
+    /**
     * @description 认证方法
     * @param authParamsDto 认证参数
     * @return com.xuecheng.ucenter.model.po.XcUser 用户信息
-    * @author Mr.M
     * @date 2022/9/29 12:11
-   */
-   XcUserExt execute(AuthParamsDto authParamsDto);
-
+    */
+    XcUserExt execute(AuthParamsDto authParamsDto);
 }
 ```
 
@@ -605,13 +689,25 @@ public class WxAuthServiceImpl implements AuthService {
 账号密码实现类代码如下：
 
 ```java
-@Override
+@Service("password_authService")
+public class PasswordAuthServiceImpl implements AuthService {
+
+    @Autowired
+    XcUserMapper xcUserMapper;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    CheckCodeClient checkCodeClient;
+
+    @Override
     public XcUserExt execute(AuthParamsDto authParamsDto) {
         //账号
         String username = authParamsDto.getUsername();
 
-        //验证码 TODO
-
+        //远程调用验证码校验接口认证服务
+        //校验验证码todo
 
         //查询数据库
         XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
@@ -635,6 +731,7 @@ public class WxAuthServiceImpl implements AuthService {
         BeanUtils.copyProperties(xcUser, xcUserExt);
         return xcUserExt;
     }
+}
 ```
 
 ## 验证码服务
@@ -712,20 +809,62 @@ POST {{checkcode_host}}/checkcode/verify?key=checkcode4506b95bddbe46cdb0d56810b7
 2. 完善PasswordAuthServiceImpl
 
    ```java
-   //远程调用验证码校验接口认证服务
-   //校验验证码
-   String checkcode = authParamsDto.getCheckcode();
-   String checkcodekey = authParamsDto.getCheckcodekey();
+   @Service("password_authService")
+   public class PasswordAuthServiceImpl implements AuthService {
    
-   if(StringUtils.isEmpty(checkcodekey) || StringUtils.isEmpty(checkcode)){
-       throw new RuntimeException("验证码为空");
-   }
-   Boolean verify = checkCodeClient.verify(checkcodekey, checkcode);
-   if(!verify){
-       throw new RuntimeException("验证码输入错误");
+       @Autowired
+       XcUserMapper xcUserMapper;
+   
+       @Autowired
+       PasswordEncoder passwordEncoder;
+   
+       @Autowired
+       CheckCodeClient checkCodeClient;
+   
+       @Override
+       public XcUserExt execute(AuthParamsDto authParamsDto) {
+           //账号
+           String username = authParamsDto.getUsername();
+   
+           //远程调用验证码校验接口认证服务
+           //校验验证码
+           String checkcode = authParamsDto.getCheckcode();
+           String checkcodekey = authParamsDto.getCheckcodekey();
+   
+           if ( StringUtils.isEmpty(checkcodekey) || StringUtils.isEmpty(checkcode) ) {
+               throw new RuntimeException("验证码为空");
+   
+           }
+           Boolean verify = checkCodeClient.verify(checkcodekey, checkcode);
+           if ( !verify ) {
+               throw new RuntimeException("验证码输入错误");
+           }
+   
+           //查询数据库
+           XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
+   
+           //查询用户不存在,返回null即可,spring security同时抛出异常提示用户不存在
+           if ( xcUser == null ) {
+               throw new RuntimeException("账号不存在");
+           }
+           //验证密码是否正确
+           //如果查到了正确的用户拿到了正确的密码,返回UserDetails对象给spring security框架,由框架进行密码比对
+           //数据库密码
+           String passwordDB = xcUser.getPassword();
+           //用户输入密码
+           String passwordForm = authParamsDto.getPassword();
+   
+           boolean matches = passwordEncoder.matches(passwordForm, passwordDB);
+           if ( !matches ) {
+               throw new RuntimeException("账号或密码错误");
+           }
+           XcUserExt xcUserExt = new XcUserExt();
+           BeanUtils.copyProperties(xcUser, xcUserExt);
+           return xcUserExt;
+       }
    }
    ```
-
+   
    
 
 # **微信扫码登录**
@@ -748,7 +887,11 @@ https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_L
 
 ### **请求获取授权码**
 
-第三方使用网站应用授权登录前请注意已获取相应网页授权作用域（scope=snsapi_login），则可以通过在 PC 端打开以下链接： https://open.weixin.qq.com/connect/qrconnect?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect 若提示“该链接无法访问”，请检查参数是否填写错误，如redirect_uri的域名与审核时填写的授权域名不一致或 scope 不为snsapi_login。
+第三方使用网站应用授权登录前请注意已获取相应网页授权作用域（scope=snsapi_login）
+
+则可以通过在 PC 端打开以下链接： https://open.weixin.qq.com/connect/qrconnect?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect 
+
+若提示“该链接无法访问”，请检查参数是否填写错误，如redirect_uri的域名与审核时填写的授权域名不一致或 scope 不为snsapi_login。
 
 **返回说明**
 
@@ -760,7 +903,13 @@ redirect_uri?code=CODE&state=STATE
 
 若用户禁止授权，则不会发生重定向。
 
-登录一号店网站应用 https://test.yhd.com/wechat/login.do 打开后，一号店会生成 state 参数，跳转到 https://open.weixin.qq.com/connect/qrconnect?appid=wxbdc5610cc59c1631&redirect_uri=https%3A%2F%2Fpassport.yhd.com%2Fwechat%2Fcallback.do&response_type=code&scope=snsapi_login&state=3d6be0a4035d839573b04816624a415e#wechat_redirect 微信用户使用微信扫描二维码并且确认登录后，PC端会跳转到 https://test.yhd.com/wechat/callback.do?code=CODE&state=3d6be0a40sssssxxxxx6624a415e 为了满足网站更定制化的需求，我们还提供了第二种获取 code 的方式，支持网站将微信登录二维码内嵌到自己页面中，用户使用微信扫码授权后通过 JS 将code返回给网站。 JS微信登录主要用途：网站希望用户在网站内就能完成登录，无需跳转到微信域下登录后再返回，提升微信登录的流畅性与成功率。 网站内嵌二维码微信登录 JS 实现办法：
+登录一号店网站应用 https://test.yhd.com/wechat/login.do 打开后，一号店会生成 state 参数
+
+跳转到 https://open.weixin.qq.com/connect/qrconnect?appid=wxbdc5610cc59c1631&redirect_uri=https%3A%2F%2Fpassport.yhd.com%2Fwechat%2Fcallback.do&response_type=code&scope=snsapi_login&state=3d6be0a4035d839573b04816624a415e#wechat_redirect 
+
+微信用户使用微信扫描二维码并且确认登录后
+
+PC端会跳转到 https://test.yhd.com/wechat/callback.do?code=CODE&state=3d6be0a40sssssxxxxx6624a415e 为了满足网站更定制化的需求，我们还提供了第二种获取 code 的方式，支持网站将微信登录二维码内嵌到自己页面中，用户使用微信扫码授权后通过 JS 将code返回给网站。 JS微信登录主要用途：网站希望用户在网站内就能完成登录，无需跳转到微信域下登录后再返回，提升微信登录的流畅性与成功率。 网站内嵌二维码微信登录 JS 实现办法：
 
 步骤1：在页面中先引入如下 JS 文件（支持https）：
 
@@ -860,7 +1009,6 @@ var wxObj = new WxLogin({
     appid: "wxed9954c01bb89b47", 
     scope: "snsapi_login", 
     redirect_uri: "http://localhost:8160/auth/wxLogin",
-    // redirect_uri: "http://tjxt-user-t.itheima.net/xuecheng/auth/wxLogin",
     state: token,
     style: "",
     href: ""
@@ -935,16 +1083,16 @@ public interface WxAuthService {
 **远程调用微信url获取令牌:**
 
 ```java
-//携带授权码申请令牌
-/**    url:https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code
+	 /** 携带授权码申请令牌
+	 * url:https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code
      * 申请访问令牌,响应示例
      * {
-     * "access_token":"ACCESS_TOKEN",
-     * "expires_in":7200,
-     * "refresh_token":"REFRESH_TOKEN",
-     * "openid":"OPENID",
-     * "scope":"SCOPE",
-     * "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
+     * 		"access_token":"ACCESS_TOKEN",
+     * 		"expires_in":7200,
+     * 		"refresh_token":"REFRESH_TOKEN",
+     * 		"openid":"OPENID",
+     * 		"scope":"SCOPE",
+     * 		"unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
      * }
      */
 private Map<String, String> getAccess_token(String code) {
@@ -970,18 +1118,18 @@ private Map<String, String> getAccess_token(String code) {
      * url:https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s
      * 获取用户信息，示例如下：
      {
-     "openid":"OPENID",
-     "nickname":"NICKNAME",
-     "sex":1,
-     "province":"PROVINCE",
-     "city":"CITY",
-     "country":"COUNTRY",
-     "headimgurl": "https://thirdwx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/0",
-     "privilege":[
-     "PRIVILEGE1",
-     "PRIVILEGE2"
-     ],
-     "unionid": " o6_bmasdasdsad6_2sgVt7hMZOPfL"
+     	"openid":"OPENID",
+     	"nickname":"NICKNAME",
+     	"sex":1,
+     	"province":"PROVINCE",
+     	"city":"CITY",
+     	"country":"COUNTRY",
+     	"headimgurl": "https://thirdwx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/0",
+     	"privilege":[
+     	"PRIVILEGE1",
+     	"PRIVILEGE2"
+     	],
+     	"unionid": " o6_bmasdasdsad6_2sgVt7hMZOPfL"
      }
      */
 private Map<String,String> getUserinfo(String access_token,String openid) {

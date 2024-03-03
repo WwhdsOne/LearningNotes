@@ -215,8 +215,8 @@ taskkill /pid PID /f
 @FeignClient(value = "media-api",configuration = MultipartSupportConfig.class,fallback = MediaServiceClientFallback.class)
 @RequestMapping("/media")
 public interface MediaServiceClient{
-...
-
+    ...
+}
 ```
 
 定义时指定回调接口fallback
@@ -294,9 +294,9 @@ public class SearchServiceClientFallbackFactory implements FallbackFactory<Searc
     }
 ```
 
-生成静态页面部分完成,对应流程图：
+生成静态页面部分完成
 
-![1709261673437](C:\Users\Wwhds\Documents\WeChat Files\wxid_y7etb57rxj2p22\FileStorage\Temp\1709261673437.jpg)
+
 
 # 课程搜索
 
@@ -511,30 +511,7 @@ Spring cloud Security： https://spring.io/projects/spring-cloud-security
 
 配置文件如下:
 
-```
-package com.xuecheng.auth.config;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-
-/**
- * @author Mr.M
- * @version 1.0
- * @description 安全管理配置
- * @date 2022/9/26 20:53
- */
+```java
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -549,26 +526,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         manager.createUser(User.withUsername("lisi").password("456").authorities("p2").build());
         return manager;
     }
-
+ 
     @Bean
     public PasswordEncoder passwordEncoder() {
-//        //密码为明文方式
+        //        //密码为明文方式
         return NoOpPasswordEncoder.getInstance();
-//        return new BCryptPasswordEncoder();
+        //        return new BCryptPasswordEncoder();
     }
 
     //配置安全拦截机制
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                .antMatchers("/r/**").authenticated()//访问/r开始的请求需要认证通过
-                .anyRequest().permitAll()//其它请求全部放行
-                .and()
-                .formLogin().successForwardUrl("/login-success");//登录成功跳转到/login-success
+            .authorizeRequests()
+            .antMatchers("/r/**").authenticated()//访问/r开始的请求需要认证通过
+            .anyRequest().permitAll()//其它请求全部放行
+            .and()
+            .formLogin().successForwardUrl("/login-success");//登录成功跳转到/login-success
     }
-
-
 }
 ```
 
@@ -588,13 +563,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 ```java
 @Bean
-    public UserDetailsService userDetailsService() {
-        //这里配置用户信息,这里暂时使用这种方式将用户存储在内存中
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.withUsername("zhangsan").password("123").authorities("p1").build());
-        manager.createUser(User.withUsername("lisi").password("456").authorities("p2").build());
-        return manager;
-    }
+public UserDetailsService userDetailsService() {
+    //这里配置用户信息,这里暂时使用这种方式将用户存储在内存中
+    InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+    manager.createUser(User.withUsername("zhangsan").password("123").authorities("p1").build());
+    manager.createUser(User.withUsername("lisi").password("456").authorities("p2").build());
+    return manager;
+}
 ```
 
 2、指定资源与权限的关系。
@@ -612,19 +587,18 @@ hasAuthority('p1')表示拥有p1权限方可访问。
 ```java
 @RestController
 public class LoginController {
-    ....
     @RequestMapping("/r/r1")
     @PreAuthorize("hasAuthority('p1')")//拥有p1权限方可访问
     public String r1(){
-      return "访问r1资源";
+        return "访问r1资源";
     }
-    
+
     @RequestMapping("/r/r2")
     @PreAuthorize("hasAuthority('p2')")//拥有p2权限方可访问
     public String r2(){
-      return "访问r2资源";
+        return "访问r2资源";
     }
-    ...
+}
 
 ```
 
@@ -668,17 +642,30 @@ spring Security功能的实现主要是由一系列过滤器链相互配合完�
 
 **ExceptionTranslationFilter** 能够捕获来自 FilterChain 所有的异常，并进行处理。但是它只会处理两类异常：AuthenticationException 和 AccessDeniedException，其它的异常它会继续抛出。
 
- 
-
 Spring Security的执行流程如下：
 
-![image-20240301133744295](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133744295.png)
+
+
+```mermaid
+sequenceDiagram
+	actor User
+	User->>+UsernamePasswordAuthenticationFilter: 1. 用户提交用户名,密码
+	UsernamePasswordAuthenticationFilter->>UsernamePasswordAuthenticationFilter: 2. 将请求信息封装为Authentication<br>实现类为UsernamePasswordAuthenticationToken
+	UsernamePasswordAuthenticationFilter->>AuthenticationManager: 3. 认证authenticate()
+	AuthenticationManager->>+DaoAuthenticationProvider: 4.委托认证authenticate()
+	DaoAuthenticationProvider->>+UserDetailsService: 5.获取用户信息loadUserByUsername()
+	UserDetailsService->>-DaoAuthenticationProvider: 6.返回UserDetails
+	DaoAuthenticationProvider->>DaoAuthenticationProvider: 7.通过PasswordEncoder对比UserDetails中的密码与Authentication中密码是否一致
+	DaoAuthenticationProvider->>-DaoAuthenticationProvider: 8.填充Authentication,如权限信息
+	DaoAuthenticationProvider->>UsernamePasswordAuthenticationFilter: 9.返回Authentication
+	UsernamePasswordAuthenticationFilter->>-SecurityContextHolder: 10.SecurityContextHolder.getContext().setAuthentication(…)方法将Authentication保存至安全上下文
+```
 
 1. 用户提交用户名、密码被SecurityFilterChain中的UsernamePasswordAuthenticationFilter过滤器获取到，封装为请求Authentication，通常情况下是UsernamePasswordAuthenticationToken这个实现类。
 2. 然后过滤器将Authentication提交至认证管理器（AuthenticationManager）进行认证
 3. 认证成功后，AuthenticationManager身份管理器返回一个被填充满了信息的（包括上面提到的权限信息，身份信息，细节信息，但密码通常会被移除）Authentication实例。
 4. SecurityContextHolder安全上下文容器将第3步填充了信息的Authentication，通过SecurityContextHolder.getContext().setAuthentication(…)方法，设置到其中。
-5. 可以看出AuthenticationManager接口（认证管理器）是认证相关的核心接口，也是发起认证的出发点，它的实现类为ProviderManager。而Spring Security支持多种认证方式，因此ProviderManager维护着一个List<AuthenticationProvider>列表，存放多种认证方式，最终实际的认证工作是由AuthenticationProvider完成的。咱们知道web表单的对应的AuthenticationProvider实现类为DaoAuthenticationProvider，它的内部又维护着一个UserDetailsService负责UserDetails的获取。最终AuthenticationProvider将UserDetails填充至Authentication。
+5. 可以看出AuthenticationManager接口（认证管理器）是认证相关的核心接口，也是发起认证的出发点，它的实现类为ProviderManager。而Spring Security支持多种认证方式，因此ProviderManager维护着一个List&lt;AuthenticationProvider&gt列表，存放多种认证方式，最终实际的认证工作是由AuthenticationProvider完成的。咱们知道web表单的对应的AuthenticationProvider实现类为DaoAuthenticationProvider，它的内部又维护着一个UserDetailsService负责UserDetails的获取。最终AuthenticationProvider将UserDetails填充至Authentication。
 
 ## 3.OAuth2
 
@@ -696,7 +683,22 @@ Oauth协议：https://tools.ietf.org/html/rfc6749
 
 下边分析一个Oauth2认证的例子，黑马程序员网站使用微信认证扫码登录的过程：
 
-![image-20240301134127012](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301134127012.png)
+```mermaid
+sequenceDiagram
+	actor 用户
+	用户->>浏览器:通过浏览器访问网站
+	浏览器->>黑马程序员网站:进入网站
+	浏览器->>黑马程序员网站:打开扫码界面
+	用户->>微信认证服务:微信扫码
+	微信认证服务->>用户:授权页面
+	用户->>微信认证服务:用户同意
+	微信认证服务->>黑马程序员网站:下发授权码
+	黑马程序员网站->>微信认证服务:授权码申请令牌
+	微信认证服务->>黑马程序员网站:下发令牌
+	黑马程序员网站->>微信用户信息:携带令牌获取用户信息
+	微信用户信息->>黑马程序员网站:返回用户信息
+	黑马程序员网站->>浏览器:显示用户登录成功
+```
 
 具体流程如下：
 
@@ -752,7 +754,7 @@ Oauth协议：https://tools.ietf.org/html/rfc6749
 
 引自Oauth2.0协议rfc6749 https://tools.ietf.org/html/rfc6749
 
-![image-20240301134442480](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301134442480.png)
+![image-20240301134442480](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301134442480.png)
 
 Oauth2包括以下角色：
 
@@ -826,10 +828,9 @@ OAuth2的几个授权模式是根据不同的应用场景以不同的方式去�
 
 ```java
 @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
+public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+}
 ```
 
 重启认证服务
@@ -902,10 +903,9 @@ POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&gr
 说明“：AuthorizationServer用 @EnableAuthorizationServer 注解标识并继承AuthorizationServerConfigurerAdapter来配置OAuth2.0 授权服务器。
 
 ```java
-package com.xuecheng.auth.config;
- @Configuration
- @EnableAuthorizationServer
- public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {...}
+@Configuration
+@EnableAuthorizationServer
+public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {...}
 ```
 
 AuthorizationServerConfigurerAdapter要求配置以下几个类：
@@ -929,22 +929,21 @@ public class AuthorizationServerConfigurerAdapter implements AuthorizationServer
 
 
 
-**2. ****TokenConfig****为令牌策略配置类**
+2. **TokenConfig**为令牌策略配置类
 
 暂时先使用InMemoryTokenStore在内存存储令牌，令牌的有效期等信息配置如下：
 
 ```java
- //令牌管理服务
-    @Bean(name="authorizationServerTokenServicesCustom")
-    public AuthorizationServerTokenServices tokenService() {
-        DefaultTokenServices service=new DefaultTokenServices();
-        service.setSupportRefreshToken(true);//支持刷新令牌
-        service.setTokenStore(tokenStore);//令牌存储策略
-        service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
-        service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
-        return service;
-    }
-
+//令牌管理服务
+@Bean(name="authorizationServerTokenServicesCustom")
+public AuthorizationServerTokenServices tokenService() {
+    DefaultTokenServices service=new DefaultTokenServices();
+    service.setSupportRefreshToken(true);//支持刷新令牌
+    service.setTokenStore(tokenStore);//令牌存储策略
+    service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
+    service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
+    return service;
+}
 ```
 
 #### **密码模式**

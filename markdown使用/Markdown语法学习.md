@@ -1,3 +1,5 @@
+
+
 # 1 Markdown标题语法
 
 创建标题需要在单词或短语面前添加(#),#号数量代表标题级别,最多添加6个#
@@ -50,7 +52,7 @@ Typora快捷键: Crtl + 1-6
 
 通过将文本设置为粗体或斜体来强调其重要性。
 
-### 4.1 粗体（Bold）
+### 4.1 粗体(`Bold`)
 
 ```markdown
 **这是粗体语法**
@@ -60,7 +62,7 @@ Typora快捷键: Crtl + 1-6
 
 Typora快捷键: Crtl + B
 
-### 4.2 斜体（Italic）
+### 4.2 斜体(`Italic`)
 
 ```markdown
 *这是斜体语法*
@@ -70,7 +72,7 @@ Typora快捷键: Crtl + B
 
 Typora快捷键: Crtl + I
 
-### 4.3 粗体（Bold）和斜体（Italic）
+### 4.3 粗体(`Bold`)和斜体(`Italic`)
 
 ```markdown
 ***这是粗体和斜体同时作用***
@@ -80,7 +82,7 @@ Typora快捷键: Crtl + I
 
 Typora快捷键: Crtl + I + B
 
-### 4.4 删除线
+### 4.4 删除线(`strikethrough`)
 
 ```markdown
 ~~这是删除线~~
@@ -215,7 +217,7 @@ Typora快捷键: Crtl + Shift + ]
 *   This is the first list item.
 *   Here's the second list item.
 
-    >I need to add another paragraph below the second list item.
+    > I need to add another paragraph below the second list item.
 
 *   And here's the third list item.
 ```
@@ -484,10 +486,40 @@ HTML 行级內联标签和区块标签不同，在內联标签的范围内， Ma
         </strong>
     </span>
 </div>
-
 在标签之后的元素
 
 **注意：在 HTML 块级标签内不能使用 Markdown 语法。例如 `<p>italic and **bold**</p>` 将不起作用。**
+
+### 12.3 插入在线视频
+
+由于markdown支持html的代码块,所以对于没有版权限制的网站可以将其提供的嵌入视频代码块复制到markdown中
+
+```html
+<iframe src="//player.bilibili.com/player.html?aid=1900722451&bvid=BV1Zm411D7gb&cid=1438515456&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+```
+
+<iframe height=498 width=510 src="//player.bilibili.com/player.html?aid=1900722451&bvid=BV1Zm411D7gb&cid=1438515456&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true">
+
+
+# 13 Markdown拓展功能
+
+### 13.1 Mermaid
+
+**Mermaid 允许你使用文本和代码创建图表和可视化。**
+
+它是一个基于 JavaScript 的图表绘制工具，可渲染 Markdown 启发的文本定义以动态创建和修改图表。
+
+Mermaid 是一个基于 JavaScript 的图表绘制工具，它使用 Markdown 启发的文本定义和渲染器来创建和修改复杂的图表。Mermaid 的主要目的是帮助文档跟上开发的步伐。
+
+Mermaid中文网:[关于 Mermaid | Mermaid 中文网 (nodejs.cn)](https://mermaid.nodejs.cn/intro/)
+
+### 13.2 LaTex
+
+LaTeX 是一个让你的文档看起来更专业的排版系统，而不是文字处理器。它尤其适合处理篇幅较长、结构严谨的文档，并且十分擅长处理公式表达。它是免费的软件，对大多数操作系统都适用。
+
+LaTex [LaTeX 入门 - OI Wiki (oi-wiki.org)](https://oi-wiki.org/tools/latex/)
+
+
 
 
 

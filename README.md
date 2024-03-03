@@ -38,7 +38,7 @@ free | grep Mem | awk '{print ($3-$7)/$2 * 100.0}'
 
 好想要一台高配MacBook
 
-学生包下来咯emoji:smile:
+学生包下来咯:satisfied:
 
 <img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/README/github%20copilot%E9%80%9A%E8%BF%87%E5%96%BD.jpeg" style="zoom: 67%;" />
 
@@ -146,4 +146,24 @@ Day08完成，学会了CAP理论和BASE理论
 # 2024.3.2
 
 学成在线Day10完成,markdown教程细节和bug修改
+
+# 2024.3.3
+
+今日将显示器安装好了，并且收拾好了宿舍。
+
+Zenuml不支持中文，期待中文支持
+
+目前流程图用Mermaid版时序图替代
+
+又看了一遍学成在线登录部分的代码,还是有很多部分并不是很理解
+
+学成在线项目以及总结完成后我会再去单独学习`Spring Security`内容
+
+今天还购买了阿里云oss的资源包,搭配PicGo使得我typora中的图可以轻松上传到服务器,不用再考虑自己用python实现了:stuck_out_tongue:
+
+不得不说4K大屏配合无线键盘开发可太爽了
+
+明天继续推进学成在线项目
+
+
 
