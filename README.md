@@ -165,5 +165,21 @@ Zenuml不支持中文，期待中文支持
 
 明天继续推进学成在线项目
 
+# 2024.3.4
+
+[Learn Git Branching](https://learngitbranching.js.org/?locale=zh_CN)前三等级完成
+
+学成在线Day11实战部分待完成
+
+***莎弥拉豪取五杀！***
+
+python原码补码反码移码计算器完成
+
+# 2024.3.5
+
+学成在线Day11实战部分已完成并且覆盖了上次提交，不会产生泄露问题了
+
+
+
 
 
