@@ -757,7 +757,7 @@ public void register(RegisterDto registerDto) {
 
 ### 3. 问题整理
 
-1. Spring Security问题:
+### 3.1. Spring Security问题:
 
 ```java
 @ApiOperation(value = "修改密码", tags = "修改密码")
@@ -812,7 +812,7 @@ protected void configure(HttpSecurity http) throws Exception {
 
 可以看到`csrf().disable()`，我们让csrf失效使得注册和找回密码需求可以正常运行
 
-2. redis缓存提前删除
+### 3.2 redis缓存提前删除
 
 ```java
 public Boolean verify(String email, String checkcode) {
@@ -829,7 +829,7 @@ public Boolean verify(String email, String checkcode) {
 
 `redisTemplate.delete(email);`由于在调用`verify`方法的方法中后续插入数据库可能导致失败，但是这步却成功了，导致删除了验证码却无法成功注册，只能重新生成验证码，可以考虑在结尾删除验证码
 
-3. SMTP泄露
+### 3.3 SMTP泄露
 
 首先感谢Git邮件提醒
 
@@ -837,7 +837,7 @@ public Boolean verify(String email, String checkcode) {
 
 解决方法就是通过nacos发布配置替代硬编码
 
-#### 3.1 在nacos发布配置
+#### 3.3.1 在nacos发布配置
 
 ```yaml
 spring:
@@ -848,7 +848,7 @@ spring:
     password: CZL**********XNY
 ```
 
-#### 3.2 设置配置读取配置类
+#### 3.3.2 设置配置读取配置类
 
 ```java
 @Configuration
@@ -871,7 +871,7 @@ public class MailSendConfigProperties {
 
 `@Configuration`即可，不用其他注解。
 
-#### 3.3 工具类修改
+#### 3.3.3 工具类修改
 
 ```java
 @Component
@@ -914,4 +914,878 @@ public class MailUtil {
   ```
 
   
+  
+  
+  
+# 选课学习
+
+  # 模块需求分析
+
+  ## 模块介绍
+
+  本模块实现了学生选课、下单支付、学习的整体流程。
+
+  网站的课程有免费和收费两种，对于免费课程学生选课后可直接学习，对于收费课程学生需要下单且支付成功方可选课、学习。
+
+  选课：是将课程加入我的课程表的过程。
+
+  我的课程表：记录我在网站学习的课程，我的课程表中有免费课程和收费课程两种，对于免费课程可直接添加到我的课程表，对于收费课程需要下单、支付成功后自动加入我的课程表。
+
+  模块整体流程如下：
+
+  ![image-20240305165437866](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240305165437866.png)
+
+## 业务流程
+
+### 学习引导
+
+用户通过搜索课程、课程推荐等信息进入课程详情页面，点击“马上学习” 引导进入学习界面去学习。
+
+流程如下：
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image002.gif)
+
+ 
+
+1、进入课程详情点击马上学习
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image004.gif)
+
+2、课程免费时引导加入我的课程表、或进入学习界面。
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image006.gif)
+
+3、课程收费时引导去支付、或试学。
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image008.gif)
+
+ 
+
+### 选课流程
+
+选课是将课程加入我的课程表的过程。
+
+对免费课程选课后可直接加入我的课程表，对收费课程选课后需要下单支付成功系统自动加入我的课程表。
+
+流程如下：
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image010.gif)
+
+### 支付流程
+
+本项目与第三方支付平台对接完成支付操作。
+
+流程如下：
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image012.gif)
+
+ 
+
+### 在线学习
+
+选课成功用户可以在线学习，对于免费课程无需选课即可在线学习。
+
+流程如下：
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image014.gif)
+
+### 免费课程续期
+
+免费课程加入我的课程表默认为1年有效期，到期用户可申请续期，流程如下：
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image016.gif)
+
+# 添加选课
+
+## 需求分析
+
+### 数据模型
+
+选课是将课程加入我的课程表的过程，根据选课的业务流程进行详细分析，业务流程如下：
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image002.gif)
+
+选课信息存入选课记录表，免费课程被选课除了进入选课记录表同时进入我的课程表，收费课程进入选课记录表后需要经过下单、支付成功才可以进入我的课程表。
+
+我的课程表记录了用户学习的课程，包括免费课程、收费课程（已经支付）。
+
+1、选课记录表
+
+当用户将课程添加到课程表时需要先创建选课记录。
+
+结构如下：
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image004.gif)
+
+选课类型：免费课程、收费课程。
+
+选课状态：选课成功、待支付、选课删除。
+
+对于免费课程：课程价格为0，有效期默认365，开始服务时间为选课时间，结束服务时间为选课时间加1年后的时间，选课状态为选课成功。
+
+对于收费课程：按课程的现价、有效期确定开始服务时间、结束服务时间，选课状态为待支付。
+
+收费课程的选课记录需要支付成功后选课状态为成功。
+
+ 
+
+2、我的课程表
+
+我的课程表中记录了用户选课成功的课程，所以我的课程表的数据来源于选课记录表。 
+
+对于免费课程创建选课记录后同时向我的课程表添加记录。
+
+对于收费课程创建选课记录后需要下单支付成功后自动向我的课程表添加记录。
+
+![img](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/clip_image006.gif)
+
+### 执行流程
+
+```mermaid
+sequenceDiagram
+    actor 用户
+    用户 ->> 学习中心服务:添加选课
+    学习中心服务 ->> 内容管理服务:查询课程信息
+    内容管理服务 ->> 内容管理服务数据库:查询课程发布表
+    学习中心服务 ->>学习中心服务:判断收费标准
+    学习中心服务 ->> 学习中心数据库:免费课程:添加选课记录表及我的课程表
+    学习中心服务 ->> 学习中心数据库:收费课程:添加选课记录表
+
+    
+```
+
+## 接口开发
+
+### 添加查询课程接口
+
+**Controller**
+
+```java
+/**
+     * @description 课程预览，发布，内部调用不用token
+     * @param courseId 课程id
+     * @return void
+     */
+@ApiOperation("课程发布")
+@PostMapping("/r/coursepublish/{courseId}")
+public CoursePublish getCoursepublish(@PathVariable("courseId") Long courseId) {
+    return coursePublishService.getCoursePublish(courseId);
+}
+```
+
+**Service接口**
+
+```java
+CoursePublish getCoursePublish(Long courseId);
+```
+
+**Service实现方法**
+
+```java
+@Override
+public CoursePublish getCoursePublish(Long courseId) {
+    return coursePublishMapper.selectById(courseId);
+}
+```
+
+由于是在网关处进行令牌校验，所以在微服务处不再校验令牌的合法性，修改内容管理content-api工程的ResouceServerConfig类，屏蔽authenticated()。
+
+```java
+@Override
+public void configure(HttpSecurity http) throws Exception {
+    http.csrf().disable()
+        .authorizeRequests()
+        //          .antMatchers("/r/**","/course/**").authenticated()//所有/r/**的请求必须认证通过
+        .anyRequest().permitAll();
+}
+```
+
+测试类
+
+```java
+@SpringBootTest
+public class FeignClientTest {
+    @Autowired
+    ContentServiceClient contentServiceClient;
+    @Test
+    public void testContentServiceClient() {
+        CoursePublish coursepublish = contentServiceClient.getCoursepublish(125L);
+        Assertions.assertNotNull(coursepublish);
+    }
+}
+```
+
+在进行feign远程调用时会将字符串转成LocalDateTime，在CoursePublish 类中LocalDateTime的属性上边添加如下代码：
+
+```java
+@JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "yyyy-MM-dd HH:mm:ss")
+```
+
+`@JsonFormat说明:`
+该注解可用于返回日期数据时的时间格式化。
+如果前端传来的为字符串格式的日期：“2022年07月29日 09时41分22秒”，则需要如下配置：
+@JsonFormat(pattern = “yyyy年MM月dd日 HH时mm分ss秒”)
+private Date createTime;
+
+解析后存入DB中的则为：2022-07-29 09:41:22，而在查询时返回的数据则为：“2022年07月29日 09时41分22秒”
+
+### 添加选课接口
+
+#### 接口分析
+
+本接口支持免费课程选课、收费课程选课。
+
+免费课程选课：添加选课记录、添加我的课程表。
+
+收费课程选课：添加选课记录。
+
+**接口定义**
+
+1、请求参数：课程id、当前用户id
+
+2、响应结果：选课记录信息、学习资格
+
+#### 接口定义
+
+学习资格：
+
+```json
+[
+    {"code":"702001","desc":"正常学习"},
+    {"code":"702002","desc":"没有选课或选课后没有支付"},
+    {"code":"702003","desc":"已过期需要申请续期或重新支付"}
+]
+```
+
+接口定义如下：
+
+**Controller**
+
+```java
+@ApiOperation("添加选课")
+@PostMapping("/choosecourse/{courseId}")
+public XcChooseCourseDto addChooseCourse(@PathVariable("courseId") Long courseId) {
+    //获取用户信息
+    SecurityUtil.XcUser user = SecurityUtil.getUser();
+    if(user == null){
+        XueChengPlusException.cast("请登录后再操作");
+    }
+    //获取用户id
+    String userId = user.getId();
+    //选课
+    XcChooseCourseDto xcChooseCourseDto = myCourseTableService.addChooseCourse(userId, courseId);
+    return xcChooseCourseDto;
+}
+```
+
+**Service接口**
+
+```java
+public interface MyCourseTableService {
+    /**
+     * @param userId   用户id
+     * @param courseId 课程id
+     * @return com.xuecheng.learning.model.dto.XcChooseCourseDto
+     * @description 添加选课
+     * @author Mr.M
+     * @date 2022/10/24 17:33
+     */
+    XcChooseCourseDto addChooseCourse(String userId, Long courseId);
+
+    /**
+     * @param userId   用户id
+     * @param courseId 课程id
+     * @return com.xuecheng.learning.model.dto.XcCourseTablesDto
+     * @description 查询学习资格，是否可以学习课程，是否已经选课，是否已经支付等等信息，返回给前端，前端根据这些信息决定是否可以学习课程，是否可以支付等等操作
+     * @date 2022/10/24 17:33
+     */
+    XcCourseTablesDto getLearningStatus(String userId, Long courseId);
+
+}
+```
+
+**添加免费课程**
+
+```java
+//添加免费课程,免费课程加入选课记录表、我的课程表
+public XcChooseCourse addFreeCoruse(String userId, CoursePublish coursepublish) {
+    //如果存在免费选课记录且选课为成功状态,直接返回
+    LambdaQueryWrapper<XcChooseCourse> eq = new LambdaQueryWrapper<XcChooseCourse>()
+        .eq(XcChooseCourse::getUserId, userId)
+        .eq(XcChooseCourse::getCourseId, coursepublish.getId())
+        .eq(XcChooseCourse::getOrderType, "700001") //免费课程
+        .eq(XcChooseCourse::getStatus, "701001");//选课成功
+    List<XcChooseCourse> xcChooseCourses = xcChooseCourseMapper.selectList(eq);
+    //同一个人同一门课程只能选一次,但数据库没有主键约束可能有多次,这里只取第一次
+    if( !xcChooseCourses.isEmpty() ){
+        return xcChooseCourses.get(0);
+    }
+    //向选课记录写数据
+    XcChooseCourse xcChooseCourse = new XcChooseCourse();
+    xcChooseCourse.setCourseId(coursepublish.getId());
+    xcChooseCourse.setCourseName(coursepublish.getName());
+    xcChooseCourse.setUserId(userId);
+    xcChooseCourse.setCompanyId(coursepublish.getCompanyId());
+    xcChooseCourse.setOrderType("700001");//免费课程
+    xcChooseCourse.setCreateDate(LocalDateTime.now());
+    xcChooseCourse.setCoursePrice(coursepublish.getPrice());
+    xcChooseCourse.setValidDays(365); //暂时硬编码
+    xcChooseCourse.setStatus("701001");//选课成功
+    xcChooseCourse.setValidtimeStart(LocalDateTime.now());
+    xcChooseCourse.setValidtimeEnd(LocalDateTime.now().plusDays(365));
+    int insert = xcChooseCourseMapper.insert(xcChooseCourse);
+    if( insert <= 0 ){
+        XueChengPlusException.cast("添加选课失败");
+    }
+    return xcChooseCourse;
+}
+```
+
+**添加收费课程**
+
+```java
+//添加收费课程
+public XcChooseCourse addChargeCoruse(String userId, CoursePublish coursepublish) {
+    //如果存在收费选课记录且选课状态为待支付，直接返回
+    LambdaQueryWrapper<XcChooseCourse> eq = new LambdaQueryWrapper<XcChooseCourse>()
+        .eq(XcChooseCourse::getUserId, userId)
+        .eq(XcChooseCourse::getCourseId, coursepublish.getId())
+        .eq(XcChooseCourse::getOrderType, "700002") //收费课程
+        .eq(XcChooseCourse::getStatus, "701002");//选课成功
+    List<XcChooseCourse> xcChooseCourses = xcChooseCourseMapper.selectList(eq);
+    //同一个人同一门课程只能选一次,但数据库没有主键约束可能有多次,这里只取第一次
+    if( !xcChooseCourses.isEmpty() ){
+        return xcChooseCourses.get(0);
+    }
+    //向选课记录写数据
+    XcChooseCourse xcChooseCourse = new XcChooseCourse();
+    xcChooseCourse.setCourseId(coursepublish.getId());
+    xcChooseCourse.setCourseName(coursepublish.getName());
+    xcChooseCourse.setUserId(userId);
+    xcChooseCourse.setCompanyId(coursepublish.getCompanyId());
+    xcChooseCourse.setOrderType("700002");//免费课程
+    xcChooseCourse.setCreateDate(LocalDateTime.now());
+    xcChooseCourse.setCoursePrice(coursepublish.getPrice());
+    xcChooseCourse.setValidDays(365); //暂时硬编码
+    xcChooseCourse.setStatus("701002");//选课成功
+    xcChooseCourse.setValidtimeStart(LocalDateTime.now());
+    xcChooseCourse.setValidtimeEnd(LocalDateTime.now().plusDays(365));
+    int insert = xcChooseCourseMapper.insert(xcChooseCourse);
+    if( insert <= 0 ){
+        XueChengPlusException.cast("添加选课失败");
+    }
+    return xcChooseCourse;
+}
+```
+
+**添加到我的课程表:**
+
+```java
+//添加到我的课程表
+public XcCourseTables addCourseTabls(XcChooseCourse xcChooseCourse) {
+    //选课成功才能向我的课程表添加数据
+    if( !xcChooseCourse.getStatus().equals("701001") ){
+        XueChengPlusException.cast("选课失败,无法添加到我的课程表");
+    }
+    XcCourseTables xcCourseTables = getXcCourseTables(xcChooseCourse.getUserId(), xcChooseCourse.getCourseId());
+    if( xcCourseTables != null ){
+        return xcCourseTables;
+    }
+    xcCourseTables = new XcCourseTables();
+    BeanUtils.copyProperties(xcChooseCourse, xcCourseTables);
+    xcCourseTables.setChooseCourseId(xcChooseCourse.getId());//记录选课记录id
+    xcCourseTables.setCourseType(xcChooseCourse.getOrderType());//课程类型
+    xcCourseTables.setUpdateDate(LocalDateTime.now());
+    int insert = xcCourseTablesMapper.insert(xcCourseTables);
+    if( insert <= 0 ){
+        XueChengPlusException.cast("添加我的课程表失败");
+    }
+    return xcCourseTables;
+}
+```
+
+**获取学习资格**
+
+```java
+@Override
+public XcCourseTablesDto getLearningStatus(String userId, Long courseId) {
+    //查询我的课程表,查不到说明没有资格学习
+    XcCourseTables xcCourseTables = getXcCourseTables(userId, courseId);
+    //最终返回结果
+    XcCourseTablesDto xcCourseTablesDto = new XcCourseTablesDto();
+    if( xcCourseTables == null ){
+        //{"code":"702002","desc":"没有选课或选课后没有支付"}
+        xcCourseTablesDto.setLearnStatus("702002");
+        return xcCourseTablesDto;
+    }
+    //查询到了之后,判断是否过期
+    LocalDateTime validtimeEnd = xcCourseTables.getValidtimeEnd();
+    if( validtimeEnd.isBefore(LocalDateTime.now()) ){
+        //{"code":"702003","desc":"选课已过期"}
+        xcCourseTablesDto.setLearnStatus("702003");
+        BeanUtils.copyProperties(xcCourseTables, xcCourseTablesDto);
+    }else{
+        xcCourseTablesDto.setLearnStatus("702001");
+        BeanUtils.copyProperties(xcCourseTables, xcCourseTablesDto);
+    }
+    return xcCourseTablesDto;
+}
+```
+
+**addChooseCourse接口完善**
+
+```java
+@Transactional
+@Override
+public XcChooseCourseDto addChooseCourse(String userId, Long courseId) {
+    //远程调用服务查看课程收费规则
+    CoursePublish coursepublish = contentServiceClient.getCoursepublish(courseId);
+    if ( coursepublish == null ) {
+        //课程不存在
+        XueChengPlusException.cast("课程不存在");
+    }
+    //获取收费规则
+    String charge = coursepublish.getCharge();
+    XcChooseCourse xcChooseCourse = null;
+    if ( charge.equals("201000") ) {
+        //免费课程
+        //向选课记录表添加数据
+        xcChooseCourse = addFreeCoruse(userId, coursepublish);
+        //向我的课程表添加数据
+        XcCourseTables xcCourseTables = addCourseTabls(xcChooseCourse);
+
+    } else {
+        //收费课程
+        //向选课记录表添加数据
+        xcChooseCourse = addChargeCoruse(userId, coursepublish);
+    }
+    //判断学生学习资格
+    XcCourseTablesDto learningStatus = getLearningStatus(userId, courseId);
+    //构造返回结果
+    XcChooseCourseDto xcChooseCourseDto = new XcChooseCourseDto();
+    BeanUtils.copyProperties(xcChooseCourse, xcChooseCourseDto);
+    //设置学习状态
+    xcChooseCourseDto.setLearnStatus(learningStatus.getLearnStatus());
+    return xcChooseCourseDto;
+}
+```
+
+**Controller查询学习资格接口**
+
+```java
+@ApiOperation("查询学习资格")
+@PostMapping("/choosecourse/learnstatus/{courseId}")
+public XcCourseTablesDto getLearnstatus(@PathVariable("courseId") Long courseId) {
+    //获取用户信息
+    SecurityUtil.XcUser user = SecurityUtil.getUser();
+    if(user == null){
+        XueChengPlusException.cast("请登录后再操作");
+    }
+    //获取用户id
+    String userId = user.getId();
+    //查询学习状态
+    return myCourseTableService.getLearningStatus(userId, courseId);
+}
+```
+
+## 接口测试
+
+测试通过,这里就不截图了
+
+# 支付
+
+## 需求分析
+
+### 执行流程
+
+用户去学习收费课程时引导其去支付，如下图：
+
+![image-20240305194230135](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240305194230135.png)
+
+当用户点击“微信支付”或支付宝支付时执行流程如下：
+
+![image-20240305193754785](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240305193754785.png)
+
+1. 请求学习中心服务创建选课记录
+
+2. 请求订单服务创建商品订单、生成支付二维码。
+
+3. 用户扫码请求订单支付服务，订单支付服务请求第三方支付平台生成支付订单。
+
+4. 前端唤起支付客户端，用户输入密码完成支付。
+
+5. 第三方支付平台支付完成发起支付通知。
+
+6. 订单支付服务接收第三方支付通知结果。
+
+7. 用户在前端查询支付结果，请求订单支付服务查询支付结果。
+
+8. 订单支付服务向学习中心服务通知支付结果。
+
+9. 学习中心服务收到支付结果，如果支付成功则更新选课记录，并添加到我的课程表。
+
+### 通用订单服务设计
+
+在本项目中不仅选课需要下单、购买学习资料、老师一对一答疑等所以收费项目都需要下单支付。
+
+所以本项目设计通用的订单服务，通用的订单服务承接各业务模块的收费支付需求，当用户需要交费时统一生成商品订单并进行支付。
+
+
+
+<img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240305194312750.png" alt="image-20240305194312750" style="zoom:50%;" />
+
+所有收费业务最终转换为商品订单记录在订单服务的商品订单表。
+
+<img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240305194344834.png" alt="image-20240305194344834" style="zoom:50%;" />
+
+以选课为例，选课记录表的ID记录在商品订单表的out_business_id字段。
+
+<img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240305194407191.png" alt="image-20240305194407191" style="zoom:50%;" />
+
+## 支付接口调研
+
+### 微信支付接口调研
+
+一般情况下，一个网站要支持在线支付功能通常接入第三方支付平台，比如：微信支付、支付宝、其它的聚合支付平台。
+
+本项目的需求实现手机扫码支付，现在对微信、支付宝的支付接口进行调研。
+
+微信目前提供的支付方式如下：
+
+地址：https://pay.weixin.qq.com/static/product/product_index.shtml
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image002.gif)
+
+1、付款码支付是指用户展示微信钱包内的“付款码”给商户系统扫描后直接完成支付，适用于线下场所面对面收银的场景，例如商超、便利店、餐饮、医院、学校、电影院和旅游景区等具有明确经营地址的实体场所。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image004.gif)
+
+2、JSAPI支付是指商户通过调用微信支付提供的JSAPI接口，在支付场景中调起微信支付模块完成收款
+
+线下场所：调用接口生成二维码，用户扫描二维码后在微信浏览器中打开页面后完成支付
+
+公众号场景：用户在微信公众账号内进入商家公众号，打开某个主页面，完成支付
+
+PC网站场景：在网站中展示二维码，用户扫描二维码后在微信浏览器中打开页面后完成支付
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image006.gif)
+
+3、小程序支付是指商户通过调用微信支付小程序支付接口，在微信小程序平台内实现支付功能；用户打开商家助手小程序下单，输入支付密码并完成支付后，返回商家小程序。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image008.gif)
+
+4、Native支付是指商户系统按微信支付协议生成支付二维码，用户再用微信“扫一扫”完成支付的模式。该模式适用于PC网站、实体店单品或订单、媒体广告支付等场景。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image010.gif)
+
+5、APP支付是指商户通过在移动端应用APP中集成开放SDK调起微信支付模块来完成支付。适用于在移动端APP中集成微信支付功能的场景。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image012.gif)
+
+ 
+
+6、刷脸支付是指用户在刷脸设备前通过摄像头刷脸、识别身份后进行的一种支付方式，安全便捷。适用于线下实体场所的收银场景，如商超、餐饮、便利店、医院、学校等。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image014.gif)
+
+ 
+
+以上接口native和JSAPI都可以实现pc网站实现扫码支付，两者区别是什么？怎么选择？
+
+JSAPI除了在pc网站扫码支付还可以实现公众号页面内支付，可以实现在手机端H5页面唤起微信客户端完成支付。
+
+本项目选择JSAPI支付接口。
+
+接口文档：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_1_1.shtml
+
+如何开通JSAPI支付接口?
+
+以企业身份注册微信公众号https://mp.weixin.qq.com/
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image016.gif)
+
+登录公众号，点击左侧菜单“微信支付”开通微信支付，如下：
+
+需要提供营业执照、身份证等信息。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image018.gif)
+
+点击申请接入，需要注册微信商户号。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image020.gif)
+
+注册微信商户号的过程请参考官方文档，本文档略。参考地址如下：
+
+https://pay.weixin.qq.com/index.php/apply/applyment_home/guide_normal#none
+
+开通微信支付后即可在微信商户平台（pay.weixin.qq.com）开通JSAPI支付。
+
+登录商品平台，进入产品中心，开通JSAPI支付：
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image022.gif)
+
+注意：JSAPI支付方式需要在公众号配置回调域名，此域名为已经备案的外网域名。
+
+最后在公众号开发信息中获取：开发者id、开发者密码。
+
+### 支付宝接口调研
+
+支付宝支付产品如下：
+
+文档：https://b.alipay.com/signing/productSetV2.htm
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image024.gif)
+
+与本项目需求相关的接口：电脑网站支付、手机网站支付。
+
+1、电脑网站支付
+
+PC网站轻松收款，资金马上到账：用户在商家PC网站消费，自动跳转支付宝PC网站收银台完成付款。 交易资金直接打入商家支付宝账户，实时到账。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image026.gif)
+
+2、手机网站支付
+
+用户在商家手机网站消费，通过浏览器自动跳转支付宝APP或支付宝网页完成付款。 轻松实现和APP支付相同的支付体验。
+
+![img](C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image028.gif)
+
+对比两种支付方式：手机网站支付方式可以在H5网页唤起支付宝，手机扫码支付可以使用手机网站支付方式来完成，相比电脑网站支付形式更灵活。
+
+本项目选择手机网站支付方式。
+
+文档：https://opendocs.alipay.com/open/02ivbt
+
+如何开通支付宝手机网站支付接口？
+
+进入网址：https://b.alipay.com/signing/productDetailV2.htm?productId=I1011000290000001001
+
+点击：立即开通
+
+上传营业执照等资料，提交审核，根据提示进行开通。
+
+![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image030.gif)
+
+## 支付接口测试
+
+### 接口定义
+
+1. 支付宝支付接口交互流程如图:
+
+​	<img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240305202331887.png" alt="image-20240305202331887" style="zoom: 50%;" />
+
+1. 用户在商户的H5网站下单支付后，商户系统按照[手机网站支付接口alipay.trade.wap.pay](https://docs.open.alipay.com/203/107090)API的参数规范生成订单数据
+
+2. 前端页面通过Form表单的形式请求到支付宝。此时支付宝会自动将页面跳转至支付宝H5收银台页面，如果用户手机上安装了支付宝APP，则自动唤起支付宝APP。
+
+3. 输入支付密码完成支付。
+
+4. 用户在支付宝APP或H5收银台完成支付后，会根据商户在手机网站支付API中传入的前台回跳地址return_url自动跳转回商户页面，同时在URL请求中以Query String的形式附带上支付结果参数，详细回跳参数见“手机网站支付接口alipay.trade.wap.pay”[前台回跳参数](https://docs.open.alipay.com/203/107090#s2)。
+
+5. 支付宝还会根据原始支付API中传入的异步通知地址notify_url，通过POST请求的形式将支付结果作为参数通知到商户系统，详情见[支付结果异步通知](https://docs.open.alipay.com/203/105286)。
+
+
+
+2. 接口定义
+
+文档：https://opendocs.alipay.com/open/203/107090
+
+接口定义：外部商户请求支付宝创建订单并支付
+
+公共参数
+
+**请求地址**：
+
+开发中使用沙箱地址：https://openapi.alipaydev.com/gateway.do
+
+请求参数：
+
+详细查阅https://opendocs.alipay.com/open/203/107090
+
+一部分由sdk设置，一部分需要编写程序时指定。
+
+
+
+3. 示例代码
+
+   ```java
+   public void doPost(HttpServletRequest httpRequest,
+                      HttpServletResponse httpResponse) throws ServletException, IOException {
+       AlipayClient alipayClient = ... //获得初始化的AlipayClient
+           AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();//创建API对应的request
+       alipayRequest.setReturnUrl("http://domain.com/CallBack/return_url.jsp");
+       alipayRequest.setNotifyUrl("http://domain.com/CallBack/notify_url.jsp");//在公共参数中设置回跳和通知地址
+       alipayRequest.setBizContent("{" +
+                                   "    \"out_trade_no\":\"20150320010101002\"," +
+                                   "    \"total_amount\":88.88," +
+                                   "    \"subject\":\"Iphone6 16G\"," +
+                                   "    \"product_code\":\"QUICK_WAP_WAY\"" +
+                                   "  }");//填充业务参数
+       String form = alipayClient.pageExecute(alipayRequest).getBody(); //调用SDK生成表单
+       httpResponse.setContentType("text/html;charset=" + AlipayServiceEnvConstants.CHARSET);
+       httpResponse.getWriter().write(form);//直接将完整的表单html输出到页面
+       httpResponse.getWriter().flush();
+   }
+   ```
+### 下单执行流程
+
+   根据接口描述，支付宝下单接口的执行流程如下：
+
+   <img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240305203331675.png" alt="image-20240305203331675" style="zoom:50%;" />
+
+   ### 支付接口测试
+
+#### 编写下单代码
+
+**maven依赖:**
+
+```xml
+<!-- 支付宝SDK -->
+<dependency>
+    <groupId>com.alipay.sdk</groupId>
+    <artifactId>alipay-sdk-java</artifactId>
+    <version>3.7.73.ALL</version>
+</dependency>
+
+<!-- 支付宝SDK依赖的日志 -->
+<dependency>
+    <groupId>commons-logging</groupId>
+    <artifactId>commons-logging</artifactId>
+    <version>1.2</version>
+</dependency>
+```
+
+下载示例代码https://opendocs.alipay.com/open/203/105910
+
+拷贝示例代码，修改、测试。
+
+编写测试Controller:
+
+```java
+package com.xuecheng.orders.api;
+
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.xuecheng.orders.config.AlipayConfig;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * @author Mr.M
+ * @version 1.0
+ * @description 测试支付宝接口
+ * @date 2022/10/20 22:19
+ */
+@Controller
+public class PayTestController {
+
+    @Value("${pay.alipay.APP_ID}")
+    String APP_ID;
+    @Value("${pay.alipay.APP_PRIVATE_KEY}")
+    String APP_PRIVATE_KEY;
+
+    @Value("${pay.alipay.ALIPAY_PUBLIC_KEY}")
+    String ALIPAY_PUBLIC_KEY;
+
+
+
+    @RequestMapping("/alipaytest")
+    public void doPost(HttpServletRequest httpRequest,
+                       HttpServletResponse httpResponse) throws ServletException, IOException, AlipayApiException {
+        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.URL, APP_ID, APP_PRIVATE_KEY, AlipayConfig.FORMAT, AlipayConfig.CHARSET, ALIPAY_PUBLIC_KEY,AlipayConfig.SIGNTYPE);
+        //获得初始化的AlipayClient
+        AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();//创建API对应的request
+        //        alipayRequest.setReturnUrl("http://domain.com/CallBack/return_url.jsp");
+        //        alipayRequest.setNotifyUrl("http://domain.com/CallBack/notify_url.jsp");//在公共参数中设置回跳和通知地址
+        alipayRequest.setBizContent("{" +
+                                    "    \"out_trade_no\":\"202210100010101002\"," +
+                                    "    \"total_amount\":0.1," +
+                                    "    \"subject\":\"Iphone6 16G\"," +
+                                    "    \"product_code\":\"QUICK_WAP_WAY\"" +
+                                    "  }");//填充业务参数
+        String form = alipayClient.pageExecute(alipayRequest).getBody(); //调用SDK生成表单
+        httpResponse.setContentType("text/html;charset=" + AlipayConfig.CHARSET);
+        httpResponse.getWriter().write(form);//直接将完整的表单html输出到页面
+        httpResponse.getWriter().flush();
+    }
+
+}
+```
+
+#### 生成二维码
+
+用户在前端使用支付宝沙箱通过扫码请求下单接口，我们需要生成订单服务的下单接口的二维码。
+
+ZXing是一个开源的类库，是用Java编写的多格式的1D / 2D条码图像处理库，使用ZXing可以生成、识别QR Code（二维码）。常用的二维码处理库还有zbar，近几年已经不再更新代码，下边介绍ZXing生成二维码的方法。
+
+1. 引入依赖
+
+在base工程pom.xml中添加依赖：
+
+```xml
+<!-- 二维码生成&识别组件 -->
+<dependency>
+    <groupId>com.google.zxing</groupId>
+    <artifactId>core</artifactId>
+    <version>3.3.3</version>
+</dependency>
+
+<dependency>
+    <groupId>com.google.zxing</groupId>
+    <artifactId>javase</artifactId>
+    <version>3.3.3</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+</dependency>
+```
+
+2. 生成二维码方法
+
+   拷贝课程资料中utils下的QRCodeUtil.java到base工程util包下。
+
+   在QRCodeUtil中添加main方法如下：
+
+   ```java
+   public static void main(String[] args) throws IOException {
+       QRCodeUtil qrCodeUtil = new QRCodeUtil();
+       System.out.println(qrCodeUtil.createQRCode("http://www.itcast.cn/", 200, 200));
+   }
+   ```
+
+3. 运行main方法输入二维码图片的base64串，如下：
+
+   ```text
+   data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIAQAAAACFI5MzAAABQElEQVR42u2YPZKDMAyF5aFIuUfIUThafDSOwhEoUzC8fZKMySSbrVI8ZuICBX8uIvtZPxjeDfuSf8liPi7LFSgrzRTvV3XCKawXYLptFobviz6ZzB2xEfTjhyS9OwXB3A7jbMSngLOQ0I4v2AZf96wqTWJ9+9/dYEHSx2RYqfg/oqUgiX3nFBVfcCepcSbiJP67iwZ1G+5+Am7kyTzW9OcW/kRAX+QJ953+uCl8zO5PV5UsaffUp8rqP5+jiySJU8jtNxcNrysetCNK6A/V4lEQeU+xa0eZREE1tOTpFYod0VKXsKCqvRqMkW5pkza8Ggy3WgEuTvZcz0dcUBc+9MneL1DqkXjQz0eaZA1LqVtmzcMffTKPiPwz1mh2zkGyNwtT9kguTVI7LWv6ul7DCpOjX9iaGV66HDny/ZL1WfILfc/hMHLUpekAAAAASUVORK5CYII=
+   ```
+
+   将base64串复制到浏览器地址后回车将展示一个二维码，用户用手机扫此二维码将请求至http://www.itcast.cn/。
+
+#### 接口测试
+
+1. 生成订单服务下单接口的二维码
+
+修改二维码生成的代码如下：
+
+```java
+public static void main(String[] args) throws IOException {
+    QRCodeUtil qrCodeUtil = new QRCodeUtil();
+    System.out.println(qrCodeUtil.createQRCode("http://localhost:63030/orders/alipaytest", 200, 200));
+}
+```
+
+注意：http://localhost:63030地址用模拟器无法访问，进入cmd命令状态，输入命令ipconfig -all 查看本地网卡分配的局域网ip地址，将上边的地址修改如下：
+
+```http
+http://192.168.101.1:63030/orders/alipaytest
+```
 

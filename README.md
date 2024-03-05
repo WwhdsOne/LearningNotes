@@ -179,6 +179,12 @@ python原码补码反码移码计算器完成
 
 学成在线Day11实战部分已完成并且覆盖了上次提交，不会产生泄露问题了
 
+[Learn Git Branching](https://learngitbranching.js.org/?locale=zh_CN)第四等级完成
+
+学成在线Day11除了支付宝部分完成
+
+支付宝二维码跳转只显示代码问题有待解决
+
 
 
 
