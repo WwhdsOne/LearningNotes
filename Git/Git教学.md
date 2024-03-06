@@ -1,6 +1,6 @@
 # Git
 
-![](D:\Programming_Learning\笔记\git\images\gitlogo.png)
+![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/gitlogo.png)
 
 
 
@@ -8,15 +8,11 @@
 
 在平时开发中,可能有时要用到上个版本的内容,例如:
 
-```
-领导让写文档,写好了,领导让修改,改好了,领导觉得第一版不错,改回来吧,此时内心一脸懵,第一版长啥样没存档啊
-```
+> 领导让写文档,写好了,领导让修改,改好了,领导觉得第一版不错,改回来吧,此时内心一脸懵,第一版长啥样没存档啊
 
 实际上,代码开发中也需要这样的软件来管理我们的代码. 例如我们经常会碰到如下的现象:
 
-```
-改之前好好的,改完就报错了,也没怎么修改啊
-```
+> 改之前好好的,改完就报错了,也没怎么修改啊
 
 在这种情况下如果不能查看修改之前的代码,查找问题是非常困难的.
 
@@ -24,10 +20,9 @@
 
 版本管理工具一般具有如下特性:
 
-```
-1) 能够记录历史版本,回退历史版本
-2) 团队开发,方便代码合并
-```
+> 能够记录历史版本,回退历史版本
+> 团队开发,方便代码合并
+
 
 # 2 主流版本管理工具介绍 
 
@@ -35,7 +30,7 @@
 
 工作流程
 
-```
+```text
 Git是分布式版本控制系统（Distributed Version Control System，简称 DVCS），分为两种类型的仓库：
 本地仓库和远程仓库
 工作流程如下
@@ -46,7 +41,7 @@ Git是分布式版本控制系统（Distributed Version Control System，简称 
     5．修改完成后，需要和团队成员共享代码时，将代码push到远程仓库
 ```
 
-![](D:\Programming_Learning\笔记\git\images\git.png)
+![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/git.png)
 
 Windows下载地址: [Git - Downloading Package (git-scm.com)](https://git-scm.com/download/win)
 
@@ -54,7 +49,7 @@ Linux/Unix下载方法: [Git (git-scm.com)](https://git-scm.com/download/linux)
 
 # 3 Git工作流程
 
-![](D:\Programming_Learning\笔记\git\images\git流程.png)
+![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/git%E6%B5%81%E7%A8%8B.png)
 
 
 
@@ -213,11 +208,11 @@ export LC_ALL="zh_CN.UTF-8"
 
 4）如果创建成功后可在文件夹下看到隐藏的.git目录。
 
-![](D:\Programming_Learning\笔记\git\images\git_init.png)
+![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/git_init.png)
 
 ### 4.5 基础操作指令
 
-![](D:\Programming_Learning\笔记\git\images\git_work.png)
+![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/git_work.png)
 
 #### 4.5.1 查看修改状态 (status)
 
@@ -344,9 +339,7 @@ $ touch .gitignore
 
 然后使用vi指令对.gitignore文件进行编辑
 
-```
-在其中插入*.txt
-```
+> 在其中插入*.txt
 
 那么之后的提交便会无视.txt后缀的文件
 
@@ -481,11 +474,11 @@ git branch -D b1 不做任何检查，强制删除
 
 当我们合并分支后，两个或者多个分支对同一个文件的同一个地方进行修改的时候（不是同一个地方是不会出现冲突的 ），此时git就不知道要取哪个分支修改的值，是取a分支修改的值，还是取b分支修改的值呢，此时就产生了冲突
 
-![](D:\Programming_Learning\笔记\git\images\冲突报错.png)
+![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/%E5%86%B2%E7%AA%81%E6%8A%A5%E9%94%99.png)
 
 冲突时文件具体内容如下:
 
-![](D:\Programming_Learning\笔记\git\images\冲突具体情况.png)
+![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/%E5%86%B2%E7%AA%81%E5%85%B7%E4%BD%93%E6%83%85%E5%86%B5.png)
 
 第一个count值表示的是当前分支修改的值
 

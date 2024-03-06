@@ -1799,3 +1799,195 @@ public static String URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do"
 ```
 
 以及最好在手机安装沙箱app来操作,模拟器会因不知名原因导致只能扫出来代码
+
+### 支付结果查询接口
+
+文档:https://opendocs.alipay.com/open/02ivbt
+
+示例代码：
+
+```java
+AlipayClient alipayClient = new DefaultAlipayClient("https://openapi.alipay.com/gateway.do","app_id","your private_key","json","GBK","alipay_public_key","RSA2");
+AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+JSONObject bizContent = new JSONObject();
+bizContent.put("out_trade_no", "20150320010101001");
+//bizContent.put("trade_no", "2014112611001004680073956707");
+request.setBizContent(bizContent.toString());
+AlipayTradeQueryResponse response = alipayClient.execute(request);
+if(response.isSuccess()){
+    System.out.println("调用成功");
+} else {
+    System.out.println("调用失败");
+}
+```
+
+刚才订单付款成功，可以使用out_trade_no商品订单号或支付宝的交易流水号trade_no去查询支付结果。
+
+out_trade_no商品订单号: 是在下单请求时指定的商品订单号。
+
+支付宝的交易流水号trade_no：是支付完成后支付宝通知支付结果时发送的trade_no
+
+我们使用out_trade_no商品订单号去查询，代码如下：
+
+```java
+@SpringBootTest
+public class AliPayTest {
+
+    @Value("${pay.alipay.APP_ID}")
+    String APP_ID;
+    @Value("${pay.alipay.APP_PRIVATE_KEY}")
+    String APP_PRIVATE_KEY;
+
+    @Value("${pay.alipay.ALIPAY_PUBLIC_KEY}")
+    String ALIPAY_PUBLIC_KEY;
+
+    @Test
+    public void queryPayResult() throws AlipayApiException {
+        AlipayClient alipayClient = new DefaultAlipayClient("https://openapi-sandbox.dl.alipaydev.com/gateway.do", APP_ID, APP_PRIVATE_KEY, AlipayConfig.FORMAT, AlipayConfig.CHARSET, ALIPAY_PUBLIC_KEY, AlipayConfig.SIGNTYPE);
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        JSONObject bizContent = new JSONObject();
+        bizContent.put("out_trade_no", "202410100010101023");           //out_trade_no和trade_no二选一即可
+        //bizContent.put("trade_no", "2014112611001004680073956707");
+        request.setBizContent(bizContent.toString());
+        AlipayTradeQueryResponse response = alipayClient.execute(request);
+        if ( response.isSuccess() ) {
+            System.out.println("调用成功");
+        } else {
+            System.out.println("调用失败");
+        }
+    }
+}
+```
+
+### 支付结果通知
+
+#### 准备支付环境
+
+对于手机网站支付产生的交易，支付宝会通知商户支付结果，有两种通知方式，通过return_url、notify_url进行通知
+
+使用return_url不能保证通知到位，推荐使用notify_url完成支付结构通知。
+
+![image-20240306123054081](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240306123054081.png)
+
+具体的使用方法是在调用下单接口的 API 中传入的异步通知地址 notify_url，通过 POST 请求的形式将支付结果作为参数通知到商户系统。
+
+详情可查看 [支付宝异步通知说明](https://opendocs.alipay.com/support/01raw4)。
+
+文档：https://opendocs.alipay.com/open/203/105286
+
+根据下单执行流程，订单服务收到支付结果需要对内容进行验签，验签过程如下：
+
+1. 在通知返回参数列表中，除去sign、sign_type两个参数外，凡是通知返回回来的参数皆是待验签的参数。将剩下参数进行 url_decode，然后进行字典排序，组成字符串，得到待签名字符串； 生活号异步通知组成的待验签串里需要保留 sign_type 参数。
+2. 将签名参数（sign）使用 base64 解码为字节码串；
+3. 使用 RSA 的验签方法，通过签名字符串、签名参数（经过 base64 解码）及支付宝公钥验证签名。
+4. 验证签名正确后，必须再严格按照如下描述校验通知数据的正确性。
+
+在上述验证通过后，商户必须根据支付宝不同类型的业务通知，正确的进行不同的业务处理，并且过滤重复的通知结果数据。
+
+通过验证out_trade_no、total_amount、appid参数的正确性判断通知请求的合法性。
+
+验证的过程可以参考sdk demo代码，下载 sdk demo代码
+
+文档:https://opendocs.alipay.com/open/203/105910
+
+![image-20240306123617296](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240306123617296.png)
+
+参考demo中的alipay.trade.wap.pay-java-utf-8\WebContent\ notify_url.jsp
+
+另外，支付宝通知订单服务的地址必须为外网域名且备案通过可以正常访问。
+
+此接口仍然使用内网穿透技术。
+
+#### 编写测试代码
+
+1. 在下单请求时设置通知地址request.setNotifyUrl("商户自己的notify_url地址");
+
+2. 编写接收通知接口，接收参数并验签
+
+```java
+@PostMapping("/paynotify")
+public void paynotify(HttpServletRequest request,HttpServletResponse response) throws IOException, AlipayApiException {
+    //获取支付宝POST过来反馈信息
+    Map<String,String> params = new HashMap<String,String>();
+    Map requestParams = request.getParameterMap();
+    for ( Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
+        String name = (String) iter.next();
+        String[] values = (String[]) requestParams.get(name);
+        String valueStr = "";
+        for (int i = 0; i < values.length; i++) {
+            valueStr = (i == values.length - 1) ? valueStr + values[i]
+                : valueStr + values[i] + ",";
+        }
+        //乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
+        //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
+        params.put(name, valueStr);
+    }
+    //获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以下仅供参考)//
+    //商户订单号
+
+    String out_trade_no = new String(request.getParameter("out_trade_no").getBytes("ISO-8859-1"),"UTF-8");
+    //支付宝交易号
+
+    String trade_no = new String(request.getParameter("trade_no").getBytes("ISO-8859-1"),"UTF-8");
+
+    //交易状态
+    String trade_status = new String(request.getParameter("trade_status").getBytes("ISO-8859-1"),"UTF-8");
+
+    //获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以上仅供参考)//
+    //计算得出通知验证结果
+    //boolean AlipaySignature.rsaCheckV1(Map<String, String> params, String publicKey, String charset, String sign_type)
+    boolean verify_result = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, AlipayConfig.CHARSET, "RSA2");
+
+    if(verify_result){//验证成功
+        //////////////////////////////////////////////////////////////////////////////////////////
+        //请在这里加上商户的业务逻辑程序代码
+
+        //——请根据您的业务逻辑来编写程序（以下代码仅作参考）——
+
+        if(trade_status.equals("TRADE_FINISHED")){
+            //判断该笔订单是否在商户网站中已经做过处理
+            //如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
+            //请务必判断请求时的total_fee、seller_id与通知时获取的total_fee、seller_id为一致的
+            //如果有做过处理，不执行商户的业务程序
+
+            //注意：
+            //如果签约的是可退款协议，退款日期超过可退款期限后（如三个月可退款），支付宝系统发送该交易状态通知
+            //如果没有签约可退款协议，那么付款完成后，支付宝系统发送该交易状态通知。
+        } else if (trade_status.equals("TRADE_SUCCESS")){
+            //判断该笔订单是否在商户网站中已经做过处理
+            //如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
+            //请务必判断请求时的total_fee、seller_id与通知时获取的total_fee、seller_id为一致的
+            //如果有做过处理，不执行商户的业务程序
+            System.out.printf("trade_status = " + trade_status);
+            //注意：
+            //如果签约的是可退款协议，那么付款完成后，支付宝系统发送该交易状态通知。
+        }
+
+        //——请根据您的业务逻辑来编写程序（以上代码仅作参考）——
+        response.getWriter().write("success");	//请不要修改或删除
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+    }else{//验证失败
+        response.getWriter().write("fail");	//请不要修改或删除
+    }
+}
+```
+
+
+
+在测试中的alipayRequse也需要修改
+
+```java
+AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();//创建API对应的request
+//        alipayRequest.setReturnUrl("http://domain.com/CallBack/return_url.jsp");
+alipayRequest.setNotifyUrl("http://318f68d075.vicp.fun:45930/orders/paynotify");//在公共参数中设置回跳和通知地址
+alipayRequest.setBizContent("{" +
+                            "    \"out_trade_no\":\"202410100010101023\"," +
+                            "    \"total_amount\":0.1," +
+                            "    \"subject\":\"Iphone116 16G\"," +
+                            "    \"product_code\":\"QUICK_WAP_WAY\"" +
+                            "  }");//填充业务参数
+```
+
+添加设置`alipayRequest.setNotifyUrl("http://318f68d075.vicp.fun:45930/orders/paynotify");`
+
