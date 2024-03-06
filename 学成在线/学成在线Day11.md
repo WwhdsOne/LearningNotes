@@ -1644,7 +1644,7 @@ PC网站轻松收款，资金马上到账：用户在商家PC网站消费，自�
 <dependency>
     <groupId>com.alipay.sdk</groupId>
     <artifactId>alipay-sdk-java</artifactId>
-    <version>3.7.73.ALL</version>
+    <version>4.34.0.ALL</version>
 </dependency>
 
 <!-- 支付宝SDK依赖的日志 -->
@@ -1678,12 +1678,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * @author Mr.M
- * @version 1.0
- * @description 测试支付宝接口
- * @date 2022/10/20 22:19
- */
 @Controller
 public class PayTestController {
 
@@ -1694,8 +1688,6 @@ public class PayTestController {
 
     @Value("${pay.alipay.ALIPAY_PUBLIC_KEY}")
     String ALIPAY_PUBLIC_KEY;
-
-
 
     @RequestMapping("/alipaytest")
     public void doPost(HttpServletRequest httpRequest,
@@ -1716,7 +1708,6 @@ public class PayTestController {
         httpResponse.getWriter().write(form);//直接将完整的表单html输出到页面
         httpResponse.getWriter().flush();
     }
-
 }
 ```
 
@@ -1765,7 +1756,7 @@ ZXing是一个开源的类库，是用Java编写的多格式的1D / 2D条码图�
 3. 运行main方法输入二维码图片的base64串，如下：
 
    ```text
-   data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIAQAAAACFI5MzAAABQElEQVR42u2YPZKDMAyF5aFIuUfIUThafDSOwhEoUzC8fZKMySSbrVI8ZuICBX8uIvtZPxjeDfuSf8liPi7LFSgrzRTvV3XCKawXYLptFobviz6ZzB2xEfTjhyS9OwXB3A7jbMSngLOQ0I4v2AZf96wqTWJ9+9/dYEHSx2RYqfg/oqUgiX3nFBVfcCepcSbiJP67iwZ1G+5+Am7kyTzW9OcW/kRAX+QJ953+uCl8zO5PV5UsaffUp8rqP5+jiySJU8jtNxcNrysetCNK6A/V4lEQeU+xa0eZREE1tOTpFYod0VKXsKCqvRqMkW5pkza8Ggy3WgEuTvZcz0dcUBc+9MneL1DqkXjQz0eaZA1LqVtmzcMffTKPiPwz1mh2zkGyNwtT9kguTVI7LWv6ul7DCpOjX9iaGV66HDny/ZL1WfILfc/hMHLUpekAAAAASUVORK5CYII=
+   data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIAQAAAACFI5MzAAABX0lEQVR42u2YS46EMAxEzYpjcFNIbppjZBWPqxJDC2k2o5HsRSNEQx4L40/ZadHfDvmSP5Iudmxdzr2JHNqPgoUjBznMxKo6jCug3WMxByl4arJrAdTa7SMykS4XoT3mI7gORjsVQbR9oez6yoNQMqvkqH6+6yeQzMM4M/Hc37oTSfpSlMuK2AQGGiOX+zqa2K+cIO2kBG799nU0cXfWJTNPJsYTN9mScdCdFvAhSQgquCANQbDMMwmpM+A0eUb7XFZHE8Z2BpmyZ/kIjUlBsGyOhC+heTvDLnkIjIWi2BVfgbeSkAKT2zWDzKbhVkeTOS7p0y6GrCkgA7lrF36lO93qaLIkmYJHv350s2jiU8BGeysbryYhPj1BmLnReabOeLJ2OQWjOn2JtqZJyJzWdfUKmXvERIT7QrspzMctF0HVDpqMapYshNFewrxRBUcWcldJ89HYp6dw8v2/6n/JD+4QqzIB2cR3AAAAAElFTkSuQmCC
    ```
 
    将base64串复制到浏览器地址后回车将展示一个二维码，用户用手机扫此二维码将请求至http://www.itcast.cn/。
@@ -1786,6 +1777,25 @@ public static void main(String[] args) throws IOException {
 注意：http://localhost:63030地址用模拟器无法访问，进入cmd命令状态，输入命令ipconfig -all 查看本地网卡分配的局域网ip地址，将上边的地址修改如下：
 
 ```http
-http://192.168.101.1:63030/orders/alipaytest
+http://192.168.1.8:63030/orders/alipaytest
 ```
 
+除此之外
+
+支付宝目前沙箱APP需要更新
+
+在Order模块中的service中
+
+请求网关地址于2023年某月更新
+
+原配置失效,作如下修改
+
+```java
+// 旧请求网关地址
+//public static String URL = "https://openapi.alipaydev.com/gateway.do";
+
+// 新请求网关地址
+public static String URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";
+```
+
+以及最好在手机安装沙箱app来操作,模拟器会因不知名原因导致只能扫出来代码
