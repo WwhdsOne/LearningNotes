@@ -185,13 +185,13 @@ alias.p=push
 
 1. 打开GitBash执行下面命令
 
-```java
+```shell
 git config --global core.quotepath false
 ```
 
-1. ${git_home}/etc/bash.bashrc 文件最后加入下面两行
+2. ${git_home}/etc/bash.bashrc 文件最后加入下面两行
 
-```java
+```shell
 export LANG="zh_CN.UTF-8" 
 export LC_ALL="zh_CN.UTF-8"
 ```
@@ -200,13 +200,13 @@ export LC_ALL="zh_CN.UTF-8"
 
 要使用Git对我们的代码进行版本控制，首先需要获得本地仓库
 
-1）在电脑的任意位置创建一个空目录（例如test）作为我们的本地Git仓库
+1. 在电脑的任意位置创建一个空目录（例如test）作为我们的本地Git仓库
 
-2）进入这个目录中，点击右键打开Git bash窗口
+2. 进入这个目录中，点击右键打开Git bash窗口
 
-3）执行命令git init
+3. 执行命令git init
 
-4）如果创建成功后可在文件夹下看到隐藏的.git目录。
+4. 如果创建成功后可在文件夹下看到隐藏的.git目录。
 
 ![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/git_init.png)
 
@@ -263,7 +263,7 @@ $ git reset
 #### 4.5.2 提交暂存区到本地仓库(commit)
 
 ```shell
-git commit -m '注释内容'
+$ git commit -m '注释内容'
 ```
 
 - 作用：提交暂存区汇总所有内容到本地仓库的当前分支
@@ -512,7 +512,7 @@ git branch -D b1 不做任何检查，强制删除
 
  要求，都可以在此版本进行开发，阶段开发完成后，需要是合并到master分支,准备上线。
 
- **例如我们要开发新功能，我们要可以在develop分支上在建一个分支，新功能一般叫做feature分支，开发完以后在合并到 develop分支上面去，而不是直接提交到master分支，最后项目做完了develop在合并到master分支上**
+> 例如我们要开发新功能，我们要可以在develop分支上在建一个分支，新功能一般叫做feature分支，开发完以后在合并到 develop分支上面去，而不是直接提交到master分支，最后项目做完了develop在合并到master分支上
 
 develop和master分支是不可删除的
 
