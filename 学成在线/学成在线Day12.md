@@ -654,9 +654,69 @@ public void receivenotify(HttpServletRequest request, HttpServletResponse respon
 }
 ```
 
-### 接口测试
+Service接口:
 
-**接口测试**
+```java
+/**
+     * 保存支付宝支付状态
+     * @param payStatusDto 支付状态
+     */
+void saveAliPayStatus(PayStatusDto payStatusDto);
+```
+
+Service实现类:
+
+```java
+@Transactional
+public void saveAliPayStatus(PayStatusDto payStatusDto){
+
+    //如果支付成功
+    String payNO = payStatusDto.getOut_trade_no();
+    XcPayRecord payRecordByPayno = getPayRecordByPayno(payNO);
+    if(payRecordByPayno == null){
+        XueChengPlusException.cast("找不到相关支付记录");
+    }
+    //拿到相关联订单id
+    Long orderId = payRecordByPayno.getOrderId();
+    XcOrders xcOrders = xcOrdersMapper.selectById(orderId);
+    if(xcOrders == null){
+        XueChengPlusException.cast("找不到相关订单");
+    }
+    //支付状态
+    String statusFromDb = payRecordByPayno.getStatus();
+    //如果数据库支付状态已经成功,不再处理
+    if("601002".equals(statusFromDb)){
+        //支付已经成功
+        return;
+    }
+    //如果支付成功
+    String tradeStatus = payStatusDto.getTrade_status();
+    //返回信息为支付成功
+    if("TRADE_SUCCESS".equals(tradeStatus)){
+        //更新支付记录表支付状态为支付成功
+        payRecordByPayno.setStatus("601002");
+        //支付宝订单号
+        payRecordByPayno.setOutPayNo(payStatusDto.getTrade_no());
+        //第三方支付渠道编号
+        payRecordByPayno.setOutPayChannel("Alipay");
+        //支付成功时间
+        payRecordByPayno.setPaySuccessTime(LocalDateTime.now());
+        int update = xcPayRecordMapper.updateById(payRecordByPayno);
+        if(update <= 0){
+            XueChengPlusException.cast("更新支付记录失败");
+        }
+        //更新订单表支付状态为支付成功
+        xcOrders.setStatus("600002");//订单已经支付成功
+
+        int update1 = xcOrdersMapper.updateById(xcOrders);
+        if(update1 <= 0){
+            XueChengPlusException.cast("更新订单失败");
+        }
+    }
+}
+```
+
+### 接口测试
 
 测试准备：
 
@@ -671,3 +731,424 @@ public void receivenotify(HttpServletRequest request, HttpServletResponse respon
 2. 支付成功跟踪service方法的日志，支付成功需要更新支付交易表记录的状态、通知时间、支付宝交易号、支付渠道(Alipay)
 
 支付成功更新订单表的状态为空。
+
+# 支付通知
+
+## 需求分析
+
+订单服务作为通用服务在订单支付成功后需要将支付结果异步通知给其它微服务。
+
+下图使用了消息队列完成支付结果通知：
+
+![image-20240309162829957](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240309162829957.png)
+
+学习中心服务：对收费课程选课需要支付，与订单服务对接完成支付。
+
+学习资源服务：对收费的学习资料需要购买后下载，与订单服务对接完成支付。
+
+订单服务完成支付后将支付结果发给每一个与订单服务对接的微服务，订单服务将消息发给交换机，由交换机广播消息，每个订阅消息的微服务都可以接收到支付结果.
+
+微服务收到支付结果根据订单的类型去更新自己的业务数据。
+
+## 技术方案
+
+使用消息队列进行异步通知需要保证消息的可靠性，即生产端将消息成功通知到消费端。
+
+消息从生产端发送到消费端经历了如下过程：
+
+1. 消息发送到交换机
+
+2. 消息由交换机发送到队列
+
+3. 消息者收到消息进行处理
+
+保证消息的可靠性需要保证以上过程的可靠性，本项目使用RabbitMQ可以通过如下方面保证消息的可靠性。
+
+1. 生产者确认机制
+
+发送消息前使用数据库事务将消息保证到数据库表中
+
+成功发送到交换机将消息从数据库中删除
+
+2. mq持久化
+
+mq收到消息进行持久化，当mq重启即使消息没有消费完也不会丢失。
+
+需要配置交换机持久化、队列持久化、发送消息时设置持久化。
+
+3、消费者确认机制
+
+消费者消费成功自动发送ack，否则重试消费。
+
+## 发送支付结果
+
+### 订单集成服务MQ
+
+订单服务通过消息队列将支付结果发给学习中心服务，消息队列采用发布订阅模式。
+
+1. 订单服务创建支付结果通知交换机。
+
+2. 学习中心服务绑定队列到交换机。
+
+项目使用RabbitMQ作为消息队列，在课前下发的虚拟上已经安装了RabbitMQ.
+
+执行docker start rabbitmq 启动RabbitMQ。访问：http://192.168.101.65:15672/ 
+
+账户密码：guest/guest
+
+交换机为Fanout广播模式。
+
+首先需要在学习中心服务和订单服务工程配置连接消息队列。
+
+1. 首先在订单服务添加消息队列依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+```
+
+2. 在nacos配置rabbitmq-dev.yaml为通用配置文件
+
+```yaml
+spring:
+  rabbitmq:
+    host: 192.168.101.65
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    publisher-confirm-type: correlated #correlated 异步回调，定义ConfirmCallback，MQ返回结果时会回调这个ConfirmCallback
+    publisher-returns: false #开启publish-return功能，同样是基于callback机制，需要定义ReturnCallback
+    template:
+      mandatory: false #定义消息路由失败时的策略。true，则调用ReturnCallback；false：则直接丢弃消息
+    listener:
+      simple:
+        acknowledge-mode: none #出现异常时返回unack，消息回滚到mq；没有异常，返回ack ,manual:手动控制,none:丢弃消息，不回滚到mq
+        retry:
+          enabled: true #开启消费者失败重试
+          initial-interval: 1000ms #初识的失败等待时长为1秒
+          multiplier: 1 #失败的等待时长倍数，下次等待时长 = multiplier * last-interval
+          max-attempts: 3 #最大重试次数
+          stateless: true #true无状态；false有状态。如果业务中包含事务，这里改为false
+```
+
+3. 在订单服务接口工程引入rabbitmq-dev.yaml配置文件
+
+```yaml
+shared-configs:
+  - data-id: rabbitmq-${spring.profiles.active}.yaml
+    group: xuecheng-plus-common
+    refresh: true
+```
+
+4. 在订单服务service工程编写MQ配置类，配置交换机
+
+```java
+@Slf4j
+@Configuration
+public class PayNotifyConfig implements ApplicationContextAware {
+
+    //交换机
+    public static final String PAYNOTIFY_EXCHANGE_FANOUT = "paynotify_exchange_fanout";
+    //支付结果通知消息类型
+    public static final String MESSAGE_TYPE = "payresult_notify";
+    //支付通知队列
+    public static final String PAYNOTIFY_QUEUE = "paynotify_queue";
+
+    //声明交换机，且持久化
+    @Bean(PAYNOTIFY_EXCHANGE_FANOUT)
+    public FanoutExchange paynotify_exchange_fanout() {
+        // 三个参数：交换机名称、是否持久化、当没有queue与其绑定时是否自动删除
+        return new FanoutExchange(PAYNOTIFY_EXCHANGE_FANOUT, true, false);
+    }
+    //支付通知队列,且持久化
+    @Bean(PAYNOTIFY_QUEUE)
+    public Queue course_publish_queue() {
+        return QueueBuilder.durable(PAYNOTIFY_QUEUE).build();
+    }
+
+    //交换机和支付通知队列绑定
+    @Bean
+    public Binding binding_course_publish_queue(@Qualifier(PAYNOTIFY_QUEUE) Queue queue, @Qualifier(PAYNOTIFY_EXCHANGE_FANOUT) FanoutExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        // 获取RabbitTemplate
+        RabbitTemplate rabbitTemplate = applicationContext.getBean(RabbitTemplate.class);
+        //消息处理service
+        MqMessageService mqMessageService = applicationContext.getBean(MqMessageService.class);
+        // 设置ReturnCallback
+        rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -> {
+            // 投递失败，记录日志
+            log.info("消息发送失败，应答码{}，原因{}，交换机{}，路由键{},消息{}",
+                     replyCode, replyText, exchange, routingKey, message.toString());
+            MqMessage mqMessage = JSON.parseObject(message.toString(), MqMessage.class);
+            //将消息再添加到消息表
+            mqMessageService.addMessage(mqMessage.getMessageType(),mqMessage.getBusinessKey1(),mqMessage.getBusinessKey2(),mqMessage.getBusinessKey3());
+
+        });
+    }
+}
+```
+
+### 发送支付结果
+
+在OrderService中定义接口:
+
+```java
+/**
+ * 发送通知结果
+ * @param message
+ */
+public void notifyPayResult(MqMessage message);
+```
+
+ 编写接口实现方法:
+
+```java
+@Override
+public void notifyPayResult(MqMessage message) {
+
+    //消息内容
+    String jsonString = JSON.toJSONString(message);
+
+    Message messageObj = MessageBuilder.withBody(jsonString.getBytes(StandardCharsets.UTF_8))
+        .setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
+    //全局消息ID
+    Long id = message.getId();
+    CorrelationData correlationData = new CorrelationData();
+    //使用CorrelationData对象指定回调方法
+    correlationData.getFuture().addCallback(
+        result -> {
+            if(result.isAck()){
+                //消息成功发送到交换机
+                log.info("消息成功发送到交换机:{}",jsonString);
+                //将消息从数据库表删除
+                mqMessageService.completed(id);
+            }else{
+                //消息发送到交换机失败
+                log.info("消息发送到交换机失败:{}",jsonString);
+            }
+        },
+        ex -> {
+            //发生异常了
+            log.info("消息发送到交换机异常:{}",jsonString);
+        }
+    );
+    rabbitTemplate.convertAndSend(PayNotifyConfig.PAYNOTIFY_EXCHANGE_FANOUT, "", messageObj, correlationData);
+}
+```
+
+订单服务收到第三方平台的支付结果时，在saveAliPayStatus方法中添加代码，向数据库消息表添加消息并进行发送消息，如下所示:
+
+```java
+//保存消息记录,参数1：支付结果通知类型，2: 业务id，3:业务类型
+MqMessage payresultNotify = mqMessageService.addMessage("payresult_notify",
+                                                        xcOrders.getOutBusinessId(),
+                                                        xcOrders.getOrderType(),
+                                                        null);
+//发送消息
+notifyPayResult(payresultNotify);
+```
+
+## 接收支付结果
+
+### 学习中心服务集成MQ
+
+1. 在学习中心服务添加消息队列依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+```
+
+2. 在学习中心服务接口工程引入rabbitmq-dev.yaml配置文件
+
+```yaml
+shared-configs:
+  - data-id: rabbitmq-${spring.profiles.active}.yaml
+    group: xuecheng-plus-common
+    refresh: true
+```
+
+3. 添加配置类
+
+```java
+@Slf4j
+@Configuration
+public class PayNotifyConfig {
+
+    //交换机
+    public static final String PAYNOTIFY_EXCHANGE_FANOUT = "paynotify_exchange_fanout";
+    //支付结果通知消息类型
+    public static final String MESSAGE_TYPE = "payresult_notify";
+    //支付通知队列
+    public static final String PAYNOTIFY_QUEUE = "paynotify_queue";
+
+    //声明交换机，且持久化
+    @Bean(PAYNOTIFY_EXCHANGE_FANOUT)
+    public FanoutExchange paynotify_exchange_fanout() {
+        // 三个参数：交换机名称、是否持久化、当没有queue与其绑定时是否自动删除
+        return new FanoutExchange(PAYNOTIFY_EXCHANGE_FANOUT, true, false);
+    }
+    //支付通知队列,且持久化
+    @Bean(PAYNOTIFY_QUEUE)
+    public Queue course_publish_queue() {
+        return QueueBuilder.durable(PAYNOTIFY_QUEUE).build();
+    }
+
+    //交换机和支付通知队列绑定
+    @Bean
+    public Binding binding_course_publish_queue(@Qualifier(PAYNOTIFY_QUEUE) Queue queue, @Qualifier(PAYNOTIFY_EXCHANGE_FANOUT) FanoutExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange);
+    }
+
+}
+```
+
+### 接收支付结果
+
+1. 新建Service来接收支付结果
+
+```java
+package com.xuecheng.learning.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.learning.config.PayNotifyConfig;
+import com.xuecheng.learning.service.MyCourseTableService;
+import com.xuecheng.messagesdk.model.po.MqMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author Wwh
+ * @ProjectName xuecheng-plus-project
+ * @dateTime 2024/3/9 17:11
+ * @description 支付通知服务
+ **/
+@Service
+@Slf4j
+public class ReceivePayNotifyService {
+
+    @Autowired
+    private MyCourseTableService myCourseTableService;
+    @RabbitListener(queues = PayNotifyConfig.PAYNOTIFY_QUEUE)
+    public void receivePayNotify(Message message) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        log.info("接收到支付通知消息：{}", message);
+        byte[] body = message.getBody();
+        String msg = new String(body);
+        //转为对象
+        MqMessage mqMessage = JSON.parseObject(msg, MqMessage.class);
+        //解析消息内容
+
+        //选课ID
+        String chooseCourseId = mqMessage.getBusinessKey1();
+
+        //获取订单类型
+        String orderType = mqMessage.getBusinessKey2();
+
+        //学习中心类服务只要购买课程的支付订单结果
+        if("60201".equals(orderType)){
+            //支付成功
+            //根据消息内容,更新选课记录,像我的课程表添加课程
+            boolean b = myCourseTableService.saveChooseCourseSuccess(chooseCourseId);
+            if(!b){
+                XueChengPlusException.cast("保存选课记录失败");
+            }
+        }
+    }
+}
+```
+
+2. 在MyCourseTableService中添加
+
+```java
+/**
+ * @param courseId 课程id
+ * @return boolean
+ * @description 保存选课成功记录，用于后续查询学习状态，是否已经选课等等
+ */
+boolean saveChooseCourseSuccess(String courseId);
+```
+
+实现方法:
+
+```java
+@Override
+public boolean saveChooseCourseSuccess(String courseId) {
+    //防止脏数据
+    //根据选课ID查询选课记录
+    XcChooseCourse xcChooseCourse = xcChooseCourseMapper.selectById(courseId);
+    if ( xcChooseCourse == null ) {
+        log.debug("接收到购买课程信息,但选课记录不存在,选课ID:{}", courseId);
+        return false;
+    }
+    //选课状态
+    String status = xcChooseCourse.getStatus();
+    //未支付时才更新为已支付
+    if ( status.equals("701002") ) {
+        //更新选课记录为成功
+        xcChooseCourse.setStatus("701001");
+        //向我的课程表插入数据
+        int insert = xcChooseCourseMapper.updateById(xcChooseCourse);
+        if(insert <= 0){
+            log.debug("更新选课记录失败,选课ID:{}", courseId);
+            XueChengPlusException.cast("更新选课记录失败");
+        }
+        //向我的课程表插入
+        XcCourseTables xcCourseTables = addCourseTabls(xcChooseCourse);
+        if(xcCourseTables == null){
+            log.debug("向我的课程表插入数据失败,选课ID:{}", courseId);
+            XueChengPlusException.cast("向我的课程表插入数据失败");
+        }
+    }
+    return true;
+}
+```
+
+## 通知支付结果测试
+
+**通知支付结果测试**
+
+测试准备：
+
+1. 找一门已发布的收费课程。
+
+2. 如果在我的课程表存储则删除。
+
+3. 删除此课程的选课记录及订单信息。
+
+测试流程：
+
+1. 进入课程详细页面，点击马上学习，生成二维码进行支付。
+
+2. 支付完成点击“支付完成”，观察订单服务控制台是否发送消息。
+
+3. 观察学习中心服务控制台是否接收到消息。
+
+4. 观察数据库中的消息表的相应记录是否已删除。
+
+ 
+
+消费重试测试：
+
+1. 在学习中心服务接收支付结果方法中制造异常。
+
+2. 重新执行上边的测试流程，观察是否消费重试。
+
+ 
