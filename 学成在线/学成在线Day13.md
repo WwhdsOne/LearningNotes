@@ -242,3 +242,111 @@ public RestResponse<String> getvideo(@PathVariable("courseId") Long courseId, @P
 
    可修改选课记录表中的课程id为不存在进行测试，测试完再恢复原样。
 
+## 我的课程表
+
+### 需求分析
+
+#### 业务流程
+
+登录网站，点击“我的学习”进入个人中心，
+
+![image-20240311093550102](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240311093550102.png)
+
+个人中心首页显示我的课程表：
+
+![image-20240311093617221](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240311093617221.png)
+
+我的课表中显示了选课成功的免费课程、收费课程。最近学习课程显示了当前用户最近学习的课程信息。
+
+点击继续学习进入当前学习章节的视频继续学习。
+
+```properties
+server {
+    listen       80;
+    server_name  ucenter.51xuecheng.cn;
+    #charset koi8-r;
+    ssi on;
+    ssi_silent_errors on;
+    #access_log  logs/host.access.log  main;
+    location / {
+        alias  D:/Programming_Learning/Project/xc-ui-pc-static-portal/ucenter/;
+        index  index.html index.htm;
+    }
+    location /include {
+        proxy_pass   http://127.0.0.1;
+    }
+    location /img/ {
+        proxy_pass   http://127.0.0.1/static/img/;
+    }
+    location /api/ {
+            proxy_pass http://gatewayserver/;
+    } 
+}
+```
+
+### 接口定义
+
+```java
+@ApiOperation("我的课程表")
+@GetMapping("/mycoursetable")
+public PageResult<XcCourseTables> mycoursetable(MyCourseTableParams params) {
+
+
+}
+```
+
+### 接口开发
+
+service接口:
+
+```java
+/**
+ * @param params 查询参数
+ * @return com.xuecheng.base.model.PageResult<com.xuecheng.learning.model.po.XcCourseTables>
+ * @description 我的课程表查询接口
+ * @date 2024/3/11 11：47
+ */
+PageResult<XcCourseTables> mycourestabls(MyCourseTableParams params);
+```
+
+service接口实现:
+
+```java
+@Override
+public PageResult<XcCourseTables> mycourestabls(MyCourseTableParams params) {
+    int pageNo = params.getPage();
+    int size = params.getSize();
+    Page<XcCourseTables> xcCourseTablesPage = new Page<>(pageNo, size);
+    LambdaQueryWrapper<XcCourseTables> eq = new LambdaQueryWrapper<XcCourseTables>()
+        .eq(XcCourseTables::getUserId, params.getUserId());
+    Page<XcCourseTables> result = xcCourseTablesMapper.selectPage(xcCourseTablesPage, eq);
+    PageResult<XcCourseTables> xcCourseTablesPageResult = new PageResult<>(result.getRecords(), result.getTotal(), size, pageNo);
+    return xcCourseTablesPageResult;
+}
+```
+
+controller完善:
+
+```java
+@ApiOperation("我的课程表")
+@GetMapping("/mycoursetable")
+public PageResult<XcCourseTables> mycoursetable(MyCourseTableParams params) {
+    //获取用户信息
+    SecurityUtil.XcUser user = SecurityUtil.getUser();
+    if(user == null){
+        XueChengPlusException.cast("请登录后再操作");
+    }
+    //获取用户id
+    String userId = user.getId();
+    params.setUserId(userId);
+    PageResult<XcCourseTables> mycourestabls = myCourseTableService.mycourestabls(params);
+    return mycourestabls;
+}
+```
+
+### 接口测试
+
+![image-20240311120705534](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240311120705534.png)
+
+
+
