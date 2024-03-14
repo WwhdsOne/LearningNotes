@@ -648,7 +648,3 @@ docker run --name xuecheng-plus-checkcode -p 63075:63075 -idt checkcode:1.0
 
 那建议检查一下jar包完整性,最好是删掉原jar包重新往虚拟机发一遍
 
-
-
-
-
