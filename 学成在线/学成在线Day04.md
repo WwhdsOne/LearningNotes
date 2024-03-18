@@ -6,7 +6,7 @@
 
 课程计划添加成功，如果课程还没有提交时可以删除课程计划。
 
-![image-20240214185143784](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240214185143784.png)
+![image-20240214185143784](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240214185143784.png)
 
 - 删除第一级别的章时要求章下边没有小节方可删除。 
 - 删除第二级别的小节的同时需要将其它关联的视频信息也删除。
@@ -16,7 +16,7 @@
 
 可以从IDEA数据库直接复制行的sql语句
 
-![image-20240214193321392](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240214193321392.png)
+![image-20240214193321392](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240214193321392.png)
 
 修改圈中部分即可
 
@@ -24,7 +24,7 @@
 
 # 课程计划排序
 
-![image-20240214200241048](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240214200241048.png)
+![image-20240214200241048](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240214200241048.png)
 
 - 上移表示将课程计划向上移动。 
 - 下移表示将课程计划向下移动。 
@@ -40,21 +40,21 @@
             teachplan T2,
             <if test="direction != null and direction == 'movedown'.toString()">
                 (SELECT id,orderby
-                FROM teachplan T3
-                WHERE T3.course_id = #{teachplan.courseId}						
-                AND T3.orderby > #{teachplan.orderby}					# 找到第一个比当前顺序大的行，和他的orderby进行就交换
-                AND T3.parentid = #{teachplan.parentid}
-                ORDER BY T3.orderby
-                limit 1) T4
+                 FROM teachplan T3
+                 WHERE T3.course_id = #{teachplan.courseId}						
+                 AND T3.orderby > #{teachplan.orderby}					# 找到第一个比当前顺序大的行，和他的orderby进行就交换
+                 AND T3.parentid = #{teachplan.parentid}
+                 ORDER BY T3.orderby
+                 limit 1) T4
             </if>
             <if test="direction != null and direction == 'moveup'.toString()">
                 (SELECT id,orderby
-                FROM teachplan T3
-                WHERE T3.course_id = #{teachplan.courseId}
-                AND T3.orderby &lt; #{teachplan.orderby}				# 找到第一个比当前顺序小的行，和他的orderby进行就交换
-                AND T3.parentid = #{teachplan.parentid}
-                ORDER BY T3.orderby desc								# 注意此时是逆序
-                limit 1) T4
+                 FROM teachplan T3
+                 WHERE T3.course_id = #{teachplan.courseId}
+                 AND T3.orderby &lt; #{teachplan.orderby}				# 找到第一个比当前顺序小的行，和他的orderby进行就交换
+                 AND T3.parentid = #{teachplan.parentid}
+                 ORDER BY T3.orderby desc								# 注意此时是逆序
+                 limit 1) T4
             </if>
         SET T2.orderby = T1.orderby,
             T1.orderby = T2.orderby

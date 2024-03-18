@@ -178,7 +178,7 @@ nacos中并未对`extension-configs`和`shared-configs`的差别
 
 到目前为止已将所有微服务的配置统一在nacos进行配置，用到的配置文件有本地的配置文件 bootstrap.yaml和nacos上的配置文件，SpringBoot读取配置文件 的顺序如下：
 
-![image-20240216202431287](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240216202431287.png)
+![image-20240216202431287](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240216202431287.png)
 
 引入配置文件的形式有：
 
@@ -316,11 +316,11 @@ file.transferTo(tempFile);
 
 如果在uploadFile方法上添加@Transactional注解，代理对象执行此方法前会开启事务，如下图：
 
-![image-20240217202502483](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240217202502483.png)
+![image-20240217202502483](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240217202502483.png)
 
 如果在uploadFile方法上没有@Transactional注解，代理对象执行此方法前不进行事务控制，如下图：
 
-![image-20240217202523999](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240217202523999.png)
+![image-20240217202523999](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240217202523999.png)
 
 所以判断该方法是否可以事务控制必须保证是通过代理对象调用此方法，且此方法上添加了@Transactional注解。
 

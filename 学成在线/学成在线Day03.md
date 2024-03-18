@@ -18,14 +18,14 @@
 之后我们在数据传输类的属性直接添加注解即可，例如：
 
 ```java
-	@NotEmpty(message = "课程名称不能为空")
-    @ApiModelProperty(value = "课程名称", required = true)
-    private String name;
+@NotEmpty(message = "课程名称不能为空")
+@ApiModelProperty(value = "课程名称", required = true)
+private String name;
 
-    @NotEmpty(message = "适用人群不能为空")
-    @Size(message = "适用人群内容过少", min = 10)
-    @ApiModelProperty(value = "适用人群", required = true)
-    private String users;
+@NotEmpty(message = "适用人群不能为空")
+@Size(message = "适用人群内容过少", min = 10)
+@ApiModelProperty(value = "适用人群", required = true)
+private String users;
 ```
 
 ### **分组校验**
@@ -38,9 +38,9 @@
 
 ```java
 public class ValidationGroups {
-	public interface Inster{};
-	public interface Update{};
-	public interface Delete{};
+    public interface Inster{};
+    public interface Update{};
+    public interface Delete{};
 }
 ```
 
@@ -92,37 +92,37 @@ private String name;
 
 ```xml
 <resultMap id="treeNodeResultMap" type="com.xuecheng.content.model.dto.TeachplanDTO">
-        <!-- 一级数据映射 -->
-        <id     column="one_id"        property="id" />
-        <result column="one_pname"      property="pname" />
-        <result column="one_parentid"     property="parentid" />
-        <result column="one_grade"  property="grade" />
-        <result column="one_mediaType"   property="mediaType" />
-        <result column="one_stratTime"   property="startTime" />
-        <result column="one_endTime"   property="endTime" />
-        <result column="one_orderby"   property="orderby" />
-        <result column="one_courseId"   property="courseId" />
-        <result column="one_coursePubId"   property="coursePubId" />
-        <!-- 一级中包含多个二级数据 -->
-        <collection property="teachPlanTreeNodes" ofType="com.xuecheng.content.model.dto.TeachplanDTO">
-            <!-- 二级数据映射 -->
-            <id     column="two_id"        property="id" />
-            <result column="two_pname"      property="pname" />
-            <result column="two_parentid"     property="parentid" />
-            <result column="two_grade"  property="grade" />
-            <result column="two_mediaType"   property="mediaType" />
-            <result column="two_stratTime"   property="startTime" />
-            <result column="two_endTime"   property="endTime" />
-            <result column="two_orderby"   property="orderby" />
-            <result column="two_courseId"   property="courseId" />
-            <result column="two_coursePubId"   property="coursePubId" />
-            <association property="teachplanMedia" javaType="com.xuecheng.content.model.po.TeachplanMedia">
-                <id column="teachplanMeidaId"   property="id" />
-                <result column="mediaFilename"   property="mediaFilename" />
-                <result column="mediaId"   property="mediaId" />
-            </association>
-        </collection>
-    </resultMap>
+    <!-- 一级数据映射 -->
+    <id     column="one_id"        property="id" />
+    <result column="one_pname"      property="pname" />
+    <result column="one_parentid"     property="parentid" />
+    <result column="one_grade"  property="grade" />
+    <result column="one_mediaType"   property="mediaType" />
+    <result column="one_stratTime"   property="startTime" />
+    <result column="one_endTime"   property="endTime" />
+    <result column="one_orderby"   property="orderby" />
+    <result column="one_courseId"   property="courseId" />
+    <result column="one_coursePubId"   property="coursePubId" />
+    <!-- 一级中包含多个二级数据 -->
+    <collection property="teachPlanTreeNodes" ofType="com.xuecheng.content.model.dto.TeachplanDTO">
+        <!-- 二级数据映射 -->
+        <id     column="two_id"        property="id" />
+        <result column="two_pname"      property="pname" />
+        <result column="two_parentid"     property="parentid" />
+        <result column="two_grade"  property="grade" />
+        <result column="two_mediaType"   property="mediaType" />
+        <result column="two_stratTime"   property="startTime" />
+        <result column="two_endTime"   property="endTime" />
+        <result column="two_orderby"   property="orderby" />
+        <result column="two_courseId"   property="courseId" />
+        <result column="two_coursePubId"   property="coursePubId" />
+        <association property="teachplanMedia" javaType="com.xuecheng.content.model.po.TeachplanMedia">
+            <id column="teachplanMeidaId"   property="id" />
+            <result column="mediaFilename"   property="mediaFilename" />
+            <result column="mediaId"   property="mediaId" />
+        </association>
+    </collection>
+</resultMap>
 ```
 
 # 新增修改课程计划

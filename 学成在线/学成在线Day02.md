@@ -22,12 +22,12 @@ public void testCourseBaseMapper(){
     LambdaQueryWrapper<CourseBase> courseBaseLambdaQueryWrapper = new LambdaQueryWrapper<>();
     //根据课程名称模糊查询,sql为course_base.name like '%?%'
     courseBaseLambdaQueryWrapper.like(StringUtils.isNotEmpty(queryCourseParamsDto.getCourseName()),
-            CourseBase::getName,
-            queryCourseParamsDto.getCourseName());
+                                      CourseBase::getName,
+                                      queryCourseParamsDto.getCourseName());
     //根据课程状态查询,sql为course_base.audit_status = ?
     courseBaseLambdaQueryWrapper.like(StringUtils.isNotEmpty(queryCourseParamsDto.getAuditStatus()),
-            CourseBase::getAuditStatus,
-            queryCourseParamsDto.getAuditStatus());
+                                      CourseBase::getAuditStatus,
+                                      queryCourseParamsDto.getAuditStatus());
 
     //创建分页查询类
     PageParams pageParams = new PageParams(1L,2L);
@@ -52,11 +52,11 @@ public void testCourseBaseMapper(){
 
 插件:
 
-![image-20240211163239135](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240211163239135.png)
+![image-20240211163239135](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240211163239135.png)
 
 点击此处可以生成Http请求
 
-![image-20240211163338945](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240211163338945.png)
+![image-20240211163338945](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240211163338945.png)
 
 
 
@@ -76,9 +76,9 @@ Content-Type: application/json
 
 在项目根目录下建立文件夹统一存放请求测试
 
-![image-20240211163614502](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240211163614502.png)
+![image-20240211163614502](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240211163614502.png)
 
-为了方便将来和网关集成测试，这里我们把测试主机地址在配置文件http-client.env.json 中配置![image-20240211163817932](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240211163817932.png)
+为了方便将来和网关集成测试，这里我们把测试主机地址在配置文件http-client.env.json 中配置![image-20240211163817932](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240211163817932.png)
 
 注意要调用http-client.env.json文件内容需要将使用以下环境运行调整至dev![image-20240211164035140](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240211164035140.png)
 
@@ -124,22 +124,22 @@ Firefox浏览器报错如下：
 
 > Access-Control-Allow-Origin：*  
 
-### 第一种 JSONP
+### 第一种 JSON
 
 通过script标签的src属性进行跨域请求，如果服务端要响应内容则首先读取请求参数callback的值，callback是一个回调函数的名称，服务端读取callback的值后将响应内容通过调用callback函数的方式告诉请求方。如下图：
 
-![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image002.gif)
+<img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240318123843870.png" alt="image-20240318123843870" style="zoom:50%;" />
 
 
 ### 第二种 添加响应头
 
-服务端在响应头添加 Access-Control-Allow-Origin：*
+服务端在响应头添加 `Access-Control-Allow-Origin：*`
 
 ### 第三种 通过nginx代理跨域
 
 由于服务端之间没有跨域，浏览器通过nginx去访问跨域地址。
 
-![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image004.gif)
+<img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240318124740478.png" alt="image-20240318124740478" style="zoom:50%;" />
 
 1. 浏览器先访问http://192.168.101.10:8601 nginx提供的地址，进入页面
 
@@ -162,8 +162,6 @@ nginx到http://www.baidu.com:8601通过服务端通信，没有跨域。
 2、修改服务端地址
 
 前端默认连接的是项目的网关地址，由于现在网关工程还没有创建，这里需要更改前端工程的参数配置文件 ，修改网关地址为内容管理服务的地址。 
-
-![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image002.gif)
 
 启动前端工程，用前端访问后端接口，观察前端界面的数据是否正确。
 
@@ -278,24 +276,24 @@ public List<CourseCategoryDTO> queryTreeNodes(String id) {
     //封装成list类型返回
     //将list转换成map,key为id,value为CourseCategoryDTO
     Map<String, CourseCategoryDTO> map = courseCategoryDTOS.stream()
-            .collect(Collectors.toMap(CourseCategory::getId, value -> value, (key1, key2) -> key2));
+        .collect(Collectors.toMap(CourseCategory::getId, value -> value, (key1, key2) -> key2));
     //遍历list,查找collect子节点
     List<CourseCategoryDTO> result = new ArrayList<>();
     courseCategoryDTOS.stream().filter(item -> !id.equals(item.getId())) //去除根节点
-            .forEach(item -> {
-                if ( item.getParentid().equals(id) ) {
-                    result.add(item);
+        .forEach(item -> {
+            if ( item.getParentid().equals(id) ) {
+                result.add(item);
+            }
+            CourseCategoryDTO courseCategoryDTO = map.get(item.getParentid());
+            //父节点属于要要找的节点则此时会在map中,若不是要找的节点则会被filter过滤
+            if ( courseCategoryDTO != null ) {
+                //如果该父节点的子节点集合为空,设置一个新的集合
+                if ( courseCategoryDTO.getChildrenTreeNodes() == null ) {
+                    courseCategoryDTO.setChildrenTreeNodes(new ArrayList<>());
                 }
-                CourseCategoryDTO courseCategoryDTO = map.get(item.getParentid());
-                //父节点属于要要找的节点则此时会在map中,若不是要找的节点则会被filter过滤
-                if ( courseCategoryDTO != null ) {
-                    //如果该父节点的子节点集合为空,设置一个新的集合
-                    if ( courseCategoryDTO.getChildrenTreeNodes() == null ) {
-                        courseCategoryDTO.setChildrenTreeNodes(new ArrayList<>());
-                    }
-                    courseCategoryDTO.getChildrenTreeNodes().add(item);
-                }
-            });
+                courseCategoryDTO.getChildrenTreeNodes().add(item);
+            }
+        });
     return result;
 }
 ```
@@ -374,9 +372,9 @@ public CourseBaseInfoDTO createCourseBaseInfo(Long companyId, AddCourseDTO addco
 异常处理方法用的三个注解:
 
 ```java
-@ResponseBody		//将java对象转换成json格式
-@ExceptionHandler(XueChengPlusException.class)//利用字节码文件捕获对应异常
-@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//设置响应码
+@ResponseBody									  //将java对象转换成json格式
+@ExceptionHandler(XueChengPlusException.class)    //利用字节码文件捕获对应异常
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) //设置响应码
 ```
 
 注意到类上用了
