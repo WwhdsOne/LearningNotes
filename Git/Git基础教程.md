@@ -4,7 +4,7 @@
 
 
 
-# 1 版本管理工具概念
+#  版本管理工具概念
 
 在平时开发中,可能有时要用到上个版本的内容,例如:
 
@@ -24,7 +24,7 @@
 > 团队开发,方便代码合并
 
 
-# 2 主流版本管理工具介绍 
+#  主流版本管理工具介绍 
 
 ## Git
 
@@ -47,22 +47,22 @@ Windows下载地址: [Git - Downloading Package (git-scm.com)](https://git-scm.c
 
 Linux/Unix下载方法: [Git (git-scm.com)](https://git-scm.com/download/linux)
 
-# 3 Git工作流程
+#  Git工作流程
 
 ![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/git%E6%B5%81%E7%A8%8B.png)
 
 
 
-# 4 命令行-- git基本操作
+#  命令行--git基本操作
 
-### 4.1 环境配置
+### 环境配置
 
 1. 打开Git Bash
 2. 设置用户信息
 
 邮箱可以是假邮箱
 
-```shell
+```bash
 git config --global user.name “wwhds”
 
 git config --global user.email “hello@wwhds.cn”
@@ -76,11 +76,11 @@ git config --global user.name
 git config --global user.email
 ```
 
-### 4.2 为常用指令配置别名
+### 为常用指令配置别名
 
 有些常用的指令参数非常多，每次都要输入好多参数，我们可以使用别名。
 
-#### 4.2.1 如何定义和使用别名
+#### 如何定义和使用别名
 
 要定义 Git 的别名，请使用 `git config` 命令，加上别名和要替换的命令。例如，要为 `git push` 创建别名 `p`：
 
@@ -105,7 +105,7 @@ alias.p=push
 
 无论使用哪种方法，定义别名都能改善你使用 Git 的整体体验。更多关于定义 Git 别名的信息，请看《[Git Book](https://link.zhihu.com/?target=https%3A//git-scm.com/book/en/v2/Git-Basics-Git-Aliases)》。
 
-#### 4.2.2 有用的 Git 别名
+#### 有用的 Git 别名
 
 1. **Git 单行日志**
 
@@ -181,7 +181,7 @@ alias.p=push
    alias.gl=config --global -l
    ```
 
-### 4.3 解决GitBash乱码问题
+### 解决GitBash乱码问题
 
 1. 打开GitBash执行下面命令
 
@@ -196,7 +196,7 @@ export LANG="zh_CN.UTF-8"
 export LC_ALL="zh_CN.UTF-8"
 ```
 
-### 4.4 获取本地仓库
+### 获取本地仓库
 
 要使用Git对我们的代码进行版本控制，首先需要获得本地仓库
 
@@ -210,11 +210,11 @@ export LC_ALL="zh_CN.UTF-8"
 
 ![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/git_init.png)
 
-### 4.5 基础操作指令
+### 基础操作指令
 
 ![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/git_work.png)
 
-#### 4.5.1 查看修改状态 (status)
+#### 查看修改状态 (status)
 
 ```shell
 $ git status
@@ -240,7 +240,7 @@ Untracked files:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
-#### 4.5.1 添加工作区到暂存区(add)
+#### 添加工作区到暂存区(add)
 
 ```shell
 $ git add .
@@ -260,7 +260,7 @@ $ git reset "文件名"
 $ git reset
 ```
 
-#### 4.5.2 提交暂存区到本地仓库(commit)
+#### 提交暂存区到本地仓库(commit)
 
 ```shell
 $ git commit -m '注释内容'
@@ -269,7 +269,7 @@ $ git commit -m '注释内容'
 - 作用：提交暂存区汇总所有内容到本地仓库的当前分支
 - 命令形式：git commit -m ‘注释内容’
 
-#### 4.5.3 查看提交日志(log)
+#### 查看提交日志(log)
 
 在4.2.2中设置了git log的别名并添加设置。
 
@@ -304,7 +304,7 @@ Date:   Wed Feb 7 15:26:15 2024 +0800
 
 提交时候添加的备注会被放到日志中
 
-#### 4.5.4 版本回退
+#### 版本回退
 
 撤回到之前的某个操作，他回去删除我们撤回到位置之后的版本
 
@@ -321,7 +321,7 @@ Date:   Wed Feb 7 15:26:15 2024 +0800
 
 git reset --hard commitID既可以做版本回退，也可以做版本还原
 
-#### 4.5.5 添加文件至忽略列表
+#### 添加文件至忽略列表
 
 一般我们总会有些文件无需纳入Git 的管理，也不希望它们总出现在未跟踪文件列表。 通常都是些自动
 
@@ -343,7 +343,7 @@ $ touch .gitignore
 
 那么之后的提交便会无视.txt后缀的文件
 
-#### 4.5.6 基础操作指令练习
+#### 基础操作指令练习
 
 1. 新建一个文件夹在其中初始化git仓库
 
@@ -409,7 +409,7 @@ $ git ll
 $  git reset a8c40cb --hard
 ```
 
-### 4.6 分支
+### 分支
 
 几乎所有的版本控制系统都以某种形式支持分支。 使用分支意味着你可以把你的工作从开发主线上分离
 
@@ -419,7 +419,7 @@ $  git reset a8c40cb --hard
 
 工作区只能在一个分支工作，每个分支存放的文件或者资源是不一样的，就相当于不同的文件夹
 
-#### 4.6.1 查看本地分支
+#### 查看本地分支
 
 ```shell
 $ git branch
@@ -427,7 +427,7 @@ $ git branch
 
 带星号的表示当前分支
 
-#### 4.6.2 创建本地分支(branch)
+#### 创建本地分支(branch)
 
 ```shell
 $ git branch "分支名"
@@ -435,7 +435,7 @@ $ git branch "分支名"
 
 创建的新分支会建立在当前分支的版本之上，所以新建的分支会有当前分支的内容
 
-#### 4.6.3 切换分支(checkout)
+#### 切换分支(checkout)
 
 ```shell
 $ git checkout
@@ -447,7 +447,7 @@ $ git checkout
 $ git checkout -b
 ```
 
-#### 4.6.4 合并分支(merge)
+#### 合并分支(merge)
 
 ```shell
 $ git merge "分支名"
@@ -461,7 +461,7 @@ $ git merge "分支名"
 
 当分支岔开时表示多个人在修改同一个文件
 
-#### 4.6.5 删除分支
+#### 删除分支
 
 **不能删除当前分支，只能删除其他分支**
 
@@ -470,7 +470,7 @@ git branch -d b1 删除分支时，需要做各种检查
 git branch -D b1 不做任何检查，强制删除
 ```
 
-#### 4.6.6 解决冲突
+#### 解决冲突
 
 当我们合并分支后，两个或者多个分支对同一个文件的同一个地方进行修改的时候（不是同一个地方是不会出现冲突的 ），此时git就不知道要取哪个分支修改的值，是取a分支修改的值，还是取b分支修改的值呢，此时就产生了冲突
 
@@ -494,7 +494,7 @@ git branch -D b1 不做任何检查，强制删除
 2. 将解决完冲突的文件加入暂存区(add)
 3. 提交到仓库(commit)
 
-#### 4.6.7 开发中分支使用原则与流程
+#### 开发中分支使用原则与流程
 
 几乎所有的版本控制系统都以某种形式支持分支。 使用分支意味着你可以把你的工作从开发主线上分离
 
