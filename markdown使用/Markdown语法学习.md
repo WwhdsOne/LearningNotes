@@ -15,7 +15,7 @@
 ## 1.2 二级标题markdown
 
 ```markdown
-### 三级标题
+##  三级标题
 ```
 
 ### 1.3 三级标题
@@ -50,7 +50,7 @@ Typora快捷键: Crtl + 1-6
 
 通过将文本设置为粗体或斜体来强调其重要性。
 
-### 4.1 粗体(`Bold`)
+##  4.1 粗体(`Bold`)
 
 ```markdown
 **这是粗体语法**
@@ -60,7 +60,7 @@ Typora快捷键: Crtl + 1-6
 
 Typora快捷键: Crtl + B
 
-### 4.2 斜体(`Italic`)
+##  4.2 斜体(`Italic`)
 
 ```markdown
 *这是斜体语法*
@@ -70,7 +70,7 @@ Typora快捷键: Crtl + B
 
 Typora快捷键: Crtl + I
 
-### 4.3 粗体(`Bold`)和斜体(`Italic`)
+##  4.3 粗体(`Bold`)和斜体(`Italic`)
 
 ```markdown
 ***这是粗体和斜体同时作用***
@@ -80,7 +80,7 @@ Typora快捷键: Crtl + I
 
 Typora快捷键: Crtl + I + B
 
-### 4.4 删除线(`strikethrough`)
+##  4.4 删除线(`strikethrough`)
 
 ```markdown
 ~~这是删除线~~
@@ -92,7 +92,7 @@ Typora快捷键: Crtl + I + B
 
 要创建块引用，请在段落前添加一个 `>` 符号。
 
-### 5.1 单行引用
+##  5.1 单行引用
 
 ```markdown
 >这就是单行引用
@@ -100,7 +100,7 @@ Typora快捷键: Crtl + I + B
 
 > 这就是单行引用  
 
-### 5.2 多个段落的块引用
+##  5.2 多个段落的块引用
 
 ```markdown
 >第一行引用
@@ -116,7 +116,7 @@ Typora快捷键: Crtl + I + B
 >
 > 第二行引用
 
-### 5.3 嵌套块引用
+##  5.3 嵌套块引用
 
 ```markdown
 >
@@ -132,9 +132,9 @@ Typora快捷键: Crtl + I + B
 >>
 >>这是第二行内层引用
 
-### 5.4 带有其他元素的引用
+##  5.4 带有其他元素的引用
 
-> #### 效果看起来很不错!
+> ## # 效果看起来很不错!
 >
 > - 这是无序列表第一行!
 > - 这是无序列表第二行!
@@ -145,7 +145,7 @@ Typora快捷键: Crtl + I + B
 
 可以将多个条目组织成有序或无序列表。
 
-### 6.1 有序列表
+##  6.1 有序列表
 
 要创建有序列表，请在每个列表项前添加数字并紧跟一个英文句点。数字不必按数学顺序排列，但是列表应当以数字 1 起始。
 
@@ -180,7 +180,7 @@ Typora快捷键: Crtl + Shift + [
 1. 第三件物品
 1. LOLOLOLOL
 
-### 6.2 无序列表
+##  6.2 无序列表
 
 要创建无序列表，请在每个列表项前面添加破折号 (-)、星号 (*) 或加号 (+) 。缩进一个或多个列表项可创建嵌套列表。
 
@@ -207,7 +207,7 @@ Typora快捷键: Crtl + Shift + ]
 * 再看一下上一行
 ```
 
-### 6.3 在列表中嵌套其他元素
+##  6.3 在列表中嵌套其他元素
 
 要在保留列表连续性的同时在列表中添加另一种元素，请将该元素缩进四个空格或一个制表符，如下例所示
 
@@ -249,7 +249,7 @@ Typora快捷键: Crtl + Shift + ]
 
 # 7 Markdown 代码语法
 
-### 7.1 转义反引号
+##  7.1 转义反引号
 
 要将单词或短语表示为代码，请将其包裹在反引号 (`) 中。
 
@@ -269,7 +269,7 @@ Typora快捷键: Crtl + Shift + ]
 
 Typora快捷键: Crtl + Shift + Q
 
-### 7.2 围栏式代码块
+##  7.2 围栏式代码块
 
 ~~~markdown
 ```json
@@ -315,7 +315,7 @@ _________
 
 # 9 Markdown 链接语法
 
-### 9.1 标准链接语法
+##  9.1 标准链接语法
 
 链接文本放在中括号内，链接地址放在后面的括号中，链接title可选。
 
@@ -327,7 +327,7 @@ _________
 
 [不懂就去问百度](http://www.baidu.com)
 
-### 9.2 带title的链接语法
+##  9.2 带title的链接语法
 
 ```markdown
 [不懂就去问百度](http://www.baidu.com "这是百度哦😙")
@@ -335,7 +335,7 @@ _________
 
 [不懂就去问百度](http://www.baidu.com "这是百度哦😙")
 
-### 9.3 网址和Email地址
+##  9.3 网址和Email地址
 
 使用尖括号可以很方便地把URL或者email地址变成可点击的链接。
 
@@ -349,7 +349,7 @@ _________
 
 <892920290@qq.com>
 
-### 9.4 带格式化的链接
+##  9.4 带格式化的链接
 
 ```markdown
 I love supporting the **[EFF](https://eff.org)**.
@@ -373,7 +373,7 @@ See the section on [`code`](#code).
 | --------------------------------------------------- | ----------------------------------------------- |
 | `[link](https://www.example.com/my%20great%20page)` | `[link](https://www.example.com/my great page)` |
 
-### 9.5 脚注
+##  9.5 脚注
 
 ```markdown
 [^footnote]: 这是个脚注
@@ -383,7 +383,7 @@ See the section on [`code`](#code).
 
 # 10 Markdown 图片语法
 
-### 10.1 基础语法
+##  10.1 基础语法
 
 要添加图像，请使用感叹号 (`!`), 然后在方括号增加替代文本，图片链接放在圆括号里，括号里的链接后可以增加一个可选的图片标题文本。
 
@@ -395,7 +395,7 @@ See the section on [`code`](#code).
 
 Typora快捷键: Crtl + Shift + I
 
-### 10.2 带链接的图像
+##  10.2 带链接的图像
 
 给图片增加链接，请将图像的Markdown 括在方括号中，然后将链接添加在圆括号中。
 
@@ -409,7 +409,7 @@ Typora快捷键: Crtl + Shift + I
 
 # 11 Markdown 转义字符语法
 
-### 11.1 特殊字符用法
+##  11.1 特殊字符用法
 
 要显示原本用于格式化 Markdown 文档的字符，请在字符前面添加反斜杠字符 \ 。
 
@@ -419,7 +419,7 @@ Typora快捷键: Crtl + Shift + I
 
 \* Without the backslash, this would be a bullet in an unordered list.
 
-### 11.2 特殊字符自动转义
+##  11.2 特殊字符自动转义
 
 在 HTML 文件中，有两个字符需要特殊处理： `<` 和 `&` 。 `<` 符号用于起始标签，`&` 符号则用于标记 HTML 实体，如果你只是想要使用这些符号，你必须要使用实体的形式，像是 `<` 和 `&`。
 
@@ -443,7 +443,7 @@ http://images.google.com/images?num=30&amp;q=larry+bird
 
 对于 Markdown 涵盖范围之外的标签，都可以直接在文件里面用 HTML 本身。如需使用 HTML，不需要额外标注这是 HTML 或是 Markdown，只需 HTML 标签添加到 Markdown 文本中即可。
 
-### 12.1 行级內联标签
+##  12.1 行级內联标签
 
 HTML 的行级內联标签如 `<span>`、`<cite>`、`<del>` 不受限制，可以在 Markdown 的段落、列表或是标题里任意使用。依照个人习惯，甚至可以不用 Markdown 格式，而采用 HTML 标签来格式化。例如：如果比较喜欢 HTML 的 `<a>` 或 `<img>` 标签，可以直接使用这些标签，而不用 Markdown 提供的链接或是图片语法。当你需要更改元素的属性时（例如为文本指定颜色或更改图像的宽度），使用 HTML 标签更方便些。
 
@@ -455,7 +455,7 @@ HTML 行级內联标签和区块标签不同，在內联标签的范围内， Ma
 
 **这一段话既可以这么加粗**,<strong>也可以这么加粗。</strong>
 
-### 12.2 区块标签
+##  12.2 区块标签
 
 区块元素──比如 `<div>`、`<table>`、`<pre>`、`<p>` 等标签，必须在前后加上空行，以便于内容区分。而且这些元素的开始与结尾标签，不可以用 tab 或是空白来缩进。Markdown 会自动识别这区块元素，避免在区块标签前后加上没有必要的 `<p>` 标签。
 
@@ -488,20 +488,9 @@ HTML 行级內联标签和区块标签不同，在內联标签的范围内， Ma
 
 **注意：在 HTML 块级标签内不能使用 Markdown 语法。例如 `<p>italic and **bold**</p>` 将不起作用。**
 
-### 12.3 插入在线视频
-
-由于markdown支持html的代码块,所以对于没有版权限制的网站可以将其提供的嵌入视频代码块复制到markdown中
-
-```html
-<iframe src="//player.bilibili.com/player.html?aid=1900722451&bvid=BV1Zm411D7gb&cid=1438515456&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
-```
-
-<iframe height=498 width=510 src="//player.bilibili.com/player.html?aid=1900722451&bvid=BV1Zm411D7gb&cid=1438515456&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true">
-
-
 # 13 Markdown拓展功能
 
-### 13.1 Mermaid
+##  13.1 Mermaid
 
 **Mermaid 允许你使用文本和代码创建图表和可视化。**
 
@@ -554,7 +543,7 @@ Future task2               :         des4, after des3, 5d
 
 等等
 
-### 13.2 LaTex
+##  13.2 LaTex
 
 LaTeX 是一个让你的文档看起来更专业的排版系统，而不是文字处理器。它尤其适合处理篇幅较长、结构严谨的文档，并且十分擅长处理公式表达。它是免费的软件，对大多数操作系统都适用。
 
