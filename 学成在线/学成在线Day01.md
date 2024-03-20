@@ -2,7 +2,7 @@
 
 # 开发工具版本
 
-![image-20240207192456061](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240207192456061.png)
+![image-20240207192456061](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240207192456061.png)
 
 # 环境搭建
 
