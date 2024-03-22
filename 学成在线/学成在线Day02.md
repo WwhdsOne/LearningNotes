@@ -169,7 +169,7 @@ nginx到http://www.baidu.com:8601通过服务端通信，没有跨域。
 
 分类表中的数据为树形结构：
 
-![image-20240211185359606](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240211185359606.png)
+![image-20240211185359606](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240211185359606.png)
 
 ### 树形数据库查询
 
