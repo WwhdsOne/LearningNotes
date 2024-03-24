@@ -316,6 +316,10 @@ Core Java学到了代理,不得不说Java细节还是挺多的,lambda表达式�
 
 javascript教程开始学习，今日学到switch语句
 
+# 2024.3.24
+
+今日javascript教程进度到`构造器和操作符 "new"`
+
 
 
 
