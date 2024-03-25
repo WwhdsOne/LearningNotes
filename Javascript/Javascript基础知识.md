@@ -276,6 +276,41 @@ let user;
 alert(user ?? "匿名"); // 匿名（user 未定义）
 ```
 
+在JavaScript中，`??`和`||`都可以用于提供默认值，但它们在处理“假值”（falsy values）时的行为是不同的。
+
+`||`运算符会返回第一个“真值”（truthy value）或者最后一个“假值”。在JavaScript中，以下值被认为是假值：
+
+- `false`
+- `0`和`-0`
+- `""`和`''`（空字符串）
+- `null`
+- `undefined`
+- `NaN`
+
+例如：
+
+```javascript
+console.log(false || "default"); // 输出："default"
+
+console.log(null || "default"); // 输出："default"
+
+console.log("" || "default"); // 输出："default"
+```
+
+`??`运算符（空值合并运算符）只有在左侧的操作数为`null`或`undefined`时，才会返回右侧的操作数。对于其他的假值，如`false`、`0`、`""`，`??`运算符会返回左侧的操作数。
+
+例如：
+
+```javascript
+console.log(false ?? "default"); // 输出：false
+
+console.log(null ?? "default"); // 输出："default"
+
+console.log("" ?? "default"); // 输出：""
+```
+
+因此，你应该根据你的需求选择使用`||`还是`??`。如果你希望除了`null`和`undefined`之外的假值被保留，你应该使用`??`。如果你希望所有的假值都被替换为默认值，你应该使用`||`。
+
 # 2.13 循环：while和for
 
 ## break/continue 标签
@@ -972,3 +1007,433 @@ cal.read();
 alert('Sum='+cal.sum());
 ```
 
+# 4.6 可选链 "?."
+
+可选链 `?.` 是一种访问嵌套对象属性的安全的方式。即使中间的属性不存在，也不会出现错误。
+
+如果可选链 `?.` 前面的值为 `undefined` 或者 `null`，它会停止运算并返回 `undefined`。
+
+**为了简明起见，在本文接下来的内容中，我们会说如果一个属性既不是 `null` 也不是 `undefined`，那么它就“存在”。**
+
+换句话说，例如 `value?.prop`：
+
+- 如果 `value` 存在，则结果与 `value.prop` 相同，
+- 否则（当 `value` 为 `undefined/null` 时）则返回 `undefined`。
+
+下面这是一种使用 `?.` 安全地访问 `user.address.street` 的方式：
+
+```javascript
+let user = {}; // user 没有 address 属性
+
+alert( user?.address?.street ); // undefined（不报错）
+```
+
+**不要过度使用可选链**
+
+我们应该只将 `?.` 使用在一些东西可以不存在的地方。
+
+例如，如果根据我们的代码逻辑，`user` 对象必须存在，但 `address` 是可选的，那么我们应该这样写 `user.address?.street`，而不是这样 `user?.address?.street`。
+
+那么，如果 `user` 恰巧为 undefined，我们会看到一个编程错误并修复它。否则，如果我们滥用 `?.`，会导致代码中的错误在不应该被消除的地方消除了，这会导致调试更加困难。
+
+**`?.` 前的变量必须已声明**
+
+如果未声明变量 `user`，那么 `user?.anything` 会触发一个错误：
+
+```javascript
+// ReferenceError: user is not defined
+user?.address;
+```
+
+`?.` 前的变量必须已声明（例如 `let/const/var user` 或作为一个函数参数）。可选链仅适用于已声明的变量。
+
+## 短路效应
+
+正如前面所说的，如果 `?.` 左边部分不存在，就会立即停止运算（“短路效应”）。
+
+因此，如果在 `?.` 的右侧有任何进一步的函数调用或操作，它们均不会执行。
+
+例如：
+
+```javascript
+let user = null;
+let x = 0;
+
+user?.sayHi(x++); // 没有 "user"，因此代码执行没有到达 sayHi 调用和 x++
+
+alert(x); // 0，值没有增加
+```
+
+**我们可以使用 `?.` 来安全地读取或删除，但不能写入**
+
+可选链 `?.` 不能用在赋值语句的左侧。
+
+例如：
+
+```javascript
+let user = null;
+
+user?.name = "John"; // Error，不起作用
+// 因为它在计算的是：undefined = "John"
+```
+
+# 4.7 symbol 类型
+
+## symbol
+
+“symbol” 值表示唯一的标识符。
+
+可以使用 `Symbol()` 来创建这种类型的值：
+
+```javascript
+let id = Symbol();
+```
+
+创建时，我们可以给 symbol 一个描述（也称为 symbol 名），这在代码调试时非常有用：
+
+```javascript
+// id 是描述为 "id" 的 symbol
+let id = Symbol("id");
+```
+
+symbol 保证是唯一的。即使我们创建了许多具有相同描述的 symbol，它们的值也是不同。描述只是一个标签，不影响任何东西。
+
+例如，这里有两个描述相同的 symbol —— 它们不相等：
+
+```javascript
+let id1 = Symbol("id");
+let id2 = Symbol("id");
+
+alert(id1 == id2); // false
+```
+
+如果你熟悉 Ruby 或者其他有 “symbol” 的语言 —— 别被误导。JavaScript 的 symbol 是不同的。
+
+所以，总而言之，symbol 是带有可选描述的“原始唯一值”。让我们看看我们可以在哪里使用它们。
+
+**symbol 不会被自动转换为字符串**
+
+JavaScript 中的大多数值都支持字符串的隐式转换。例如，我们可以 `alert` 任何值，都可以生效。symbol 比较特殊，它不会被自动转换。
+
+例如，这个 `alert` 将会提示出错：
+
+```javascript
+let id = Symbol("id");
+alert(id); // 类型错误：无法将 symbol 值转换为字符串。
+```
+
+这是一种防止混乱的“语言保护”，因为字符串和 symbol 有本质上的不同，不应该意外地将它们转换成另一个。
+
+如果我们真的想显示一个 symbol，我们需要在它上面调用 `.toString()`，如下所示：
+
+```javascript
+let id = Symbol("id");
+alert(id.toString()); // Symbol(id)，现在它有效了
+```
+
+或者获取 `symbol.description` 属性，只显示描述（description）：
+
+```javascript
+let id = Symbol("id");
+alert(id.description); // id
+```
+
+## 隐藏属性
+
+symbol 允许我们创建对象的“隐藏”属性，代码的任何其他部分都不能意外访问或重写这些属性。
+
+例如，如果我们使用的是属于第三方代码的 `user` 对象，我们想要给它们添加一些标识符。
+
+我们可以给它们使用 symbol 键：
+
+```javascript
+let user = { // 属于另一个代码
+  name: "John"
+};
+
+let id = Symbol("id");
+
+user[id] = 1;
+
+alert( user[id] ); // 我们可以使用 symbol 作为键来访问数据
+```
+
+使用 `Symbol("id")` 作为键，比起用字符串 `"id"` 来有什么好处呢？
+
+由于 `user` 对象属于另一个代码库，所以向它们添加字段是不安全的，因为我们可能会影响代码库中的其他预定义行为。但 symbol 属性不会被意外访问到。第三方代码不会知道新定义的 symbol，因此将 symbol 添加到 `user` 对象是安全的。
+
+## 全局 symbol
+
+正如我们所看到的，通常所有的 symbol 都是不同的，即使它们有相同的名字。但有时我们想要名字相同的 symbol 具有相同的实体。例如，应用程序的不同部分想要访问的 symbol `"id"` 指的是完全相同的属性。
+
+为了实现这一点，这里有一个 **全局 symbol 注册表**。我们可以在其中创建 symbol 并在稍后访问它们，它可以确保每次访问相同名字的 symbol 时，返回的都是相同的 symbol。
+
+要从注册表中读取（不存在则创建）symbol，请使用 `Symbol.for(key)`。
+
+该调用会检查全局注册表，如果有一个描述为 `key` 的 symbol，则返回该 symbol，否则将创建一个新 symbol（`Symbol(key)`），并通过给定的 `key` 将其存储在注册表中。
+
+例如：
+
+```javascript
+// 从全局注册表中读取
+let id = Symbol.for("id"); // 如果该 symbol 不存在，则创建它
+
+// 再次读取（可能是在代码中的另一个位置）
+let idAgain = Symbol.for("id");
+
+// 相同的 symbol
+alert( id === idAgain ); // true
+```
+
+注册表内的 symbol 被称为 **全局 symbol**。如果我们想要一个应用程序范围内的 symbol，可以在代码中随处访问 —— 这就是它们的用途。
+
+# 4.8 对象 —— 原始值转换
+
+**为了进行转换，JavaScript 尝试查找并调用三个对象方法：**
+
+1. 调用 `obj[Symbol.toPrimitive](hint)` —— 带有 symbol 键 `Symbol.toPrimitive`（系统 symbol）的方法，如果这个方法存在的话，
+2. 否则，如果 hint 是 `"string"` —— 尝试调用 `obj.toString()` 或 `obj.valueOf()`，无论哪个存在。
+3. 否则，如果 hint 是 `"number"` 或 `"default"` —— 尝试调用 `obj.valueOf()` 或 `obj.toString()`，无论哪个存在。
+
+## Symbol.toPrimitive
+
+我们从第一个方法开始。有一个名为 `Symbol.toPrimitive` 的内建 symbol，它被用来给转换方法命名，像这样：
+
+```javascript
+obj[Symbol.toPrimitive] = function(hint) {
+    // 这里是将此对象转换为原始值的代码
+    // 它必须返回一个原始值
+    // hint = "string"、"number" 或 "default" 中的一个
+}
+```
+
+如果 `Symbol.toPrimitive` 方法存在，则它会被用于所有 hint，无需更多其他方法。
+
+例如，这里 `user` 对象实现了它：
+
+```javascript
+let user = {
+    name: "John",
+    money: 1000,
+
+    [Symbol.toPrimitive](hint) {
+        alert(`hint: ${hint}`);
+        return hint == "string" ? `{name: "${this.name}"}` : this.money;
+    }
+};
+
+// 转换演示：
+alert(user); // hint: string -> {name: "John"}
+alert(+user); // hint: number -> 1000
+alert(user + 500); // hint: default -> 1500
+```
+
+从代码中我们可以看到，根据转换的不同，`user` 变成一个自描述字符串或者一个金额。`user[Symbol.toPrimitive]` 方法处理了所有的转换情况。
+
+## toString/valueOf
+
+如果没有 `Symbol.toPrimitive`，那么 JavaScript 将尝试寻找 `toString` 和 `valueOf` 方法：
+
+- 对于 `"string"` hint：调用 `toString` 方法，如果它不存在，则调用 `valueOf` 方法（因此，对于字符串转换，优先调用 `toString`）。
+- 对于其他 hint：调用 `valueOf` 方法，如果它不存在，则调用 `toString` 方法（因此，对于数学运算，优先调用 `valueOf` 方法）。
+
+`toString` 和 `valueOf` 方法很早己有了。它们不是 symbol（那时候还没有 symbol 这个概念），而是“常规的”字符串命名的方法。它们提供了一种可选的“老派”的实现转换的方法。
+
+`toString` 和 `valueOf` 方法很早己有了。它们不是 symbol（那时候还没有 symbol 这个概念），而是“常规的”字符串命名的方法。它们提供了一种可选的“老派”的实现转换的方法。
+
+这些方法必须返回一个原始值。如果 `toString` 或 `valueOf` 返回了一个对象，那么返回值会被忽略（和这里没有方法的时候相同）。
+
+默认情况下，普通对象具有 `toString` 和 `valueOf` 方法：
+
+- `toString` 方法返回一个字符串 `"[object Object]"`。
+- `valueOf` 方法返回对象自身。
+
+下面是一个示例：
+
+```javascript
+let user = {name: "John"};
+
+alert(user); // [object Object]
+alert(user.valueOf() === user); // true
+```
+
+对象到原始值的转换，是由许多期望以原始值作为值的内建函数和运算符自动调用的。
+
+这里有三种类型（hint）：
+
+- `"string"`（对于 `alert` 和其他需要字符串的操作）
+- `"number"`（对于数学运算）
+- `"default"`（少数运算符，通常对象以和 `"number"` 相同的方式实现 `"default"` 转换）
+
+规范明确描述了哪个运算符使用哪个 hint。
+
+转换算法是：
+
+1. 调用 `obj[Symbol.toPrimitive](hint)` 如果这个方法存在，
+2. 否则，如果 hint 是"string"
+   - 尝试调用 `obj.toString()` 或 `obj.valueOf()`，无论哪个存在。
+3. 否则，如果 hint 是"number"或者"default"
+   - 尝试调用 `obj.valueOf()` 或 `obj.toString()`，无论哪个存在。
+
+所有这些方法都必须返回一个原始值才能工作（如果已定义）。
+
+在实际使用中，通常只实现 `obj.toString()` 作为字符串转换的“全能”方法就足够了，该方法应该返回对象的“人类可读”表示，用于日志记录或调试。
+
+# 5.2 数字类型
+
+## 编写数字的更多方法
+
+假如我们需要表示 10 亿。显然，我们可以这样写：
+
+```javascript
+let billion = 1000000000;
+```
+
+我们也可以使用下划线 `_` 作为分隔符：
+
+```javascript
+let billion = 1_000_000_000;
+```
+
+这里的下划线 `_` 扮演了“[语法糖](https://en.wikipedia.org/wiki/Syntactic_sugar)”的角色，使得数字具有更强的可读性。JavaScript 引擎会直接忽略数字之间的 `_`，所以 上面两个例子其实是一样的。
+
+- ```javascript
+  alert( 123456..toString(36) ); // 2n9c
+  ```
+
+**使用两个点来调用一个方法**
+
+请注意 `123456..toString(36)` 中的两个点不是打错了。如果我们想直接在一个数字上调用一个方法，比如上面例子中的 `toString`，那么我们需要在它后面放置两个点 `..`。
+
+如果我们放置一个点：`123456.toString(36)`，那么就会出现一个 error，因为 JavaScript 语法隐含了第一个点之后的部分为小数部分。如果我们再放一个点，那么 JavaScript 就知道小数部分为空，现在使用该方法。
+
+也可以写成 `(123456).toString(36)`。
+
+**总结**
+
+要写有很多零的数字：
+
+- 将 `"e"` 和 0 的数量附加到数字后。就像：`123e6` 与 `123` 后面接 6 个 0 相同。
+- `"e"` 后面的负数将使数字除以 1 后面接着给定数量的零的数字。例如 `123e-6` 表示 `0.000123`（`123` 的百万分之一）。
+
+对于不同的数字系统：
+
+- 可以直接在十六进制（`0x`），八进制（`0o`）和二进制（`0b`）系统中写入数字。
+- `parseInt(str, base)` 将字符串 `str` 解析为在给定的 `base` 数字系统中的整数，`2 ≤ base ≤ 36`。
+- `num.toString(base)` 将数字转换为在给定的 `base` 数字系统中的字符串。
+
+对于常规数字检测：
+
+- `isNaN(value)` 将其参数转换为数字，然后检测它是否为 `NaN`
+- `isFinite(value)` 将其参数转换为数字，如果它是常规数字，则返回 `true`，而不是 `NaN/Infinity/-Infinity`
+
+要将 `12pt` 和 `100px` 之类的值转换为数字：
+
+- 使用 `parseInt/parseFloat` 进行“软”转换，它从字符串中读取数字，然后返回在发生 error 前可以读取到的值。
+
+小数：
+
+- 使用 `Math.floor`，`Math.ceil`，`Math.trunc`，`Math.round` 或 `num.toFixed(precision)` 进行舍入。
+- 请确保记住使用小数时会损失精度。
+
+更多数学函数：
+
+- 需要时请查看 [Math](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math) 对象。这个库很小，但是可以满足基本的需求。
+
+# 5.4 数组
+
+## pop/push, shift/unshift 方法
+
+- `pop`在末端取出一个元素
+- `push`在末端添加一个元素
+- `shift`在首端取出一个元素
+- `unshift`在首端添加一个元素
+
+```javascript
+let arr = ["Apple","Banana","Peach"]
+    alert(arr) //["Apple","Banana","Peach"]
+    alert(arr.shift()) // Apple
+    alert(arr) //["Banana","Peach"]
+    arr.unshift("Apple")
+    alert(arr) // ["Apple","Banana","Peach"]
+    arr.push("Orange")
+    alert(arr) // ["Apple","Banana","Peach","Orange"]
+    alert(arr.pop()) // Orange
+    alert(arr) // ["Apple","Banana","Peach"]
+```
+
+## 循环
+
+遍历数组最古老的方式就是 `for` 循环：
+
+```javascript
+let arr = ["Apple", "Orange", "Pear"];
+
+for (let i = 0; i < arr.length; i++) {
+  alert( arr[i] );
+}
+```
+
+但对于数组来说还有另一种循环方式，`for..of`：
+
+```javascript
+let fruits = ["Apple", "Orange", "Plum"];
+
+// 遍历数组元素
+for (let fruit of fruits) {
+  alert( fruit );
+}
+```
+
+`for..of` 不能获取当前元素的索引，只是获取元素值，但大多数情况是够用的。而且这样写更短。
+
+技术上来讲，因为数组也是对象，所以使用 `for..in` 也是可以的：
+
+```javascript
+let arr = ["Apple", "Orange", "Pear"];
+
+for (let key in arr) {
+  alert( arr[key] ); // Apple, Orange, Pear
+}
+```
+
+但这其实是一个很不好的想法。会有一些潜在问题存在：
+
+1. `for..in` 循环会遍历 **所有属性**，不仅仅是这些数字属性。
+
+   在浏览器和其它环境中有一种称为“类数组”的对象，它们 **看似是数组**。也就是说，它们有 `length` 和索引属性，但是也可能有其它的非数字的属性和方法，这通常是我们不需要的。`for..in` 循环会把它们都列出来。所以如果我们需要处理类数组对象，这些“额外”的属性就会存在问题。
+
+2. `for..in` 循环适用于普通对象，并且做了对应的优化。但是不适用于数组，因此速度要慢 10-100 倍。当然即使是这样也依然非常快。只有在遇到瓶颈时可能会有问题。但是我们仍然应该了解这其中的不同。
+
+通常来说，我们不应该用 `for..in` 来处理数组。
+
+## 关于 “length”
+
+当我们修改数组的时候，`length` 属性会自动更新。准确来说，它实际上不是数组里元素的个数，而是最大的数字索引值加一。
+
+例如，一个数组只有一个元素，但是这个元素的索引值很大，那么这个数组的 `length` 也会很大：
+
+```javascript
+let fruits = [];
+fruits[123] = "Apple";
+
+alert( fruits.length ); // 124
+```
+
+要知道的是我们通常不会这样使用数组。
+
+`length` 属性的另一个有意思的点是它是可写的。
+
+如果我们手动增加它，则不会发生任何有趣的事儿。但是如果我们减少它，数组就会被截断。该过程是不可逆的，下面是例子：
+
+```javascript
+let arr = [1, 2, 3, 4, 5];
+
+arr.length = 2; // 截断到只剩 2 个元素
+alert( arr ); // [1, 2]
+
+arr.length = 5; // 又把 length 加回来
+alert( arr[3] ); // undefined：被截断的那些数值并没有回来
+```
+
+所以，清空数组最简单的方法就是：`arr.length = 0;`。

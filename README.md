@@ -320,6 +320,16 @@ javascript教程开始学习，今日学到switch语句
 
 今日javascript教程进度到`构造器和操作符 "new"`
 
+# 2024.3.25
+
+javascript学到了数组的一些操作
+
+Core Java异常学了7.1小节
+
+博客的无法点击目录跳转bug修复
+
+
+
 
 
 
