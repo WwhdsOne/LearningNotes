@@ -1239,8 +1239,6 @@ alert(user + 500); // hint: default -> 1500
 
 `toString` 和 `valueOf` 方法很早己有了。它们不是 symbol（那时候还没有 symbol 这个概念），而是“常规的”字符串命名的方法。它们提供了一种可选的“老派”的实现转换的方法。
 
-`toString` 和 `valueOf` 方法很早己有了。它们不是 symbol（那时候还没有 symbol 这个概念），而是“常规的”字符串命名的方法。它们提供了一种可选的“老派”的实现转换的方法。
-
 这些方法必须返回一个原始值。如果 `toString` 或 `valueOf` 返回了一个对象，那么返回值会被忽略（和这里没有方法的时候相同）。
 
 默认情况下，普通对象具有 `toString` 和 `valueOf` 方法：
@@ -1437,3 +1435,310 @@ alert( arr[3] ); // undefined：被截断的那些数值并没有回来
 ```
 
 所以，清空数组最简单的方法就是：`arr.length = 0;`。
+
+# 5.5 数组方法
+
+## splice(粘接)
+
+arr.splice方法可以说是处理数组的瑞士军刀。它可以做所有事情：添加，删除和插入元素。
+
+语法是：
+
+```javascript
+arr.splice(start[, deleteCount, elem1, ..., elemN])
+```
+
+它从索引 `start` 开始修改 `arr`：删除 `deleteCount` 个元素并在当前位置插入 `elem1, ..., elemN`。最后返回被删除的元素所组成的数组。
+
+通过例子我们可以很容易地掌握这个方法。
+
+让我们从删除开始：
+
+```javascript
+let arr = ["I", "study", "JavaScript"];
+
+arr.splice(1, 1); // 从索引 1 开始删除 1 个元素
+
+alert( arr ); // ["I", "JavaScript"]
+```
+
+然后是删除后添加:
+
+```javascript
+let arr = ["I", "study", "JavaScript"];
+
+arr.splice(0, 3,"Let's","dance"); // remove 3 first elements and replace them with another
+
+alert( arr ); // now ["Let's", "dance"]
+```
+
+若将deleteCount设置为0则可以直接添加元素
+
+```javascript
+let arr = ["I", "study", "JavaScript"];
+
+    arr.splice(3, 0,"Let's","dance"); // 从索引 3 开始删除 0 个元素
+
+    alert( arr );  // ["I", "study", "JavaScript", "Let's", "dance"]
+```
+
+在这里我们可以看到 `splice` 返回了被删除的元素所组成的数组：
+
+```javascript
+let arr = ["I", "study", "JavaScript", "right", "now"];
+
+// 删除前两个元素
+let removed = arr.splice(0, 2);
+
+alert( removed ); // "I", "study" <-- 被从数组中删除了的元素
+```
+
+## concat
+
+arr.concat 创建一个新数组，其中包含来自于其他数组和其他项的值。
+
+语法：
+
+```javascript
+arr.concat(arg1, arg2...)
+```
+
+它接受任意数量的参数 —— 数组或值都可以。
+
+结果是一个包含来自于 `arr`，然后是 `arg1`，`arg2` 的元素的新数组。
+
+如果参数 `argN` 是一个数组，那么其中的所有元素都会被复制。否则，将复制参数本身。
+
+例如：
+
+```javascript
+let arr = [1, 2];
+
+// 从 arr 和 [3,4] 创建一个新数组
+alert( arr.concat([3, 4]) ); // 1,2,3,4
+
+// 从 arr、[3,4] 和 [5,6] 创建一个新数组
+alert( arr.concat([3, 4], [5, 6]) ); // 1,2,3,4,5,6
+
+// 从 arr、[3,4]、5 和 6 创建一个新数组
+alert( arr.concat([3, 4], 5, 6) ); // 1,2,3,4,5,6
+```
+
+通常，它只复制数组中的元素。其他对象，即使它们看起来像数组一样，但仍然会被作为一个整体添加：
+
+```javascript
+let arr = [1, 2];
+
+let arrayLike = {
+  0: "something",
+  length: 1
+};
+
+alert( arr.concat(arrayLike) ); // 1,2,[object Object]
+```
+
+……但是，如果类数组对象具有 `Symbol.isConcatSpreadable` 属性，那么它就会被 `concat` 当作一个数组来处理：此对象中的元素将被添加：
+
+```javascript
+let arr = [1, 2];
+
+let arrayLike = {
+  0: "something",
+  1: "else",
+  [Symbol.isConcatSpreadable]: true,
+  length: 2
+};
+
+alert( arr.concat(arrayLike) ); // 1,2,something,else
+```
+
+## 遍历：forEach
+
+arr.forEach 方法允许为数组的每个元素都运行一个函数。
+
+语法：
+
+```javascript
+arr.forEach(function(item, index, array) {
+    // ... do something with item
+});
+```
+
+例如，下面这个程序显示了数组的每个元素：
+
+```javascript
+// 对每个元素调用 alert
+["Bilbo", "Gandalf", "Nazgul"].forEach(alert);
+```
+
+而这段代码更详细地介绍了它们在目标数组中的位置：
+
+```javascript
+["Bilbo", "Gandalf", "Nazgul"].forEach((item, index, array) => {
+    alert(`${item} is at index ${index} in ${array}`);
+});
+```
+
+## find
+
+想象一下，我们有一个对象数组。我们如何找到具有特定条件的对象？
+
+这时可以用 arr.find 方法。
+
+语法如下：
+
+```javascript
+let result = arr.find(function(item, index, array) {
+  // 如果返回 true，则返回 item 并停止迭代
+  // 对于假值（falsy）的情况，则返回 undefined
+});
+```
+
+依次对数组中的每个元素调用该函数：
+
+- `item` 是元素。
+- `index` 是它的索引。
+- `array` 是数组本身。
+
+如果它返回 `true`，则搜索停止，并返回 `item`。如果没有搜索到，则返回 `undefined`。
+
+例如，我们有一个存储用户的数组，每个用户都有 `id` 和 `name` 字段。让我们找到 `id == 1` 的那个用户：
+
+```javascript
+let users = [
+    {id: 1, name: "John"},
+    {id: 2, name: "Pete"},
+    {id: 3, name: "Mary"}
+];
+
+let user = users.find(item => item.id == 1);
+
+alert(user.name); // John
+```
+
+## filter
+
+`find` 方法搜索的是使函数返回 `true` 的第一个（单个）元素。
+
+如果需要匹配的有很多，我们可以使用 arr.filter(fn)
+
+语法与 `find` 大致相同，但是 `filter` 返回的是所有匹配元素组成的数组：
+
+```javascript
+let results = arr.filter(function(item, index, array) {
+  // 如果 true item 被 push 到 results，迭代继续
+  // 如果什么都没找到，则返回空数组
+});
+```
+
+例如：
+
+```javascript
+let users = [
+  {id: 1, name: "John"},
+  {id: 2, name: "Pete"},
+  {id: 3, name: "Mary"}
+];
+
+// 返回前两个用户的数组
+let someUsers = users.filter(item => item.id < 3);
+
+alert(someUsers.length); // 2
+```
+
+## map
+
+arr.map方法是最有用和经常使用的方法之一。
+
+它对数组的每个元素都调用函数，并返回结果数组。
+
+语法：
+
+```javascript
+let result = arr.map(function(item, index, array) {
+    // 返回新值而不是当前元素
+})
+```
+
+例如，在这里我们将每个元素转换为它的字符串长度：
+
+```javascript
+let lengths = ["Bilbo", "Gandalf", "Nazgul"].map(item => item.length);
+alert(lengths); // 5,7,6
+```
+
+## sort(fn)
+
+arr.sort方法对数组进行 **原位（in-place）** 排序，更改元素的顺序。(译注：原位是指在此数组内，而非生成一个新数组。)
+
+它还返回排序后的数组，但是返回值通常会被忽略，因为修改了 `arr` 本身。
+
+语法：
+
+```javascript
+let arr = [ 1, 2, 15 ];
+
+// 该方法重新排列 arr 的内容
+arr.sort();
+
+alert( arr );  // 1, 15, 2
+```
+
+你有没有注意到结果有什么奇怪的地方？
+
+顺序变成了 `1, 15, 2`。不对，但为什么呢？
+
+**这些元素默认情况下被按字符串进行排序。**
+
+需要进行排序函数的编写才能正常编写
+
+```javascript
+let arr = ["5", "7", "233","666"].map(item => Number(item));
+arr.sort(function(a, b) {
+    return b - a;
+});
+console.log(arr); // [666, 233, 7, 5]
+```
+
+## reduce/reduceRight
+
+当我们需要遍历一个数组时 —— 我们可以使用 `forEach`，`for` 或 `for..of`。
+
+当我们需要遍历并返回每个元素的数据时 —— 我们可以使用 `map`。
+
+[arr.reduce](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce) 方法和 [arr.reduceRight](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight) 方法和上面的种类差不多，但稍微复杂一点。它们用于根据数组计算单个值。
+
+语法是：
+
+```javascript
+let value = arr.reduce(function(accumulator, item, index, array) {
+  // ...
+}, [initial]);
+```
+
+该函数一个接一个地应用于所有数组元素，并将其结果“搬运（carry on）”到下一个调用。
+
+参数：
+
+- `accumulator` —— 是上一个函数调用的结果，第一次等于 `initial`（如果提供了 `initial` 的话）。
+- `item` —— 当前的数组元素。
+- `index` —— 当前索引。
+- `arr` —— 数组本身。
+
+应用函数时，上一个函数调用的结果将作为第一个参数传递给下一个函数。
+
+因此，第一个参数本质上是累加器，用于存储所有先前执行的组合结果。最后，它成为 `reduce` 的结果。
+
+听起来复杂吗？
+
+掌握这个知识点的最简单的方法就是通过示例。
+
+在这里，我们通过一行代码得到一个数组的总和：
+
+```javascript
+let arr = [1, 2, 3, 4, 5];
+
+let result = arr.reduce((sum, current) => sum + current, 0);
+
+alert(result); // 15
+```
