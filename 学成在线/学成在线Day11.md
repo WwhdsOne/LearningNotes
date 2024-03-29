@@ -1534,21 +1534,15 @@ https://pay.weixin.qq.com/index.php/apply/applyment_home/guide_normal#none
 
 文档：https://b.alipay.com/signing/productSetV2.htm
 
-![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image024.gif)
-
 与本项目需求相关的接口：电脑网站支付、手机网站支付。
 
 1、电脑网站支付
 
 PC网站轻松收款，资金马上到账：用户在商家PC网站消费，自动跳转支付宝PC网站收银台完成付款。 交易资金直接打入商家支付宝账户，实时到账。
 
-![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image026.gif)
-
 2、手机网站支付
 
 用户在商家手机网站消费，通过浏览器自动跳转支付宝APP或支付宝网页完成付款。 轻松实现和APP支付相同的支付体验。
-
-![img](C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image028.gif)
 
 对比两种支付方式：手机网站支付方式可以在H5网页唤起支付宝，手机扫码支付可以使用手机网站支付方式来完成，相比电脑网站支付形式更灵活。
 
@@ -1563,8 +1557,6 @@ PC网站轻松收款，资金马上到账：用户在商家PC网站消费，自�
 点击：立即开通
 
 上传营业执照等资料，提交审核，根据提示进行开通。
-
-![img](file:///C:/Users/Wwhds/AppData/Local/Temp/msohtmlclip1/01/clip_image030.gif)
 
 ## 支付接口测试
 

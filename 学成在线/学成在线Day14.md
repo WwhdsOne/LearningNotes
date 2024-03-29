@@ -88,7 +88,7 @@ Apache JMeter 是 Apache 组织基于 Java 开发的压力测试工具，用于�
 
 https://jmeter.apache.org/download_jmeter.cgi
 
-![image-20240314092408135](C:/Users/Wwhds/AppData/Roaming/Typora/typora-user-images/image-20240314092408135.png)
+![image-20240314092408135](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240314092408135.png)
 
 下载，解压，进入bin目录修改`jmeter.properties`，设置中文和字体
 

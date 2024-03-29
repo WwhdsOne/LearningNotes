@@ -1,7 +1,3 @@
-# 学成在线Day07
-
-
-
 # 技术方案
 
 ## 作业分片方案
@@ -121,7 +117,7 @@ sequenceDiagram
 
 根据MIME Type去判断是否是avi视频，下边列出部分MIME Type
 
-![image-20240219164705050](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240219164705050.png)
+![image-20240219164705050](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240219164705050.png)
 
 avi视频的MIME Type是video/x-msvideo
 
@@ -179,13 +175,13 @@ synchronized(锁对象){
 
 synchronized只能保证同一个虚拟机中多个线程去争抢锁。
 
-![image-20240219190142694](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240219190142694.png)
+![image-20240219190142694](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240219190142694.png)
 
 如果是多个执行器分布式部署，并不能保证同一个视频只有一个执行器去处理。
 
 现在要实现分布式环境下所有虚拟机中的线程去同步执行就需要让多个虚拟机去共用一个锁，虚拟机可以分布式部署，锁也可以分布式部署，如下图：
 
-![image-20240219190206663](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240219190206663.png)
+![image-20240219190206663](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240219190206663.png)
 
 虚拟机都去抢占同一个锁，锁是一个单独的程序提供加锁、解锁服务。
 
@@ -455,7 +451,7 @@ private async handleDeleteMedia(node: ICourseOutlineTreeNode) {
 
 下图是课程预览的效果图，也是课程正式发布后的课程详情界面：
 
-![image-20240220200205363](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240220200205363.png)
+![image-20240220200205363](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240220200205363.png)
 
 教学机构确认课程内容无误，提交审核，平台运营人员对课程内容审核，审核通过后教学机构人员发布课程成功。
 
@@ -475,7 +471,7 @@ private async handleDeleteMedia(node: ICourseOutlineTreeNode) {
 
 早期我们采用的jsp技术就是一种模板引擎技术，如下图：
 
-![image-20240220200332744](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240220200332744.png)
+![image-20240220200332744](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240220200332744.png)
 
 1、浏览器请求web服务器
 

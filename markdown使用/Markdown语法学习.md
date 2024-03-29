@@ -400,10 +400,10 @@ Typora快捷键: Crtl + Shift + I
 给图片增加链接，请将图像的Markdown 括在方括号中，然后将链接添加在圆括号中。
 
 ```markdown
-[![风景图](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/Markdown%E4%BD%BF%E7%94%A8/small095125P47QH1707616285.jpg)](http://www.baidu.com)
+[![风景图](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/Markdown%E4%BD%BF%E7%94%A8/small095125P47QH1707616285.jpg)](https://www.baidu.com)
 ```
 
-[![图片描述](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/Markdown%E4%BD%BF%E7%94%A8/small095125P47QH1707616285.jpg)](http://www.baidu.com)
+[![图片描述](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/Markdown%E4%BD%BF%E7%94%A8/small095125P47QH1707616285.jpg)](https://www.baidu.com)
 
 
 

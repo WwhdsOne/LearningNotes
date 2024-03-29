@@ -1,5 +1,3 @@
-# 学成在线Day08
-
 # 课程预览
 
 ## 接口定义
@@ -14,7 +12,7 @@ nginx: [error] OpenEvent("Global\ngx_reload_34084") failed (2: The system cannot
 
 模板修改好之后，点击
 
-![image-20240226173831645](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240226173831645.png)
+![image-20240226173831645](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240226173831645.png)
 
 可以不用重启项目
 
@@ -38,7 +36,7 @@ nginx: [error] OpenEvent("Global\ngx_reload_34084") failed (2: The system cannot
 
 ## 业务流程
 
-![image-20240227135349170](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240227135349170.png)
+![image-20240227135349170](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240227135349170.png)
 
 在课程基本表course_base表设置课程审核状态字段，包括：未提交、已提交(未审核)、审核通过、审核不通过。
 
@@ -127,7 +125,7 @@ nginx: [error] OpenEvent("Global\ngx_reload_34084") failed (2: The system cannot
 
 为了提高网站的速度需要将课程信息进行缓存，并且要将课程信息加入索引库方便搜索，下图显示了课程发布后课程信息的流转情况：
 
-![image-20240227144812329](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240227144812329.png)
+![image-20240227144812329](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240227144812329.png)
 
 1. 向内容管理数据库的课程发布表存储课程发布信息，更新课程基本信息表中发布状态为已发布。
 
@@ -183,7 +181,7 @@ CAP是 `Consistency`、`Availability`、`Partition tolerance`三个词语的缩�
 
 
 
-![image-20240227145524460](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240227145524460.png)
+![image-20240227145524460](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240227145524460.png)
 
 1. `一致性`是指用户不管访问哪一个结点拿到的数据都是最新的，比如查询小明的信息，不能出现在数据没有改变的情况下两次查询结果不一样。
 
@@ -242,7 +240,7 @@ BASE 是 `Basically Available(基本可用)`、`Soft state(软状态)`和 `Event
 
 时序图如下:
 
-![image-20240227150255989](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240227150255989.png)
+![image-20240227150255989](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240227150255989.png)
 
 1. 执行发布操作，内容管理服务存储课程发布表的同时向消息表添加一条“课程发布任务”。这里使用本地事务保证课程发布信息保存成功，同时消息表也保存成功。
 
@@ -299,7 +297,7 @@ service代码如下,有待完善:
 
 ## 消息模块技术方案
 
-![image-20240227162519786](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240227162519786.png)
+![image-20240227162519786](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240227162519786.png)
 
 上图中红色框内的都是与消息处理相关的操作：
 
@@ -313,7 +311,7 @@ service代码如下,有待完善:
 
 使用消息表这种方式实现最终事务一致性的地方除了课程发布还有其它业务场景。
 
-![image-20240227162727715](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240227162727715.png)
+![image-20240227162727715](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240227162727715.png)
 
 如果在每个地方都实现一套针对消息表定时扫描、处理的逻辑基本上都是重复的，软件的可复用性太低，成本太高。
 
@@ -333,7 +331,7 @@ service代码如下,有待完善:
 
 所以，本项目确定将对消息表相关的处理做成一个SDK组件供各微服务使用,如下图所示：
 
-![image-20240227162824003](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240227162824003.png)
+![image-20240227162824003](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240227162824003.png)
 
 下边对消息SDK的设计内容进行说明：
 

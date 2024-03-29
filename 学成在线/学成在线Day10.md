@@ -1,9 +1,3 @@
-
-
-# 学成在线Day10
-
-
-
 # JWT
 
 ## 普通令牌的问题
@@ -144,11 +138,11 @@ public CourseBaseInfoDto getCourseBaseById(@PathVariable("courseId") Long course
 
 到目前为止，测试通过了认证服务颁发jwt令牌，客户端携带jwt访问资源服务，资源服务对jwt的合法性进行验证。如下图：
 
-![image-20240301180738561](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301180738561.png)
+![image-20240301180738561](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301180738561.png)
 
 仔细观察此图，遗漏了本项目架构中非常重要的组件：网关，加上网关并完善后如下图所示：
 
-![image-20240301180755266](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301180755266.png)
+![image-20240301180755266](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301180755266.png)
 
 所有访问微服务的请求都要经过网关，在网关进行用户身份的认证可以将很多非法的请求拦截到微服务以外，这叫做网关认证。
 
@@ -368,7 +362,7 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
 
 基于的认证流程在研究Spring Security过程中已经测试通过，到目前为止用户认证流程如下：
 
-![image-20240302100509537](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302100509537.png)
+![image-20240302100509537](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240302100509537.png)
 
 认证所需要的用户信息存储在用户中心数据库，现在需要将认证服务连接数据库查询用户信息。
 
@@ -430,7 +424,7 @@ public interface UserDetails extends Serializable {
 
 我们只要实现UserDetailsService 接口查询数据库得到用户信息返回UserDetails 类型的用户信息即可,框架调用loadUserByUsername()方法拿到用户信息之后是如何执行的，见下图：
 
-![image-20240302103505430](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302103505430.png)
+![image-20240302103505430](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240302103505430.png)
 
 首先屏蔽原有的UserService
 
@@ -754,7 +748,7 @@ public class PasswordAuthServiceImpl implements AuthService {
 
 如下：
 
-![image-20240302122054930](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302122054930.png)
+![image-20240302122054930](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240302122054930.png)
 
 验证码服务如何生成并校验验证码？
 
@@ -772,7 +766,7 @@ public class PasswordAuthServiceImpl implements AuthService {
 
 6、验证码服务根据key从缓存取出正确的验证码和用户输入的验证码进行比对，如果相同则校验通过，否则不通过。
 
-![image-20240302122129225](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302122129225.png)
+![image-20240302122129225](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240302122129225.png)
 
 1、生成验证码接口
 
@@ -796,11 +790,11 @@ POST {{checkcode_host}}/checkcode/verify?key=checkcode4506b95bddbe46cdb0d56810b7
 
 到目前为止账号和密码认证所需要的技术、组件都已开发完毕，下边实现账号密码认证，输出如下图：
 
-![image-20240302161407938](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302161407938.png)
+![image-20240302161407938](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240302161407938.png)
 
 流程如下：
 
-![image-20240302161427234](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302161427234.png)
+![image-20240302161427234](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240302161427234.png)
 
 ### **账号密码认证开发**
 
@@ -881,7 +875,7 @@ https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_L
 
 流程如下：
 
-![image-20240302172032467](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302172032467.png)
+![image-20240302172032467](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240302172032467.png)
 
 第三方应用获取access_token令牌后即可请求微信获取用户的信息，成功获取到用户的信息表示用户在第三方应用认证成功。
 
@@ -1021,7 +1015,7 @@ var wxObj = new WxLogin({
 
 本部分内容涉及到的请求url请查看微信帮助文档
 
-![image-20240302181509670](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240302181509670.png)
+![image-20240302181509670](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240302181509670.png)
 
 本项目认证服务需要做哪些事？
 

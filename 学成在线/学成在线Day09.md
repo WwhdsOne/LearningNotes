@@ -1,7 +1,3 @@
-# 学成在线Day09
-
-
-
 # 页面静态化
 
 ## 页面静态化概念
@@ -181,7 +177,7 @@ taskkill /pid PID /f
 
 微服务的雪崩效应表现在服务与服务之间调用，当其中一个服务无法提供服务可能导致其它服务也死掉，比如：服务B调用服务A，由于A服务异常导致B服务响应缓慢，最后B、C等服务都不可用，像这样由一个服务所引起的一连串的多个服务无法提供服务即是微服务的雪崩效应，如下图：
 
-![image-20240229192607540](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240229192607540.png)
+![image-20240229192607540](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240229192607540.png)
 
 如何解决由于微服务异常引起的雪崩效应呢？
 
@@ -193,13 +189,13 @@ taskkill /pid PID /f
 
 当下游服务异常而断开与上游服务的交互，它就相当于保险丝，下游服务异常触发了熔断，从而保证上游服务不受影响。
 
-![image-20240229192808246](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240229192808246.png)
+![image-20240229192808246](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240229192808246.png)
 
 降级：
 
 当下游服务异常触发熔断后，上游服务就不再去调用异常的微服务而是执行了降级处理逻辑，这个降级处理逻辑可以是本地一个单独的方法。
 
-![image-20240229192920699](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240229192920699.png)
+![image-20240229192920699](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240229192920699.png)
 
 两者都是为了保护系统，熔断是当下游服务异常时一种保护系统的手段，降级是熔断后上游服务处理熔断的方法。
 
@@ -310,15 +306,15 @@ public class SearchServiceClientFallbackFactory implements FallbackFactory<Searc
 
 全文检索可以简单理解为通过索引搜索文章。
 
-![image-20240301133145260](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133145260.png)
+![image-20240301133145260](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133145260.png)
 
 全文检索的速度非常快，早期应用在搜索引擎技术中，比如：百度、google等，现在通常一些大型网站的搜索功能都是采用全文检索技术。
 
-![image-20240301133158004](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133158004.png)
+![image-20240301133158004](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133158004.png)
 
 课程搜索也要将课程信息建立索引，在课程发布时建立课程索引，索引建立好用户可通过搜索网页去查询课程信息。
 
-![image-20240301110007796](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301110007796.png)
+![image-20240301110007796](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301110007796.png)
 
 所以，课程搜索模块包括两部分：课程索引、课程搜索。
 
@@ -336,7 +332,7 @@ public class SearchServiceClientFallbackFactory implements FallbackFactory<Searc
 
 在课程发布操作执行后通过消息处理方式创建课程索引，如下图：
 
-![image-20240301133215694](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133215694.png)
+![image-20240301133215694](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133215694.png)
 
 本项目使用elasticsearch作为索引及搜索服务。
 
@@ -348,7 +344,7 @@ public class SearchServiceClientFallbackFactory implements FallbackFactory<Searc
 
 课程搜索可以从首页进入搜索页面。
 
-![image-20240301110126724](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301110126724.png)
+![image-20240301110126724](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301110126724.png)
 
 下图是搜索界面，可以通过课程分类、课程难度等级等条件进行搜索。
 
@@ -362,7 +358,7 @@ public class SearchServiceClientFallbackFactory implements FallbackFactory<Searc
 
 canal主要用途是基于 MySQL 数据库增量日志解析，并能提供增量数据订阅和消费，实现将MySQL的数据同步到消息队列、Elasticsearch、其它数据库等，应用场景十分丰富。 
 
-![image-20240301133237230](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133237230.png)
+![image-20240301133237230](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133237230.png)
 
 它的地址：
 
@@ -378,7 +374,7 @@ Canal基于mysql的binlog技术实现数据同步，什么是binlog，它是一�
 
 所以，使用canal是需要开启mysql的binlog写入功能，Canal工作原理如下：
 
-![image-20240301133257781](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133257781.png)
+![image-20240301133257781](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133257781.png)
 
 1、canal 模拟 MySQL slave 的交互协议，伪装自己为 MySQL slave ，向 MySQL master 发送dump 
 
@@ -404,7 +400,7 @@ Logstash： 开源实时日志分析平台 ELK包括Elasticsearch、Kibana、Log
 
 如下图：
 
-![image-20240301133312380](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133312380.png)
+![image-20240301133312380](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133312380.png)
 
 1、课程发布向消息表插入记录。
 
@@ -430,13 +426,13 @@ Logstash： 开源实时日志分析平台 ELK包括Elasticsearch、Kibana、Log
 
 项目包括学生、学习机构的老师、平台运营人员三类用户，不管哪一类用户在访问项目受保护资源时都需要进行身份认证。比如：发布课程操作，需要学习机构的老师首先登录系统成功，然后再执行发布课程操作。创建订单，需要学生用户首先登录系统，才可以创建订单。如下图：
 
-![image-20240301133354267](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133354267.png)
+![image-20240301133354267](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133354267.png)
 
 什么是用户授权？
 
 ​    用户认证通过后去访问系统的资源，系统会判断用户是否拥有访问资源的权限，只允许访问有权限的系统资源，没有权限的资源将无法访问，这个过程叫用户授权。比如：用户去发布课程，系统首先进行用户身份认证，认证通过后继续判断用户是否有发布课程的权限，如果没有权限则拒绝继续访问系统，如果有权限则继续发布课程。如下图：
 
-![image-20240301133417716](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133417716.png)
+![image-20240301133417716](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133417716.png)
 
   ## 业务流程
 
@@ -444,13 +440,13 @@ Logstash： 开源实时日志分析平台 ELK包括Elasticsearch、Kibana、Log
 
 项目包括学生、学习机构的老师、平台运营人员三类用户，三类用户将使用统一的认证入口，如下图：
 
-![image-20240301133440646](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133440646.png)
+![image-20240301133440646](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133440646.png)
 
 用户输入账号和密码提交认证，认证通过则继续操作。
 
 项目由统一认证服务受理用户的认证请求，如下图：
 
-![image-20240301133544154](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133544154.png)
+![image-20240301133544154](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133544154.png)
 
 认证通过由认证服务向给用户颁发令牌，相当于访问系统的通行证，用户拿着令牌去访问系统的资源。
 
@@ -462,7 +458,7 @@ Logstash： 开源实时日志分析平台 ELK包括Elasticsearch、Kibana、Log
 
 如下图，用户只需要认证一次，便可以在多个拥有访问权限的系统中访问。
 
-![image-20240301133600353](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133600353.png)
+![image-20240301133600353](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133600353.png)
 
  
 
@@ -472,7 +468,7 @@ Logstash： 开源实时日志分析平台 ELK包括Elasticsearch、Kibana、Log
 
 微信扫码登录其中的原理正是使用了第三方认证，如下图：
 
-![image-20240301133612279](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133612279.png)
+![image-20240301133612279](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133612279.png)
 
 # **Spring Security** **认证研究**(重点)
 
@@ -505,7 +501,7 @@ Spring cloud Security： https://spring.io/projects/spring-cloud-security
 
 有如下界面:
 
-![image-20240301130300278](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301130300278.png)
+![image-20240301130300278](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301130300278.png)
 
 账号和密码是多少呢？下一步需要进行安全配置。
 
@@ -614,7 +610,7 @@ public class LoginController {
 
 整理授权的过程见下图所示：
 
-![image-20240301133641903](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133641903.png)
+![image-20240301133641903](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133641903.png)
 
 ### 工作原理
 
@@ -624,13 +620,13 @@ Spring Security所解决的问题就是**安全访问控制**，而安全访问�
 
 ​    当初始化Spring Security时，会创建一个名为SpringSecurityFilterChain的Servlet过滤器，类型为 org.springframework.security.web.FilterChainProxy，它实现了javax.servlet.Filter，因此外部的请求会经过此类，下图是Spring Security过虑器链结构图：
 
-![image-20240301133704312](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133704312.png)
+![image-20240301133704312](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133704312.png)
 
 FilterChainProxy是一个代理，真正起作用的是FilterChainProxy中SecurityFilterChain所包含的各个Filter，同时这些Filter作为Bean被Spring管理，它们是Spring Security核心，各有各的职责，但他们并不直接处理用户的**认证**，也不直接处理用户的**授权**，而是把它们交给了认证管理器（AuthenticationManager）和决策管理器（AccessDecisionManager）进行处理。
 
 spring Security功能的实现主要是由一系列过滤器链相互配合完成。
 
-![image-20240301133728055](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301133728055.png)
+![image-20240301133728055](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301133728055.png)
 
 下面介绍过滤器链中主要的几个过滤器及其作用：
 
@@ -706,9 +702,9 @@ sequenceDiagram
 
 用户进入黑马程序的登录页面，点击微信的图标开打微信扫码界面。
 
-![image-20240301134223182](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301134223182.png)
+![image-20240301134223182](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301134223182.png)
 
-![image-20240301134239105](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301134239105.png)
+![image-20240301134239105](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301134239105.png)
 
 微信扫码的目的是通过微信认证登录黑马程序员官网，黑马程序员网站需要从微信获取当前用户的身份信息才会让当前用户在黑马网站登录成功。
 
@@ -726,7 +722,7 @@ sequenceDiagram
 
 资源拥有者扫描二维码表示资源拥有者请求微信进行认证，微信认证通过向用户手机返回授权页面，如下图：
 
-![image-20240301134312905](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301134312905.png)
+![image-20240301134312905](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301134312905.png)
 
 询问用户是否授权黑马程序员访问自己在微信的用户信息，用户点击“确认登录”表示同意授权，微信认证服务器会颁发一个授权码给黑马程序员的网站。
 
@@ -816,7 +812,7 @@ OAuth2的几个授权模式是根据不同的应用场景以不同的方式去�
 
 下图是授权码模式的交互图：
 
-![image-20240301134756575](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301134756575.png)
+![image-20240301134756575](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301134756575.png)
 
 要想测试授权模式首先要配置授权服务器即上图中的认证服务器，需要配置授权服务及令牌策略。
 
@@ -855,7 +851,7 @@ public AuthenticationManager authenticationManagerBean() throws Exception {
 
 显示授权页面
 
-![image-20240301135523863](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301135523863.png)
+![image-20240301135523863](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301135523863.png)
 
 授权“XcWebApp”访问自己的受保护资源?
 
@@ -952,7 +948,7 @@ public AuthorizationServerTokenServices tokenService() {
 
 
 
-![image-20240301141024801](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240301141024801.png)
+![image-20240301141024801](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240301141024801.png)
 
 1、资源拥有者提供账号和密码
 

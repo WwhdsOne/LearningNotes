@@ -1,7 +1,3 @@
-# 学成在线Day02
-
-
-
 # 开发持久层
 
 在真实开发中，切记从底层向上层开发。例如项目应该先写持久层(mapper)再写业务层(service)
@@ -80,7 +76,7 @@ Content-Type: application/json
 
 为了方便将来和网关集成测试，这里我们把测试主机地址在配置文件http-client.env.json 中配置![image-20240211163817932](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240211163817932.png)
 
-注意要调用http-client.env.json文件内容需要将使用以下环境运行调整至dev![image-20240211164035140](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240211164035140.png)
+注意要调用http-client.env.json文件内容需要将使用以下环境运行调整至dev![image-20240211164035140](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240211164035140.png)
 
 # 跨域三种解决方案
 
@@ -231,7 +227,7 @@ SELECT * FROM t1;
 
 输出：
 
-![image-20240211193838531](C:\Users\Wwhds\AppData\Roaming\Typora\typora-user-images\image-20240211193838531.png)
+![image-20240211193838531](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240211193838531.png)
 
 课程分类表层级固定查询sql:
 
