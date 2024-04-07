@@ -373,3 +373,90 @@ D `public double getNum(float d){return 4.0d;}`
 > 子类返回类型小于等于父类方法返回类型，
 > 子类抛出异常小于等于父类方法抛出异常，
 > 子类访问权限大于等于父类方法访问权限。
+
+# 14. 以下哪几种方式可用来实现线程间通知和唤醒：( )
+
+正确答案: A C  你的答案: A B C D (错误)
+
+A Object.wait/notify/notifyAll
+B ReentrantLock.wait/notify/notifyAll
+C Condition.await/signal/signalAll
+D Thread.wait/notify/notifyAll
+
+> **wait()、notify()和notifyAll()是Object类中的方法** 
+> 
+>从这三个方法的文字描述可以知道以下几点信息：  
+> 
+>1）wait()、notify()和notifyAll()方法是本地方法，并且为final方法，无法被重写。  
+> 2）调用某个对象的wait()方法能让当前线程阻塞，并且当前线程必须拥有此对象的monitor（即锁）   
+>
+>    3）调用某个对象的notify()方法能够唤醒一个正在等待这个对象的monitor的线程，如果有多个线程都在等待这个对象的monitor，则只能唤醒其中一个线程；  
+>4）调用notifyAll()方法能够唤醒所有正在等待这个对象的monitor的线程；  
+>    有朋友可能会有疑问：为何这三个不是Thread类声明中的方法，而是Object类中声明的方法  
+>    （当然由于Thread类继承了Object类，所以Thread也可以调用者三个方法）？其实这个问题很简单，由于每个对象都拥有monitor（即锁），所以让当前线程等待某个对象的锁，当然应该通过这个对象来操作了。而不是用当前线程来操作，因为当前线程可能会等待多个线程的锁，如果通过线程来操作，就非常复杂了。上面已经提到，如果调用某个对象的wait()方法，当前线程必须拥有这个对象的monitor（即锁），因此调用wait()方法必须在同步块或者同步方法中进行（synchronized块或者synchronized方法）。  
+> 调用某个对象的wait()方法，相当于让当前线程交出此对象的monitor，然后进入等待状态，等待后续再次获得此对象的锁（Thread类中的sleep方法使当前线程暂停执行一段时间，从而让其他线程有机会继续执行，但它并不释放对象锁）；notify()方法能够唤醒一个正在等待该对象的monitor的线程，当有多个线程都在等待该对象的monitor的话，则只能唤醒其中一个线程，具体唤醒哪个线程则不得而知。同样地，调用某个对象的notify()方法，当前线程也必须拥有这个对象的monitor，因此调用notify()方法必须在同步块或者同步方法中进行（synchronized块或者synchronized方法）。ofityAll()方法能够唤醒所有正在等待该对象的monitor的线程，这一点与notify()方法是不同的。  
+>    
+>    **Condition是在java 1.5中才出现的，它用来替代传统的Object的wait()、notify()实现线程间的协作，相比使用Object的wait()、notify()，使用Condition1的await()、signal()这种方式实现线程间协作更加安全和高效。因此通常来说比较推荐使用Condition，在阻塞队列那一篇博文中就讲述到了，阻塞队列实际上是使用了Condition来模拟线程间协作。**
+>    
+>    - Condition是个接口，基本的方法就是await()和signal()方法；  
+>    - Condition依赖于Lock接口，生成一个Condition的基本代码是lock.newCondition()  
+>    -    调用Condition的await()和signal()方法，都必须在lock保护之内，就是说必须在lock.lock()和lock.unlock之间才可以使用Conditon中的await()对应Object的wait()；    Condition中的signal()对应Object的notify()；    Condition中的signalAll()对应Object的notifyAll()
+
+# 15. 下面哪个不对？（异常相关）
+
+正确答案: C
+
+
+  A RuntimeException is the superclass of those exceptions that can be thrown during the normal operation of the Java Virtual Machine.`(RuntimeException是Java虚拟机正常操作期间可以抛出的异常的超类。)`
+
+  B A method is not required to declare in its throws clause any subclasses of RuntimeExeption that might be thrown during the execution of the method but not caught`(方法不需要在其throws子句中声明RuntimeExeption的任何子类，这些子类可能在方法的执行过程中抛出但未被捕获)`
+
+  C An RuntimeException is a subclass of Throwable that indicates serious problems that a reasonable application should not try to catch.`(RuntimeException是Throwable的一个子类，表示合理的应用程序不应该试图捕捉的严重问题。)`
+
+  D NullPointerException is one kind of RuntimeException`(空指针异常是RuntimeException的一个子类)`
+
+# 16. Servlet的生命周期可以分为初始化阶段，运行阶段和销毁阶段三个阶段，以下过程属于初始化阶段是（）。
+
+正确答案: A C D  你的答案: A D (错误)
+
+A 加载Servlet类及.class对应的数据
+B 创建servletRequest和servletResponse对象
+C 创建ServletConfig对象
+D 创建Servlet对象
+
+> <img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/837161_1500632807603_69CC22FA8A75E64DB0D6CBB3F4B6995F.jpg" alt="img" style="zoom:50%;" />
+>
+> Servlet（Server Applet），全称Java Servlet，未有中文译文。是用Java编写的服务器端程序。其主要功能在于交互式地浏览和修改数据，生成动态Web内容。狭义的Servlet是指Java语言实现的一个接口，广义的Servlet是指任何实现了这个Servlet接口的类，一般情况下，人们将Servlet理解为后者。 Servlet运行于支持Java的应用服务器中。从原理上讲，Servlet可以响应任何类型的请求，但绝大多数情况下Servlet只用来扩展基于HTTP协议的Web服务器。 这个过程为： 
+>
+> 1) 客户端发送请求至服务器端； 
+> 2) 服务器将请求信息发送至 Servlet； 
+> 3) Servlet 生成响应内容并将其传给服务器。响应内容动态生成，通常取决于客户端的请求； 
+> 4) 服务器将响应返回给客户端。
+
+# 17. 有如下一段代码，请选择其运行结果（java内存相关）
+
+```java
+public class StringDemo{
+    private static final String MESSAGE="taobao";
+    public static void main(String [] args) {
+        String a = "tao"+"bao";
+        String b = "tao";
+        String c = "bao";
+        System.out.println(  a == MESSAGE  );
+        System.out.println( ( b + c ) == MESSAGE  );
+    }
+}  
+```
+
+正确答案: C  你的答案: A (错误)
+
+A true true
+B false false
+C true false
+D false true
+
+> MESSAGE和a的字符串都存储在常量池里，且二者内容相同。
+>
+> 而(c+b)的内容则是存放在堆内存中，两者指向不同，所以是false。![AE29DD7F161F1C3498BBA73AA043DCB8](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/AE29DD7F161F1C3498BBA73AA043DCB8.png)
+
+18. 
