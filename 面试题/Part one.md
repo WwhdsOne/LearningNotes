@@ -459,4 +459,121 @@ D false true
 >
 > 而(c+b)的内容则是存放在堆内存中，两者指向不同，所以是false。![AE29DD7F161F1C3498BBA73AA043DCB8](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/AE29DD7F161F1C3498BBA73AA043DCB8.png)
 
-18. 
+# 18. 下面选项中,哪些是interface中合法方法定义?()                                        
+- ```
+  public void main(String [] args);
+  ```
+
+- ```
+  private int getSum();
+  ```
+
+- ```
+  boolean setFlag(Boolean [] test);
+  ```
+
+- ```
+  public float get(int x)                                        
+  ```
+
+正确答案：A C D
+
+> java程序的入口必须是static类型的，接口中不允许有static类型的方法。A项没有static修饰符，可以作为普通的方法。而且接口中的方法必须是public的。想想借口就是为了让别人实现的，相当于标准，标准不允许别人使用是不合理的，所以接口中的方法必须是public。C项中，接口中的方法默认是public的。D项属于正常的方法。所以答案是：ACD
+
+# 19. Java语言中，下面哪个语句是创建数组的正确语句？(   )                                        
+- ```
+  float f[][] = new float[6][6];
+  ```
+
+- ```
+  float []f[] = new float[6][6];
+  ```
+
+- ```
+  float f[][] = new float[][6];
+  ```
+
+- ```
+  float [][]f = new float[6][6];
+  ```
+
+- ```
+  float [][]f = new float[6][];                     
+  ```
+
+正确答案：A B D E
+
+> 在Java中，第一个框必须有值
+
+# 20.观察以下代码：（类中final方法相关） 
+```java
+class Car extends Vehicle
+{
+    public static void main (String[] args)
+    {
+        new  Car(). run();
+    }
+    private final void run()
+    {
+        System. out. println ("Car");
+    }
+}
+class Vehicle
+{
+    private final void run()
+    {
+        System. out. println("Vehicle");
+    }
+}
+```
+
+ 下列哪些针对代码运行结果的描述是正确的？                                        
+
+A Car
+
+B Vehicle
+
+C Compiler error at line 3
+
+D Compiler error at line 5
+
+E Exception thrown at runtime                    
+
+正确答案：A
+
+> 父类定义为final后不允许被重写，所以子类的final方法定义的是属于自己的方法，不会导致编译错误。
+
+# 21. 对文件名为Test.java的java代码描述正确的是(子类调用父类构造函数相关)
+
+```java
+class Person {
+	String name = "No name";
+	public Person(String nm) {
+		name = nm;
+	}
+}
+class Employee extends Person {
+	String empID = "0000";
+	public Employee(String id) {
+		empID = id;
+	}
+}
+public class Test {
+	public static void main(String args[]) {
+		Employee e = new Employee("123");
+		System.out.println(e.empID);
+	}
+}
+```
+
+A 输出：0000
+B 输出：123
+C 编译报错
+D 输出：No name
+
+正确答案：C
+
+> 子类的构造方法总是先调用父类的构造方法，如果子类的构造方法没有明显地指明使用父类的哪个构造方法，子类就调用父类不带参数的构造方法。
+>
+> 一个类只有在没有构造函数的时候，才会被编译器自动添加上无参构造。父类没有无参的构造函数，所以子类需要在自己的构造函数中显示的调用父类的构造函数。
+
