@@ -183,9 +183,9 @@ D 一个类可以实现多个接口，但只能继承一个抽象类。
 >
 > ```java
 > public interface Demo{
->     public static void print() {         
->         System.out.println("Hello World!");      
->     }
+>        public static void print() {         
+>            System.out.println("Hello World!");      
+>        }
 > }
 > ```
 >
@@ -195,7 +195,7 @@ D 一个类可以实现多个接口，但只能继承一个抽象类。
 >
 > ```java
 > public interface Demo{
->     public abstract void method();
+>        public abstract void method();
 > }
 > ```
 >
@@ -207,14 +207,14 @@ D 一个类可以实现多个接口，但只能继承一个抽象类。
 >
 > ```java
 > public interface Demo{
->     //默认方法
->     public default void method(){
->         System.out.println("default method...");
->     }
->     //静态方法
->     public static void print(){
->         System.out.println("static method...");
->     }
+>        //默认方法
+>        public default void method(){
+>            System.out.println("default method...");
+>        }
+>        //静态方法
+>        public static void print(){
+>            System.out.println("static method...");
+>        }
 > }
 > ```
 >
@@ -222,9 +222,9 @@ D 一个类可以实现多个接口，但只能继承一个抽象类。
 >
 > ```java
 > public interface Demo{
->     private void method() {
->         System.out.println("Hello World!");
->     }
+>        private void method() {
+>            System.out.println("Hello World!");
+>        }
 > } 
 > ```
 
@@ -576,4 +576,47 @@ D 输出：No name
 > 子类的构造方法总是先调用父类的构造方法，如果子类的构造方法没有明显地指明使用父类的哪个构造方法，子类就调用父类不带参数的构造方法。
 >
 > 一个类只有在没有构造函数的时候，才会被编译器自动添加上无参构造。父类没有无参的构造函数，所以子类需要在自己的构造函数中显示的调用父类的构造函数。
+
+# 22. Java是一门支持反射的语言,基于反射为Java提供了丰富的动态性支持，下面关于
+
+# 哪些是错误的：(  )
+
+正确答案：A D F                                       
+
+
+  A Java反射主要涉及的类如Class, Method, Filed,等，他们都在java.lang.reflet包下
+
+  B 通过反射可以动态的实现一个接口，形成一个新的类，并可以用这个类创建对象，调用对象方法
+
+  C 通过反射，可以突破Java语言提供的对象成员、类成员的保护机制，访问一般方式不能访问的成员
+
+  D Java反射机制提供了字节码修改的技术，可以动态的修剪一个类
+
+
+  E Java的反射机制会给内存带来额外的开销。例如对永生堆的要求比不通过反射要求的更多
+
+  F Java反射机制一般会带来效率问题，效率问题主要发生在查找类的方法和字段对象，因此通过缓存需要反射类的字段和方法就能达到与之间调用类的方法和访问类的字段一样的效率
+
+>   A Class类在java.lang包 
+>
+>   B 动态代理技术可以动态创建一个代理对象，反射不行 
+>
+>   C 反射访问私有成员时，Field调用setAccessible可解除访问符限制 
+>
+>   D CGLIB实现了字节码修改，反射不行 
+>
+>   E 反射会动态创建额外的对象，比如每个成员方法只有一个Method对象作为root，他不胡直接暴露给用户。调用时会返回一个Method的包装类 
+>
+>   F 反射带来的效率问题主要是动态解析类，JVM没法对反射代码优化
+
+# 23. 下面说法正确的是？（yield和sleep）                             
+
+  A 调用Thread的sleep()方法会释放锁，调用wait()方法不释放锁
+  B 一个线程调用yield方法，可以使具有相同优先级线程获得处理器
+  C 在Java中，高优先级的可运行的线程会抢占低优先级线程的资源
+  D java中，线程可以调用yield方法使比自己低优先级的线程运行
+
+正确答案: B C
+
+# 24. 
 
