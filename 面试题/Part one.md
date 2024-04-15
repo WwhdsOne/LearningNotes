@@ -793,3 +793,62 @@ D javaprof
 > db.exe是java的调试器 
 >
 > javaprof.exe是剖析工具
+
+# 32. 在Java中，以下数据类型中,需要内存最多的是()
+
+正确答案: B  你的答案: C (错误)
+
+A byte
+B long
+C Object
+D int
+
+> Object 是引用数据类型，只申明而不创建实例，只会在栈内存中开辟空间，默认为空，空占1 bit.
+
+# 33. 以下代码执行后输出结果为（包含main的类执行顺序）
+
+正确答案: A  你的答案: D (错误)
+
+A blockAblockBblockA
+B blockAblockAblockB
+C blockBblockBblockA
+D blockBblockAblockB
+
+> 静态块：用static申明，JVM加载类时执行，仅执行一次
+> 构造块：类中直接用{}定义，每一次创建对象时执行
+> 执行顺序优先级：静态块>main()>构造块>构造方法
+> 静态块按照申明顺序执行，先执行Test t1 = new Test();
+> 所有先输出blockA，然后执行静态块，输出blockB，最后执行main
+> 方法中的Test t2 = new Test();输出blockA。
+
+# 34. 判断对错。List，Set，Map都继承自继承Collection接口。
+
+正确答案: B
+
+A 对
+
+B 错
+
+> ![7010483_1496974867310_D5D2D67073C3D04D7B608AD94C2886F0](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/7010483_1496974867310_D5D2D67073C3D04D7B608AD94C2886F0.png)
+
+# 35. 事务隔离级别是由谁实现的？
+
+正确答案:C
+
+
+A  Java应用程序
+
+B  Hibernate
+
+C  数据库系统
+
+D  JDBC驱动程序
+
+> A 我们写java程序的时候只是设定事物的隔离级别，而不是去实现它 
+>
+> B Hibernate是一个java的数据持久化框架，方便数据库的访问 
+>
+> C 事物隔离级别由数据库系统实现，是数据库系统本身的一个功能 
+>
+> D JDBC是java database connector，也就是java访问数据库的驱动
+
