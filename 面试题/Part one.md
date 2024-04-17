@@ -852,3 +852,135 @@ D  JDBC驱动程序
 >
 > D JDBC是java database connector，也就是java访问数据库的驱动
 
+# 36. 有关finally语句块说法正确的是（ ）
+
+正确答案: A B C  你的答案: A C D (错误)
+
+A 不管catch是否捕获异常，finally语句块都是要被执行的
+B 在try语句块或catch语句块中执行到System.exit(0)直接退出程序
+C finally块中的return语句会覆盖try块中的return返回
+D finally 语句块在 catch语句块中的return语句之前执行
+
+> **如果try语句里有return，那么代码的行为如下：**
+> 1.如果有返回值，就把返回值保存到局部变量中
+> 2.执行jsr指令跳到finally语句里执行
+> 3.执行完finally语句后，返回之前保存在局部变量表里的值
+>
+> **如果try，finally语句里均有return，忽略try的return，而使用finally的return.**
+
+# 37. 以下哪些类是线程安全的（）
+
+正确答案: A D E  你的答案: A (错误)
+
+A Vector
+B HashMap
+C ArrayList
+D StringBuffer
+E Properties
+
+> A，Vector相当于一个线程安全的List
+>
+> B，HashMap是非线程安全的，其对应的线程安全类是HashTable
+>
+> C，Arraylist是非线程安全的，其对应的线程安全类是Vector
+>
+> D，StringBuffer是线程安全的，相当于一个线程安全的StringBuilder
+>
+> E，Properties实现了Map接口，是线程安全的
+
+# 38. 一般用()创建InputStream对象,表示从标准输入中获取数据,用()创建OutputStream对象，表示输出到标准输出设备中。
+
+正确答案：A                                        
+
+A System.in System.out
+
+B System.out System.in
+
+C System.io.in System.io.out
+
+D System.io.out System.io.in    
+
+> System.in 和 System.out 是java中的标准输入输出流，一般情况下代表从控制台输入和输出到控制台                
+
+# 39. 以下哪个区域不属于新生代？
+
+正确答案：C
+
+A eden区
+
+B from区
+
+C 元数据区
+
+D to区
+
+> （1）Eden区，from区，to区：三个区的内存比例可以通过参数【–XX:SurvivorRatio=数字】配置，默认该值为8，即Eden:from:to = 8:1:1 
+>
+> （2）大部分对象创建都是在Eden的（除了个别大对象外，大对象内存可以设置参数【-XX:PretenureSizeThreshold=字节数】配置，超过配置内存的大对象直接进入老年代），from和to不是固定的（可以互换身份，Survivor区），初始化的时候其中一个是空的。
+>
+> （3）新生代的 Minor GC 中，一个Survivor区中数据复制进去，另个是空的，下一次GC的时候，有数据的是from Survivor，没数据的to Survivor，GC的时候，from区和Eden区的数据都复制到to中。这样from和to就互换身份，一直这么循环处理。
+>
+> （4）第（3）步中复制一次，所有对象年龄加1，当任意一个对象复制到一定次数（默认15次，可以配置【-XX:MaxTenuringThreshold=数字】参数进行修改）的时候，就被复制到了老年代 
+>
+> （5）提到老年代，再补充一下，新生代 ( Young )、老年代 ( Old )内存比例为=1:2，新生代加老年代就是java堆内存了
+>
+> ![4AC5BFBDFC533AA394D4433D2375A422](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/4AC5BFBDFC533AA394D4433D2375A422.png)
+
+# 40. 下列流当中，属于处理流的是：（） 
+
+正确答案：C D  
+
+A FilelnputStream
+
+B lnputStream
+
+C DatalnputStream
+
+D BufferedlnputStream
+
+> 按照流是否直接与特定的地方（如磁盘、内存、设备等）相连，分为节点流和处理流两类。  
+>
+> - ​     节点流：可以从或向一个特定的地方（节点）读写数据。如FileReader.    
+> - ​     处理流：是对一个已存在的流的连接和封装，通过所封装的流的功能调用实现数据读写。如BufferedReader.处理流的构造方法总是要带一个其他的流对象做参数。一个流对象经过其他流的多次包装，称为流的链接。    
+>
+> ​    **JAVA常用的节点流：**     
+>
+> - ​     文 件 FileInputStream FileOutputStrean FileReader FileWriter 文件进行处理的节点流。    
+> - ​     字符串 StringReader StringWriter 对字符串进行处理的节点流。    
+> - ​     数 组 ByteArrayInputStream ByteArrayOutputStreamCharArrayReader CharArrayWriter 对数组进行处理的节点流（对应的不再是文件，而是内存中的一个数组）。    
+> - ​     管 道 PipedInputStream PipedOutputStream PipedReaderPipedWriter对管道进行处理的节点流。    
+>
+> ​    **常用处理流（关闭处理流使用关闭里面的节点流）**   
+>
+> - ​     缓冲流：BufferedInputStrean BufferedOutputStream BufferedReader BufferedWriter 增加缓冲功能，避免频繁读写硬盘。    
+>
+> - ​     转换流：InputStreamReader OutputStreamReader 实现字节流和字符流之间的转换。    
+> - ​     数据流 DataInputStream DataOutputStream 等-提供将基础数据类型写入到文件中，或者读取出来.    
+>
+> ###     流的关闭顺序   
+>
+> 1. ​     一般情况下是：先打开的后关闭，后打开的先关闭    
+> 2. ​     另一种情况：看依赖关系，如果流a依赖流b，应该先关闭流a，再关闭流b。例如，处理流a依赖节点流b，应该先关闭处理流a，再关闭节点流b    
+> 3. ​     可以只关闭处理流，不用关闭节点流。处理流关闭的时候，会调用其处理的节点流的关闭方法。
+
+# 41. 关于 Socket 通信编程，以下描述错误的是：（ ）
+
+正确答案：D
+
+A 服务器端通过new ServerSocket()创建TCP连接对象
+B 服务器端通过TCP连接对象调用accept()方法创建通信的Socket对象
+C 客户端通过new Socket()方法创建通信的Socket对象
+D 客户端通过new ServerSocket()创建TCP连接对象              
+
+> Socket套接字 
+>
+> 就是源Ip地址，目标IP地址，源端口号和目标端口号的组合 
+>
+> 服务器端：ServerSocket提供的实例 
+>
+> ServerSocket server= new ServerSocket(端口号) 
+>
+> 客户端：Socket提供的实例 
+>
+> Socket soc=new Socket(ip地址，端口号)
+
