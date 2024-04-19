@@ -984,3 +984,125 @@ D 客户端通过new ServerSocket()创建TCP连接对象
 >
 > Socket soc=new Socket(ip地址，端口号)
 
+# 42. Which lines of the following will produce an error?(Java数据默认类型)
+
+
+
+```java
+bytea1 = 2, a2 = 4, a3;
+shorts = 16;
+a2 = s;
+a3 = a1 * a2;
+```
+
+
+正确答案: A  你的答案: D (错误)
+
+A Line 3 and Line 4
+B Line 1 only
+C Line 3 only
+D Line 4 only
+
+> 数值型变量在默认情况下为Int型，byte和short型在计算时会自动转换为int型计算，结果也是int 型。所以a1*a2的结果是int型的。
+
+# 43. 下列Java代码中的变量a、b、c分别在内存的____存储区存放。
+```java
+class A {
+    private String a = “aa”;
+    public boolean methodB() {
+        String b = “bb”;
+        final String c = “cc”;
+    }
+}
+```
+  A 堆区、堆区、堆区
+  B 堆区、栈区、堆区
+  C 堆区、栈区、栈区
+  D 堆区、堆区、栈区
+  E 静态区、栈区、堆区
+  F 静态区、栈区、栈区
+
+> 堆区：只存放类对象，线程共享；
+>
+> 方法区：又叫静态存储区，存放class文件和静态数据，线程共享;
+>
+> 栈区：存放方法局部变量，基本类型变量区、执行环境上下文、操作指令区，线程不共享;
+
+# 44. 有关线程的哪些叙述是对的（）     
+
+#                                 
+
+正确答案：B C D
+A 一旦一个线程被创建，它就立即开始运行。
+B 使用start()方法可以使一个线程成为可运行的，但是它不一定立即开始运行。
+C 当一个线程因为抢先机制而停止运行，它可能被放在可运行队列的前面。
+D 一个线程可能因为不同的原因停止并进入就绪状态。
+
+> 我自己最开始的时候只选了BD没选C。看评论里面也对C存疑，通过书籍查证C是可以选的。 
+>
+>   在抢先式系统下，由高优先级的线程参与调度。分为2种情况： 
+>
+>   1.若多个线程都处于就绪状态，则具有高优先级的线程会在低优先级之前得到执行；
+>
+>   2.在当前线程的运行过程中，如果有较高级别的线程准备就绪，则正在运行的较低级别的线程将被挂起，转到较高级别的线程运行，直到结束后又会转到原来被挂起的线程。 
+>
+>   第二种情况就描述了C所代表的情况，可以看到当较高级别的线程抢去运行权并运行完成之后，是先将权利转给原来的线程的，所以C是正确的。                     
+
+# 45. 代码片段：（final修饰变量不可再转换类型）
+
+```java
+byte b1=1,b2=2,b3,b6;  
+final byte b4=4,b5=6;  
+b6=b4+b5;  
+b3=(b1+b2);  
+System.out.println(b3+b6);
+```
+
+关于上面代码片段叙述正确的是（） 
+
+正确答案 C
+
+A 输出结果：13
+
+B 语句：b6=b4+b5编译出错
+
+C 语句：b3=b1+b2编译出错
+
+D 运行期抛出异常
+
+> 被final修饰的变量是常量，是最终类型，这里的b6=b4+b5可以看成是b6=10；在编译时就已经变为b6=10了 
+>
+> 而b1和b2是byte类型，java中进行计算时候将他们提升为int类型，再进行计算，b1+b2计算后已经是int类型，赋值给b3，b3是byte类型，类型不匹配，编译不会通过，需要进行强制转换。 
+>
+> Java中的byte，short，char进行计算时都会提升为int类型。
+
+# 46. 要导入java/awt/event下面的所有类，叙述正确的是？()
+
+正确答案:C
+
+A import java.awt.*和import java.awt.event.*都可以
+B 只能是import java.awt.*
+C 只能是import java.awt.event.*
+D import java.awt.*和import java.awt.event.*都不可以
+
+> 导包只可以导到当前层，不可以再导入包里面的包中的类
+
+# 47. java语言的下面几种数组复制方法中，哪个效率最高？
+
+正确答案:B
+
+A for 循环逐一复制
+B System.arraycopy
+C Array.copyOf
+D 使用clone方法
+
+> System.arraycopy()：native方法+JVM手写函数，在JVM里预写好速度最快   
+>
+> clone()：native方法，但并未手写，需要JNI转换，速度其次   
+>
+> Arrays.copyof()：本质是调用1的方法   
+>
+> for()：全是深复制，并且不是封装方法，最慢情有可原
+>
+> **效率：System.arraycopy > clone > Arrays.copyOf > for循环**
+
