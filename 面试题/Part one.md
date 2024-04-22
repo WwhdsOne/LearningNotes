@@ -1106,3 +1106,56 @@ D 使用clone方法
 >
 > **效率：System.arraycopy > clone > Arrays.copyOf > for循环**
 
+# 48. Which method you define as the starting point of new thread in a class from which n thread can be execution?
+
+
+下列哪一个方法你认为是新线程开始执行的点，也就是从该点开始线程n被执行。 
+
+A public void start()
+B public void run()
+C public void int()
+D public static void main(String args[])
+E public void runnable()
+
+> 题目的意思是，下列哪一个方法你认为是新线程开始执行的点，也就是从该点开始线程n被执行。
+> 了解过线程的知识我们知道：
+> start()方法是启动一个线程，此时的线程处于就绪状态，但并不一定就会执行，还需要等待CPU的调度。
+> run()方法才是线程获得CPU时间，开始执行的点。
+
+# 49. 下面几个关于Java里queue的说法哪些是正确的（）？
+
+正确答案: A C  你的答案: B C D (错误)
+
+A LinkedBlockingQueue是一个可选有界队列，不允许null值
+B PriorityQueue，LinkedBlockingQueue都是线程不安全的
+C PriorityQueue是一个无界队列，不允许null值，入队和出队的时间复杂度是O（log(n)）
+D PriorityQueue，ConcurrentLinkedQueue都遵循FIFO原则
+
+> - ArrayBlockingQueue：基于数组，在创建ArrayBlockingQueue对象时必须制定容量大小，先进先出队列，有界队列，容量有上限。      
+> - LinkedBlockingQueue：基于链表，在创建LinkedBlockingQueue对象时如果不指定容量大小，默认大小为Integer.MAX_VALUE，先进先出队列，有界队列，容量有上限。
+> - PriorityBlockingQueue：按照元素的优先级对元素进行排序，按照优先级顺序出队，每次出队的元素都是优先级最高的元素。注意，此阻塞队列为无界阻塞队列，即容量没有上限。
+>
+> blocking queue说明：不接受null元素；可能是容量有限的；实现被设计为主要用于生产者 - 消费者队列；不支持任何类型的“关闭”或“关闭”操作，表示不再添加项目实现是线程安全的；
+
+# 50. 以下选项中，合法的**赋值**语句是（）
+
+正确答案: B,我的答案：C
+
+A a>1;
+B i++;
+C a = a+1=5;
+D y = int(i);
+
+> ![5405625_1527164035805_CAAD68FC10A3980D447E333B567B643F](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/5405625_1527164035805_CAAD68FC10A3980D447E333B567B643F.png)
+
+# 51. 以下哪些方法是Object类中的方法
+
+正确答案：A B C D
+
+A clone()
+B toString()
+C wait()
+D finalize()
+
+> ![330581894_1566056683581_BCF7AE6ECD3CE4E58BE8D9E8DB25E169](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/330581894_1566056683581_BCF7AE6ECD3CE4E58BE8D9E8DB25E169.png)
+
