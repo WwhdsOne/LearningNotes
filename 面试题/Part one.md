@@ -68,7 +68,7 @@ D Double oD=3;
 >
 > D：int 转为 封装类型Double，是无法编译的，Double oD = 3.0， 会把double类型的3.0自动装箱为Double，没有问题
 
-# 4. 以下哪种方式实现的单例是线程安全的（待学习）
+# 4. 以下哪种方式实现的单例是线程安全的
 
 正确答案: A B C D  你的答案: B C (错误)
 
@@ -77,9 +77,13 @@ B 静态内部类
 C 双检锁模式
 D 饿汉式
 
+>A. 枚举：Java 枚举本身就是线程安全的，因此使用枚举实现的单例模式也是线程安全的。  
 >
+>B. 静态内部类：静态内部类只有在被调用时才会加载，实现了懒加载，且由 JVM 保证了线程安全。  
 >
->...
+>C. 双检锁模式：双检锁模式（Double-Checked Locking）在同步块外部和内部都检查了实例是否已经存在，只有当实例不存在时才会进行同步，这样既保证了线程安全，又提高了执行效率。  
+>
+>D. 饿汉式：饿汉式在类加载时就创建了实例，由 JVM 保证了线程安全，但没有实现懒加载。  所以，所有的选项都可以实现线程安全的单例模式，但是它们在懒加载和执行效率上有所不同。
 
 # 5. 下列说法正确的是（内部类相关）
 
@@ -1158,4 +1162,163 @@ C wait()
 D finalize()
 
 > ![330581894_1566056683581_BCF7AE6ECD3CE4E58BE8D9E8DB25E169](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/330581894_1566056683581_BCF7AE6ECD3CE4E58BE8D9E8DB25E169.png)
+
+# 52.给出以下代码,请给出结果(方法传递的是值而不是地址)
+
+```java
+class Two{
+    Byte x;
+}
+class PassO{
+    public static void main(String[] args){
+        PassO p=new PassO();
+        p.start();
+    }
+    void start(){
+        Two t=new Two();
+        System.out.print(t.x+””);
+        Two t2=fix(t);
+        System.out.print(t.x+” ” +t2.x);
+    }
+    Two fix(Two tt){
+        tt.x=42;
+        return tt;
+    }
+}
+```
+
+A null null 42
+B null 42 42
+C 0 0 42
+D 0 42 42
+E An exception is thrown at runtime
+F Compilation
+
+> `Byte`是包装类，当`fix`方法调用时，传入的是`t`实例的值，但是方法中使用的`t.x`是它的地址值。
+>
+> 当修改`t`中的`x`时，其内存指向的部分被修改，所以`t`和`t2`的`x`在调用后均为`42`
+
+# 53. 以下代码执行的结果显示是多少（ ）？
+
+![image-20240423081628869](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240423081628869.png)
+
+
+A true,false,true
+
+B false,true,false
+
+C true,true,false
+
+D false,false,true
+
+正确答案：D
+
+> 对于-128到127之间的数，Java会对其进行缓存
+>
+> String s = "abc"：通过字面量赋值创建字符串。则将栈中的引用直接指向该字符串，如不存在，则在常量池中生成一个字符串，再将栈中的引用指向该字符串 
+>
+> String s = “a”+“bc”：编译阶段会直接将“a”和“bc”结合成“abc”，这时如果方法区已存在“abc”，则将s的引用指向该字符串，如不存在，则在方法区中生成字符串“abc”对象，然后再将s的引用指向该字符串 
+>
+> String s = "a" + new String("bc"):栈中先创建一个"a"字符串常量，再创建一个"bc"字符串常量，编译阶段不会进行拼接，在运行阶段拼接成"abc"字符串常量并将s的引用指向它，效果相当于String s = new String("abc")，只有'+'两边都是字符串常量才会在编译阶段优化
+
+# 54. 下面论述正确的是（关于hashcode和equal）？
+
+正确答案D
+
+A 如果两个对象的hashcode相同，那么它们作为同一个HashMap的key时，必然返回同样的值
+B 如果a,b的hashcode相同，那么a.equals(b)必须返回true
+C 对于一个类，其所有对象的hashcode必须不同
+D 如果a.equals(b)返回true，那么a,b两个对象的hashcode必须相同
+
+> 当两个对象的hashCode相同，但它们实际上不相等（即它们的equals方法返回false）时，它们可以作为HashMap的不同的键存在。在这种情况下，它们可以关联到HashMap中的不同的值。
+>
+> hashCode()方法和equals()方法的作用其实是一样的，在Java里都是用来对比两个对象是否相等一致。
+>
+> ***那么equals()既然已\******经\******能\******实现\******对\******比的功能了，为什么还要hashCode()呢？\***因为重写的equals()里一般比较的比较全面比较复杂，这样效率就比较低，而利用hashCode()进行对比，则只要生成一个hash值进行比较就可以了，效率很高。*
+>
+> ***那么hashCode()既然效率这么高为什么还要equals()呢***？ 因为hashCode()并不是完全可靠，有时候不同的对象他们生成的hashcode也会一样（生成hash值得公式可能存在的问题），所以hashCode()只能说是大部分时候可靠，并不是绝对可靠，  
+>
+> **所以我们可以得出：**  
+>
+>    **1.equals()相等的两个对象他们的hashCode()肯定相等，也就是用equals()对比是绝对可靠的。**  
+>
+>    **2.hashCode()相等的两个对象他们的equal()不一定相等，也就是hashCode()不是绝对可靠的。**
+
+# 55. socket编程中，以下哪个socket的操作是不属于服务端操作的（）？
+
+正确答案:C
+
+A accept
+B recieve
+C getInputStream
+D close
+
+> ![8955099_1521189690989_0BB28C2A1ECCC47EC020E89E8A554BBC](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/8955099_1521189690989_0BB28C2A1ECCC47EC020E89E8A554BBC.png)
+
+# 56. 下面有关Java的说法正确的是（）        
+
+​                    
+
+正确答案：A C D E F  
+
+A  一个类可以实现多个接口
+
+B 抽象类必须有抽象方法
+
+C protected成员在子类可见性可以修改
+
+D 通过super可以调用父类构造函数
+
+E final的成员方法实现中只能读取类的成员变量
+
+F String是不可修改的，且java运行环境中对string对象有一个常量池保存
+
+> A对：java类单继承，多实现
+> B错：被abstract修饰的类就是抽象类，有没有抽象方法无所谓
+> C错：描述有问题。protected成员在子类的可见性，我最初理解是子类（不继承父类protected成员方法）获取父类被protected修饰的成员属性或方法，可见性是不可能变的，因为修饰符protected就是描述可见性的。
+> 这道题应该是要考察子类继承父类，并重写父类的protected成员方法，该方法的可见性可以修改，这是对的，因为子类继承父类的方法，访问权限可以相同或往大了改 
+> D对。
+> E错：final修饰的方法只是不能重写，static修饰的方法只能访问类的成员变量
+> F对。
+
+# 57. 以下程序段的输出结果为：（包装类==相关）
+
+```java
+public class EqualsMethod
+{
+    public static void main(String[] args)
+    {
+        Integer n1 = new Integer(47);
+        Integer n2 = new Integer(47);
+        System.out.print(n1 == n2);
+        System.out.print(",");
+        System.out.println(n1 != n2);
+    }
+}
+
+```
+
+
+A false，false
+
+B false，true
+
+C true，false
+
+D true，true
+
+> 使用Integer a = 1;或Integer a = Integer.valueOf(1);  在值介于-128至127直接时，作为基本类型。 
+>
+> 使用Integer a = new Integer(1); 时，无论值是多少，都作为对象。
+
+# 58. JVM内存不包含如下哪个部分(带学习)
+
+正确答案：D
+
+A Stacks
+B PC寄存器
+C Heap
+D Heap Frame
+
+> ![272084FEBFF2E659FA20DF7ACF52DD13](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/272084FEBFF2E659FA20DF7ACF52DD13.png)
 
