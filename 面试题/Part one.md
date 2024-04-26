@@ -1281,7 +1281,9 @@ F String是不可修改的，且java运行环境中对string对象有一个常�
 > E错：final修饰的方法只是不能重写，static修饰的方法只能访问类的成员变量
 > F对。
 
-# 57. 以下程序段的输出结果为：（包装类==相关）
+# 57. 以下程序段的输出结果为：（包装类相关）
+
+正确答案:B
 
 ```java
 public class EqualsMethod
@@ -1321,4 +1323,31 @@ C Heap
 D Heap Frame
 
 > ![272084FEBFF2E659FA20DF7ACF52DD13](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/272084FEBFF2E659FA20DF7ACF52DD13.png)
+
+# 59. 执行以下程序后的输出结果是（StringBuffer相关）
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        StringBuffer a = new StringBuffer("A"); 
+        StringBuffer b = new StringBuffer("B"); 
+        operator(a, b); 
+        System.out.println(a + "," + b); 
+    } 
+    public static void operator(StringBuffer x, StringBuffer y) { 
+        x.append(y); y = x; 
+    }
+}
+```
+正确答案：D
+A  A,A
+B  A,B
+C  B,B
+D  AB,B
+
+> StringBuffer传的是引用，String传的是值
+>
+> x.append(y),将x指向的内容后添加了"B"，a中的指向的内容更改
+>
+> y = x,将y指向了x，b中指向的内容并未更改
 
