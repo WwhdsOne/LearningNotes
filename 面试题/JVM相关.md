@@ -133,3 +133,31 @@ D ClassLoader就是用来动态加载class文件到内存当中用的
 >
 > classloader 加载类用的是全盘负责委托机制。*所谓全盘负责，即是当一个classloader加载一个Class的时候，这个Class所依赖的和引用的所有 Class也由这个classloader负责载入，除非是显式的使用另外一个classloader载入。*  
 > 所以，当我们自定义的classloader加载成功了com.company.MyClass以后，MyClass里所有依赖的class都由这个classLoader来加载完成。
+
+# 7. 下面有关 java 类加载器,说法正确的是?()   
+
+
+A 引导类加载器(bootstrap class loader):它用来加载 Java 的核心库,是用C++来实现的
+B 扩展类加载器(extensions class loader):它用来加载 Java 的扩展库。
+C 系统类加载器(system class loader):它根据 Java 应用的类路径(CLASSPATH)来加载 Java 类
+D tomcat 为每个 App 创建一个 Loader,里面保存着此 WebApp 的 ClassLoader。需要加载 WebApp 下的类时,就取出 ClassLoader 来使用                        
+
+正确答案：B C D
+
+> 	1）Bootstrap ClassLoader
+>   		
+>   	负责加载$JAVA_HOME中jre/lib/rt.jar里所有的class，由C++实现，不是ClassLoader子类
+>   		
+>   	2）Extension ClassLoader
+>   		
+>   	负责加载java平台中扩展功能的一些jar包，包括$JAVA_HOME中jre/lib/*.jar或-Djava.ext.dirs指定目录下的jar包
+>   		
+>   	3）App ClassLoader
+>   		
+>   	负责记载classpath中指定的jar包及目录中class
+>   		
+>   	4）Custom ClassLoader
+>   		
+>   	属于应用程序根据自身需要自定义的ClassLoader，如tomcat、jboss都会根据j2ee规范自行实现ClassLoader
+>   		
+>   	加载过程中会先检查类是否被已加载，检查顺序是自底向上，从Custom ClassLoader到BootStrap ClassLoader逐层检查，只要某个classloader已加载就视为已加载此类，保证此类只所有ClassLoader加载一次。而加载的顺序是自顶向下，也就是由上层来逐层尝试加载此类。
