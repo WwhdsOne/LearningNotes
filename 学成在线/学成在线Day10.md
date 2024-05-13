@@ -394,8 +394,6 @@ sequenceDiagram
 UserDetailService是一个接口：
 
 ```java
-package org.springframework.security.core.userdetails;
-
 public interface UserDetailsService {
     UserDetails loadUserByUsername(String var1) throws UsernameNotFoundException;
 }
@@ -419,7 +417,6 @@ public interface UserDetails extends Serializable {
 
     boolean isEnabled();
 }
-
 ```
 
 我们只要实现UserDetailsService 接口查询数据库得到用户信息返回UserDetails 类型的用户信息即可,框架调用loadUserByUsername()方法拿到用户信息之后是如何执行的，见下图：
@@ -433,16 +430,13 @@ public interface UserDetails extends Serializable {
 
 ```java
 public class UserServiceImpl implements UserDetailsService {
-
     //用户中心dao层
     @Autowired
     XcUserMapper xcUserMapper;
-
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         //查询数据库
         XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, s));
-
         //查询用户不存在,返回null即可,spring security同时抛出异常提示用户不存在
         if ( xcUser == null ) {
             return null;

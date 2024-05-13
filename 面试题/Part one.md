@@ -1757,10 +1757,134 @@ C 前后都可以
 
 正确答案：A
 
-> 链接：https://www.nowcoder.com/questionTerminal/java中线程分为两种类型： 
+> 中线程分为两种类型： 
 >
 > 1：用户线程。通过Thread.setDaemon(false)设置为用户线程； 
 >
 > 2：守护线程。通过Thread.setDaemon(true)设置为守护线程，如果不设置，默认用户线程； 
 >
 > 守护线程是服务用户线程的线程，在它启动之前必须先set。
+
+# 78. 以下类型为Final类型的为（）
+
+A HashMap
+B StringBuffer
+C String
+D Hashtable
+
+正确答案：B C
+
+> 通过阅读源码可以知道，string与stringbuffer都是通过字符数组实现的。 
+>
+> 其中string的字符数组是final修饰的，所以字符数组不可以修改。 
+>
+> stringbuffer的字符数组没有final修饰，所以字符数组可以修改。 
+>
+> string与stringbuffer都是final修饰，只是限制他们所存储的引用地址不可修改。 
+>
+> 至于地址所指内容能不能修改，则需要看字符数组可不可以修改。
+
+# 79. java8中，下面哪个类用到了解决哈希冲突的开放定址法 
+
+A LinkedHashSet
+B HashMap
+C ThreadLocal
+D TreeMap
+
+正确答案：C
+
+> ThreadLocalMap使用开放定址法解决hash冲突，HashMap使用链地址法解决hash冲突。
+
+# 80. 运行代码，输出的结果是（父子类加载顺序）
+
+```java
+public class P {
+    public static int abc = 123;
+    static{
+        System.out.println("P is init");
+    }
+}
+public class S extends P {
+    static{
+        System.out.println("S is init");
+    }
+}
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(S.abc);
+    }
+}
+```
+
+A P is init<br /123
+B S is init<br /P is init<br /123
+C P is init<br /S is init<br /123
+D S is init<br /123
+
+> 不会初始化子类的几种
+>
+> 1. 调用的是父类的static方法或者字段
+>
+> 2.调用的是父类的final方法或者字段
+>
+> 3. 通过数组来引用
+
+# 81. Java数据库连接库JDBC用到哪种设计模式?
+
+A 生成器
+B 桥接模式
+C 抽象工厂
+D 单例模式
+> JDBC连接 [数据库](https://gw-c.nowcoder.com/api/sparta/jump/link?link=http://www.2cto.com/database/) 的时候，在各个数据库之间进行切换，基本不需要动太多的代码，甚至丝毫不动，原因就是JDBC提供了统一接口，每个数据库提供各自的实现，用一个叫做数据库驱动的程序来桥接就行了
+
+# 82. 以下JAVA程序的运行结果是什么( )
+
+```java
+public static void main(String[] args) {
+    Object o1 = true ? new Integer(1) : new Double(2.0);
+    Object o2;
+    if (true) {
+    o2 = new Integer(1);
+    } else {
+        o2 = new Double(2.0);
+    }
+    System.out.print(o1);
+    System.out.print(" ");         
+    System.out.print(o2);
+}
+```
+
+A 1 1
+B 1.0 1.0
+C 1 1.0
+D 1.0 1
+
+> ```java
+> byte b = 1;
+> char c = 1;
+> short s = 1;
+> int i = 1;
+> 
+> // 三目，一边为byte另一边为char，结果为int
+> // 其它情况结果为两边中范围大的。适用包装类型
+> i = true ? b : c; // int
+> b = true ? b : b; // byte
+> s = true ? b : s; // short
+> 
+> // 表达式，两边为byte,short,char，结果为int型
+> // 其它情况结果为两边中范围大的。适用包装类型
+> i = b + c; // int
+> i = b + b; // int
+> i = b + s; // int
+> 
+> // 当 a 为基本数据类型时，a += b，相当于 a = (a) (a + b)
+> // 当 a 为包装类型时， a += b 就是 a = a + b
+> b += s; // 没问题
+> c += i; // 没问题
+> 
+> // 常量任君搞，long以上不能越
+> b = (char) 1 + (short) 1 + (int) 1; // 没问题
+> // i = (long) 1 // 错误
+> ```
+>
+> 

@@ -145,19 +145,61 @@ D tomcat 为每个 App 创建一个 Loader,里面保存着此 WebApp 的 ClassLo
 正确答案：B C D
 
 > 	1）Bootstrap ClassLoader
->   		
+>   						
 >   	负责加载$JAVA_HOME中jre/lib/rt.jar里所有的class，由C++实现，不是ClassLoader子类
->   		
+>   						
 >   	2）Extension ClassLoader
->   		
+>   						
 >   	负责加载java平台中扩展功能的一些jar包，包括$JAVA_HOME中jre/lib/*.jar或-Djava.ext.dirs指定目录下的jar包
->   		
+>   						
 >   	3）App ClassLoader
->   		
+>   						
 >   	负责记载classpath中指定的jar包及目录中class
->   		
+>   						
 >   	4）Custom ClassLoader
->   		
+>   						
 >   	属于应用程序根据自身需要自定义的ClassLoader，如tomcat、jboss都会根据j2ee规范自行实现ClassLoader
->   		
+>   						
 >   	加载过程中会先检查类是否被已加载，检查顺序是自底向上，从Custom ClassLoader到BootStrap ClassLoader逐层检查，只要某个classloader已加载就视为已加载此类，保证此类只所有ClassLoader加载一次。而加载的顺序是自顶向下，也就是由上层来逐层尝试加载此类。
+
+# 8.下面有关JVM内存，说法错误的是？ 
+
+正确答案：C                         
+
+A 程序计数器是一个比较小的内存区域，用于指示当前线程所执行的字节码执行到了第几行，是线程隔离的
+B 虚拟机栈描述的是Java方法执行的内存模型，用于存储局部变量，操作数栈，动态链接，方法出口等信息，是线程隔离的
+C 方法区用于存储JVM加载的类信息、常量、静态变量、以及编译器编译后的代码等数据，是线程隔离的
+D 原则上讲，所有的对象都在堆区上分配内存，是线程之间共享的
+
+> 方法区在JVM中也是一个非常重要的区域，它与堆一样，是被 **线程共享** 的区域。 在方法区中，存储了每个类的信息（包括类的名称、方法信息、字段信息）、静态变量、常量以及编译器编译后的代码等。
+
+# 9. 下面有关java classloader说法正确的是（）？ 
+
+A ClassLoader就是用来动态加载class文件到内存当中用的
+
+
+B JVM在判定两个class是否相同时，只用判断类名相同即可，和类加载器无关
+
+
+C ClassLoader使用的是双亲委托模型来搜索类的
+
+
+D Java默认提供的三个ClassLoader是Boostrap ClassLoader，Extension ClassLoader，App ClassLoader
+
+E 以上都不正确
+
+
+
+> JDK中提供了三个ClassLoader，根据层级从高到低为： 
+>
+> 1. Bootstrap ClassLoader，主要加载JVM自身工作需要的类。      
+> 2. Extension ClassLoader，主要加载%JAVA_HOME%\lib\ext目录下的库类。      
+> 3. Application ClassLoader，主要加载Classpath指定的库类，一般情况下这是程序中的默认类加载器，也是**ClassLoader.getSystemClassLoader()** 的返回值。（这里的Classpath默认指的是环境变量中配置的Classpath，但是可以在执行Java命令的时候使用-cp 参数来修改当前程序使用的Classpath）     
+>
+> ​    JVM加载类的实现方式，我们称为 **双亲委托模型**：   
+>
+> ​    如果一个类加载器收到了类加载的请求，他首先不会自己去尝试加载这个类，而是把这个请求委托给自己的父加载器，每一层的类加载器都是如此，因此所有的类加载请求最终都应该传送到顶层的**Bootstrap ClassLoader**中，只有当父加载器反馈自己无法完成加载请求时，子加载器才会尝试自己加载。   
+>
+>    **双亲委托模型的重要用途是为了解决类载入过程中的安全性问题。**  
+>
+>    假设有一个开发者自己编写了一个名为java.lang.Object的类，想借此欺骗JVM。现在他要使用**自定义ClassLoader**来加载自己编写的***java.lang.Object\**类。然而幸运的是，**双亲委托模型**不会让他成功。因为JVM会优先在**Bootstrap ClassLoader**的路径下找到**java.lang.Object类，并载入它

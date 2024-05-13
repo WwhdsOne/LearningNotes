@@ -871,7 +871,8 @@ public class PayNotifyConfig implements ApplicationContextAware {
 
     //交换机和支付通知队列绑定
     @Bean
-    public Binding binding_course_publish_queue(@Qualifier(PAYNOTIFY_QUEUE) Queue queue, @Qualifier(PAYNOTIFY_EXCHANGE_FANOUT) FanoutExchange exchange) {
+    public Binding binding_course_publish_queue(@Qualifier(PAYNOTIFY_QUEUE) Queue queue, 
+                                                @Qualifier(PAYNOTIFY_EXCHANGE_FANOUT) FanoutExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange);
     }
 
@@ -888,8 +889,11 @@ public class PayNotifyConfig implements ApplicationContextAware {
                      replyCode, replyText, exchange, routingKey, message.toString());
             MqMessage mqMessage = JSON.parseObject(message.toString(), MqMessage.class);
             //将消息再添加到消息表
-            mqMessageService.addMessage(mqMessage.getMessageType(),mqMessage.getBusinessKey1(),mqMessage.getBusinessKey2(),mqMessage.getBusinessKey3());
-
+            mqMessageService.addMessage(mqMessage.getMessageType(),
+                                        mqMessage.getBusinessKey1(),
+                                        mqMessage.getBusinessKey2(),
+                                        mqMessage.getBusinessKey3()
+                                       );
         });
     }
 }
@@ -1005,10 +1009,10 @@ public class PayNotifyConfig {
 
     //交换机和支付通知队列绑定
     @Bean
-    public Binding binding_course_publish_queue(@Qualifier(PAYNOTIFY_QUEUE) Queue queue, @Qualifier(PAYNOTIFY_EXCHANGE_FANOUT) FanoutExchange exchange) {
+    public Binding binding_course_publish_queue(@Qualifier(PAYNOTIFY_QUEUE) Queue queue, 
+                                                @Qualifier(PAYNOTIFY_EXCHANGE_FANOUT) FanoutExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange);
     }
-
 }
 ```
 

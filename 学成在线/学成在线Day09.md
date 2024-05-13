@@ -31,39 +31,39 @@ maven依赖:
 
 ```java
 @Test
-    public void testGenerateHtmlByTemplate() throws IOException, TemplateException {
-        //配置freemarker
-        Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
+public void testGenerateHtmlByTemplate() throws IOException, TemplateException {
+    //配置freemarker
+    Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
 
-        //加载模板
-        //选指定模板路径,classpath下templates下
-        //得到classpath路径
-        String classpath = this.getClass().getResource("/").getPath();
-        configuration.setDirectoryForTemplateLoading(new File(classpath + "/templates/"));
-        //设置字符编码
-        configuration.setDefaultEncoding("utf-8");
+    //加载模板
+    //选指定模板路径,classpath下templates下
+    //得到classpath路径
+    String classpath = this.getClass().getResource("/").getPath();
+    configuration.setDirectoryForTemplateLoading(new File(classpath + "/templates/"));
+    //设置字符编码
+    configuration.setDefaultEncoding("utf-8");
 
-        //指定模板文件名称
-        Template template = configuration.getTemplate("course_template.ftl");
+    //指定模板文件名称
+    Template template = configuration.getTemplate("course_template.ftl");
 
-        //准备数据
-        CoursePreviewDTO coursePreviewInfo = coursePublishService.getCoursePreviewInfo(26L);
+    //准备数据
+    CoursePreviewDTO coursePreviewInfo = coursePublishService.getCoursePreviewInfo(26L);
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("model", coursePreviewInfo);
+    Map<String, Object> map = new HashMap<>();
+    map.put("model", coursePreviewInfo);
 
-        //静态化
-        //参数1：模板，参数2：数据模型
-        String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
-        System.out.println(content);
-        //将静态化内容输出到文件中
-        InputStream inputStream = IOUtils.toInputStream(content);
-        //输出流
+    //静态化
+    //参数1：模板，参数2：数据模型
+    String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
+    System.out.println(content);
+    //将静态化内容输出到文件中
+    InputStream inputStream = IOUtils.toInputStream(content);
+    //输出流
 
-        //再用拷贝流输出
-        FileOutputStream fileOutputStream = new FileOutputStream("D:\\Programming_Learning\\Project\\freemaker\\" + 25 + ".html");
-        IOUtils.copy(inputStream, fileOutputStream);
-    }
+    //再用拷贝流输出
+    FileOutputStream fileOutputStream = new FileOutputStream("D:\\Programming_Learning\\Project\\freemaker\\" + 25 + ".html");
+    IOUtils.copy(inputStream, fileOutputStream);
+}
 ```
 
 ## 上传文件测试
@@ -245,14 +245,11 @@ fallbackFactory代码如下:
 public class SearchServiceClientFallbackFactory implements FallbackFactory<SearchServiceClient> {
     @Override
     public SearchServiceClient create(Throwable throwable) {
-
         return new SearchServiceClient() {
-
             @Override
             public Boolean add(CourseIndex courseIndex) {
                 throwable.printStackTrace();
                 log.debug("调用搜索发生熔断走降级方法,熔断异常:", throwable.getMessage());
-
                 return false;
             }
         };
@@ -264,30 +261,28 @@ public class SearchServiceClientFallbackFactory implements FallbackFactory<Searc
 
 ```java
 //生成课程静态化页面并上传至文件系统
-    public void generateCourseHtml(MqMessage mqMessage, long courseId) throws Exception {
-        log.info("开始执行课程静态化任务,id:{}", mqMessage.getId());
-        Long taskId = mqMessage.getId();
-        MqMessageService mqMessageService = this.getMqMessageService();
-        //任务幂等性处理
-        //取出当前阶段执行状态
-        int stageOne = mqMessageService.getStageOne(taskId);
-        if(stageOne > 0){
-            //已经执行过了
-            log.info("课程静态化完成,无需处理");
-            return ;
-        }
-        //生成html页面
-        File file = coursePublishService.generateCourseHtml(courseId);
-        if(file == null){
-            XueChengPlusException.cast("生成课程静态化页面为空");
-        }
-        //上传到minio
-        coursePublishService.uploadCourseHtml(courseId,file);
-
-
-        //将任务状态设置为完成
-        mqMessageService.completedStageOne(taskId);
+public void generateCourseHtml(MqMessage mqMessage, long courseId) throws Exception {
+    log.info("开始执行课程静态化任务,id:{}", mqMessage.getId());
+    Long taskId = mqMessage.getId();
+    MqMessageService mqMessageService = this.getMqMessageService();
+    //任务幂等性处理
+    //取出当前阶段执行状态
+    int stageOne = mqMessageService.getStageOne(taskId);
+    if(stageOne > 0){
+        //已经执行过了
+        log.info("课程静态化完成,无需处理");
+        return ;
     }
+    //生成html页面
+    File file = coursePublishService.generateCourseHtml(courseId);
+    if(file == null){
+        XueChengPlusException.cast("生成课程静态化页面为空");
+    }
+    //上传到minio
+    coursePublishService.uploadCourseHtml(courseId,file);
+    //将任务状态设置为完成
+    mqMessageService.completedStageOne(taskId);
+}
 ```
 
 生成静态页面部分完成
