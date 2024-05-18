@@ -1896,7 +1896,7 @@ B 中间件应支持标准的协议和接口
 C 中间件可运行于多种硬件和操作系统平台上
 D 跨越网络,硬件，操作系统平台的应用或服务可通过中间件透明交互
 
-> 中间件是一种独立的系统软件或服务程序，分布式应用软件借助这种软件在不同的技术之间共享资源。中间件位于客户机/    服务器的操作系统之上，管理计算机资源和网络通讯。是连接两个独立应用程序或独立系统的软件。相连接的系统，即使它们具有不同的接口，但通过中间件相互之间仍能交换信息。执行中间件的一个关键途径是信息传递。通过中间件，应用程序可以工作于多平台或OS环境。  
+> 中间件是一种独立的系统软件或服务程序，分布式应用软件借助这种软件在不同的技术之间共享资源。中间件位于客户机服务器的`操作系统`之上，管理计算机资源和网络通讯。是连接两个独立应用程序或独立系统的软件。相连接的系统，即使它们具有不同的接口，但通过中间件相互之间仍能交换信息。执行中间件的一个关键途径是信息传递。通过中间件，应用程序可以工作于多平台或OS环境。  
 >
 > （简单来说，中间件并不能提高内核的效率，一般只是负责网络信息的分发处理）  
 >
@@ -1908,3 +1908,195 @@ D 跨越网络,硬件，操作系统平台的应用或服务可通过中间件�
 >
 > ​                  
 
+# 84. 以下那些代码段能正确执行(关于+=类型转换) 
+
+正确答案：C D  
+
+
+A
+ ```
+  public static void main(String args[]) {
+  byte a = 3;
+  byte b = 2;
+  b = a + b;
+  System.out.println(b);
+  }
+ ```
+B
+ ```
+  public static void main(String args[]) {
+  byte a = 127;
+  byte b = 126;
+  b = a + b;
+  System.out.println(b);
+  }
+ ```
+C
+ ```
+  public static void main(String args[]) {
+  byte a = 3;
+  byte b = 2;
+  a+=b;
+  System.out.println(b);
+  }
+ ```
+D
+ ```
+  public static void main(String args[]) {
+  byte a = 127;
+  byte b = 127;
+  a+=b;
+  System.out.println(b);
+  }
+ ```
+
+> byte类型的变量在做运算时被会转换为int类型的值，故A、B左为byte，右为int，会报错；而C、D语句中用的是a+=b的语句，此语句会将被赋值的变量自动强制转化为相对应的类型。
+>
+> A、B选项需要加强转(byte)
+>
+> C、D选项中的+=会自动进行强转，相当于加了(byte)；
+
+# 85.下面代码运行结果是
+
+```java
+class Value{
+    public int i=15;
+}
+public class Test{
+    public static void main(String argv[]){
+        Test t=new Test( );
+        t.first( );
+    }
+
+    public void first( ){
+        int i=5;
+        Value v=new Value( );
+        v.i=25;
+        second(v,i);
+        System.out.println(v.i);
+    }
+
+    public void second(Value v,int i){
+        i = 0;
+        v.i = 20;
+        Value val = new Value( );
+        v = val;
+        System.out.println(v.i+" "+i);
+    }
+}
+```
+
+A 15 0 20
+B 15 0 15
+C 20 0 20
+D 0 15 20
+
+> 这题选A，考察的是值传递与引用传递，Java中原始数据类型都是值传递，传递的是值得副本，形参的改变不会影响实际参数的值， 引用传递传递的是引用类型数据，包括String,数组，列表, map,类对象等类型，形参与实参指向的是同一内存地址，因此形参改变会影响实参的值。
+
+
+
+# 86. final、finally和finalize的区别中，下述说法正确的有？
+
+
+正确答案：A B C                                         
+
+A final用于声明属性，方法和类，分别表示属性不可变，方法不可覆盖，类不可继承。
+B finally是异常处理语句结构的一部分，表示总是执行。
+C finalize是Object类的一个方法，在垃圾收集器执行的时候会调用被回收对象的此方法，可以覆盖此方法提供垃圾收集时的其他资源的回收，例如关闭文件等。
+D 引用变量被final修饰之后，不能再指向其他对象，它指向的对象的内容也是不可变的。
+
+> **A，D考的一个知识点，final修饰变量，变量的引用（也就是指向的地址）不可变，但是引用的内容可以变（地址中的内容可变）。**  
+>
+> **B，finally表示总是执行。但是其实finally也有不执行的时候，但是这个题不要扣字眼。**  
+>
+> **1. 在try中调用System.exit(0)，强制退出了程序，finally块不执行。**  
+>
+> 2. 在进入try块前，出现了异常，finally块不执行。
+>     
+>
+> **C，finalize方法，这个选项错就错在，这个方法一个对象只能执行一次，只能在第一次进入被回收的队列，而且对象所属于的类重写了finalize方法才会被执行。第二次进入回收队列的时候，不会再执行其finalize方法，而是直接被二次标记，在下一次GC的时候被GC。**  
+
+# 87. 以下说法错误的是（）
+
+A 其他选项均不正确
+B java线程类优先级相同
+C Thread和Runnable接口没有区别
+D 如果一个类继承了某个类，只能使用Runnable实现线程
+
+> D 实现多线程的三种方式，一种是继承Thread类使用此方式就不能继承其他的类了。还有两种是实现Runnable接口或者实现Callable接口
+
+# 88. 说明输出结果(获取类名相关)
+
+正确答案：C
+
+```java
+import java.util.Date;  
+public class SuperTest extends Date{  
+    private static final long serialVersionUID = 1L;  
+    private void test(){  
+       System.out.println(super.getClass().getName());  
+    }  
+     
+    public static void main(String[]args){  
+       new SuperTest().test();  
+    }  
+}  
+```
+
+A SuperTest
+B SuperTest.class
+C test.SuperTest
+D test.SuperTest.class
+
+> TestSuper和Date的getClass都没有重写，他们都是调用Object的getClass，而Object的getClass作用是返回的是运行时的类的名字。
+>
+> 这个运行时的类就是当前类，所以`super.getClass().getName()` 返回的是test.SuperTest，与Date类无关
+>
+> 要返回Date类的名字需要写super.getClass().getSuperclass()
+
+# 89. 下面有关SPRING的事务传播特性，说法错误的是？
+
+正确答案：B                                       
+
+A PROPAGATION_SUPPORTS：支持当前事务，如果当前没有事务，就以非事务方式执行
+B PROPAGATION_REQUIRED：支持当前事务，如果当前没有事务，就抛出异常
+C PROPAGATION_REQUIRES_NEW：新建事务，如果当前存在事务，把当前事务挂起
+D PROPAGATION_NESTED：支持当前事务，新增Savepoint点，与当前事务同步提交或回滚
+
+> PROPAGATION_REQUIRED--支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。 
+>
+> PROPAGATION_SUPPORTS--支持当前事务，如果当前没有事务，就以非事务方式执行。 
+> PROPAGATION_MANDATORY--支持当前事务，如果当前没有事务，就抛出异常。 
+> PROPAGATION_REQUIRES_NEW--新建事务，如果当前存在事务，把当前事务挂起。 
+> PROPAGATION_NOT_SUPPORTED--以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。 
+> PROPAGATION_NEVER--以非事务方式执行，如果当前存在事务，则抛出异常。
+
+# 90. 下面代码输出是？（枚举相关）
+
+```java
+enum AccountType
+{
+    SAVING, FIXED, CURRENT;
+    private AccountType()
+    {
+        System.out.println("It is a account type");
+    }
+}
+class EnumOne
+{
+    public static void main(String[]args)
+    {
+        System.out.println(AccountType.FIXED);
+    }
+}
+```
+
+A 编译正确，输出”It is a account type”once followed by”FIXED”
+B 编译正确，输出”It is a account type”twice followed by”FIXED”
+C 编译正确，输出”It is a account type”thrice followed by”FIXED”
+D 编译正确，输出”It is a account type”four times followed by”FIXED”
+E 编译错误
+
+> 答案：C
+>
+> 枚举类有三个实例，故调用三次构造方法，打印三次It is a account type
