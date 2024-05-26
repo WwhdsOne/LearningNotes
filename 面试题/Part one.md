@@ -2167,7 +2167,7 @@ b7=(b2+b5);  /*语句4*/
 System.out.println(b3+b6);
 ```
 
-> 链接：https://www.nowcoder.com/questionTerminal/Java表达式转型规则**由低到高转换**： 
+> 表达式转型规则**由低到高转换**： 
 >
 >   1、所有的byte,short,char型的值将被提升为int型； 
 >
@@ -2188,3 +2188,23 @@ System.out.println(b3+b6);
 >   语句3错误：b8=(b1+b4);虽然b4不会自动提升，但b1仍会自动提升，所以结果需要强转，b8=(byte)(b1+b4); 
 >
 >   语句4错误：b7=(b2+b5); 同上。同时注意b7是**final修饰，即只可赋值一次，便不可再改变**。
+
+# 95. 局部内部类可以用哪些修饰符修饰？
+
+正确答案：C D
+
+A public
+B private
+C abstract
+D final
+
+> <img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/242025553_1547012774538_BA9669C5826A238ACEC0BD86755FA5DB.png" alt="242025553_1547012774538_BA9669C5826A238ACEC0BD86755FA5DB" style="zoom:33%;" />
+
+# 96. 下面的对象创建方法中哪些会调用构造方法 （）？
+正确答案: A C 
+A new语句创建对象
+B 调用Java.io.ObjectInputStream的readObject方法
+C java反射机制使用java.lang.Class或java.lang.reflect.Constructor的newInstance()方法
+D 调用对象的clone()方法
+
+> 构造函数的作用是完成对象的初始化。当程序执行到new操作符时， 首先去看new操作符后面的类型，因为知道了类型，才能知道要分配多大的内存空间。分配完内存之后，再调用构造函数，填充对象的各个域，这一步叫做对象的初始化。而选项B、D中，对象的初始化并不是通过构造函数完成的，而是读取别的内存区域中的对象的各个域来完成。
