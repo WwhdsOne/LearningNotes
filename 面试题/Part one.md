@@ -2208,3 +2208,49 @@ C java反射机制使用java.lang.Class或java.lang.reflect.Constructor的newIns
 D 调用对象的clone()方法
 
 > 构造函数的作用是完成对象的初始化。当程序执行到new操作符时， 首先去看new操作符后面的类型，因为知道了类型，才能知道要分配多大的内存空间。分配完内存之后，再调用构造函数，填充对象的各个域，这一步叫做对象的初始化。而选项B、D中，对象的初始化并不是通过构造函数完成的，而是读取别的内存区域中的对象的各个域来完成。
+
+# 97. 用户不能调用构造方法，只能通过new关键字自动调用。（）
+
+正确答案：B
+
+A 正确
+B 错误
+
+> 选B。 
+>
+> 1. ​    在类内部可以用户可以使用关键字this.构造方法名()调用（参数决定调用的是本类对应的构造方法）   
+> 2. ​    在子类中用户可以通过关键字**super.父类构造方法名()**调用（参数决定调用的是父类对应的构造方法。）   
+> 3. ​    反射机制对于任意一个类，都能够知道这个类的所有属性和方法，包括类的构造方法。
+
+# 98. 以下代码将打印出
+
+```java
+public static void main(String args[]) {
+    List  Listlist1 = new ArrayList();
+    Listlist1.add(0);
+    List Listlist2 = Listlist1;
+    System.out.println(Listlist1.get(0) instanceof Integer);
+    System.out.println(Listlist2.get(0) instanceof Integer);
+}
+```
+
+A 编译错误
+B true true
+C true false
+D false false
+
+> JDK5之后提供的自动拆箱和自动装箱实现了将基本数据类型存入collection类型的集合（ArrayList,LinkedList）。例如题目中向ArrayList存入了基本类型0，int类型会自动装箱变为Integer类型存入集合中，使编译正常通过。 
+>
+> 将list1的引用赋值给了list2，那么list1和list2都将指向同一个堆内存空间。instanceof关键字在Java中用于判断一个对象是否属于某个特定类的实例，并且返回boolean类型的返回值。显然，list1.get(0)和list2.get(0)都属于Integer的实例。答案选择B。
+
+# 99. 下面关于JAVA的垃圾回收机制，正确的是（ ）     
+
+正确答案: B
+
+A 当调用“System.gc()”来强制回收时，系统会立即回收垃圾
+B 垃圾回收不能确定具体的回收时间
+C 程序可明确地标识某个局部变量的引用不再被使用
+D 程序可以显式地立即释放对象占有的内存
+
+> java提供了一个系统级的线程，即垃圾回收器线程。用来对每一个分配出去的内存空间进行跟踪。当JVM空闲时，自动回收每块可能被回收的内存，GC是完全自动的，不能被强制执行。程序员最多只能用System.gc()来建议执行垃圾回收器回收内存，但是具体的回收时间，是不可知的。当对象的引用变量被赋值为null，可能被当成垃圾。
+
