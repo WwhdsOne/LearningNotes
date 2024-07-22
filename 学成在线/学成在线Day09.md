@@ -169,6 +169,12 @@ taskkill /pid PID /f
 
 全部关闭，新打开的才是能正常使用的
 
+或者使用这一行代码即可全部关闭
+
+```cmd
+for /f "tokens=2" %i in ('tasklist ^| findstr nginx') do (taskkill /PID %i /F)
+```
+
 浪费我俩小时服了
 
 ## 熔断降级处理

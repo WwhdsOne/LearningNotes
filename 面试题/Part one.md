@@ -485,25 +485,11 @@ D false true
 > java程序的入口必须是static类型的，接口中不允许有static类型的方法。A项没有static修饰符，可以作为普通的方法。而且接口中的方法必须是public的。想想借口就是为了让别人实现的，相当于标准，标准不允许别人使用是不合理的，所以接口中的方法必须是public。C项中，接口中的方法默认是public的。D项属于正常的方法。所以答案是：ACD
 
 # 19. Java语言中，下面哪个语句是创建数组的正确语句？(   )                                        
-- ```
-  float f[][] = new float[6][6];
-  ```
-
-- ```
-  float []f[] = new float[6][6];
-  ```
-
-- ```
-  float f[][] = new float[][6];
-  ```
-
-- ```
-  float [][]f = new float[6][6];
-  ```
-
-- ```
-  float [][]f = new float[6][];                     
-  ```
+A float f[][] = new float\[6][6];
+B float []f[] = new float\[6][6];
+C float f\[][] = new float\[][6];
+D float \[][]f = new float\[6][6];
+E float \[][]f = new float\[6][];                     
 
 正确答案：A B D E
 
