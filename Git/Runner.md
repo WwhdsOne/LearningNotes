@@ -137,15 +137,6 @@ ENTRYPOINT ["./entrypoint.sh"]
 
      切换到非root用户是因为`actions-runner-linux-x64-2.322.0.tar.gz`中的脚本因为安全原因不允许使用sudo指令执行脚本，所以不能使用root用户
 
-3. 入口点脚本
-
-   ```dockerfile
-   COPY --chown=runner:runner entrypoint.sh .
-   RUN chmod +x entrypoint.sh
-   ```
-
-   这部分脚本内容用于以后对不同的github仓库复用，在获取github仓库设置部分会详细讲解
-
 4. 下载runner压缩包
 
    ```dockerfile
