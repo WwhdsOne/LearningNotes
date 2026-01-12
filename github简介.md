@@ -20,5 +20,36 @@
 
 # 🏢 实习经历
 - **2024.7 - 2025.2** 智谱华章，后端工程师  
+
+  • 开发了多个重要项目并参与多版本迭代：
+
+  **–** CodeGeeX 校园版（Java）
+
+  **–** 校园版运营平台（Go）
+
+  **–** 模型评测平台（Java）
+
+  **–** AICO 智能引擎（Go）
+
+  **–** 大模型代码能力评测工具复现论文效果并工程化使简易使用(Python + Docker)
+
+  > [NaturalCodeBench](https://github.com/THUDM/NaturalCodeBench)
+  >
+  > [HumanEval-X: 多语言代码生成基准](https://github.com/zai-org/CodeGeeX/blob/main/codegeex/benchmark/README_zh.md)
+  >
+  > [Bird](https://bird-bench.github.io/)
+  >
+  > [Spider](https://yale-lily.github.io/spider)
+
+  • 技术框架搭建与中间件开发：搭建了用于组内 GO 后端项目的基于 Gin + GRPC 的二次开发框架，
+
+  并且编写了日志中间件。
+
+  • 文档编写：实习期间提供了 30 + 篇研发文档和技术文档，确保项目可维护性，总结了相关经验。
+
 - **2025.12 - 至今** 蓝色光标，后端工程师 
 
+  **TTS 云函数服务（AWS Lambda）**
+
+  - 基于 Lambda + S3 + CloudFront 实现文本转语音服务，封装 SenseAudio TTS，返回 CDN 音频链接
+  - 集成 Whisper 生成词级时间戳与 SRT 字幕，支持音频参数配置与响度/时长计算
