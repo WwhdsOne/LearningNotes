@@ -21,12 +21,13 @@
   - [8. GitHub 插件](#8-github-插件)
   - [9. UI/UX Pro Max 插件](#9-uiux-pro-max-插件)
   - [10. Claude HUD 插件](#10-claude-hud-插件)
+  - [11. Caveman 插件](#11-caveman-插件)
 - [独立安装的第三方 Skills](#独立安装的第三方-skills)
-  - [11. Golang Pro](#11-golang-pro)
-  - [12. Academic Writing Workflow (中文)](#12-academic-writing-workflow-中文)
-  - [13. Skill Vetter](#13-skill-vetter)
+  - [12. Golang Pro](#12-golang-pro)
+  - [13. Academic Writing Workflow (中文)](#13-academic-writing-workflow-中文)
+  - [14. Skill Vetter](#14-skill-vetter)
 - [Claude Code 扩展工具](#claude-code-扩展工具)
-  - [14. ccstatusline](#14-ccstatusline)
+  - [15. ccstatusline](#15-ccstatusline)
 - [项目级别 Skills](#项目级别-skills)
 - [内置 Skills](#内置-skills)
 - [已注册的插件市场](#已注册的插件市场)
@@ -219,11 +220,31 @@
 
 ---
 
+### 11. Caveman 插件
+
+- **来源仓库：** `JuliusBrussee/caveman`
+- **来源市场：** `claude-plugins-official`
+- **安装命令：**
+  ```bash
+  claude plugins add --marketplace claude-plugins-official caveman
+  ```
+- **说明：** 极简主义通信模式，通过压缩语言节省 ~75% token 使用量，同时保持技术准确性
+- **包含的 Skills（4 个）：**
+
+  | Skill | 说明 |
+  |-------|------|
+  | `caveman` | 极简通信模式，节省 ~75% token，支持强度级别调整 |
+  | `caveman-commit` | 超压缩提交信息生成器，保留意图和推理，使用 Conventional Commits 格式 |
+  | `caveman-review` | 超压缩代码审查注释，保留可操作信号，每行一个 |
+  | `caveman:compress` | 压缩自然语言内存文件（CLAUDE.md、todos、preferences）为 caveman 格式 |
+
+---
+
 ## 独立安装的第三方 Skills
 
 这些 Skill 安装在 `~/.claude/skills/` 目录中，不通过插件市场管理。
 
-### 11. Golang Pro
+### 12. Golang Pro
 
 - **作者：** `github.com/Jeffallan`
 - **版本：** 1.1.0
@@ -231,12 +252,12 @@
 - **安装方式：** 手动安装到 `~/.claude/skills/golang-pro/`
 - **说明：** 并发 Go 模式（goroutine、channel）、微服务（gRPC、REST）、性能优化（pprof）、泛型、接口、错误处理
 
-### 12. Academic Writing Workflow (中文)
+### 13. Academic Writing Workflow (中文)
 
 - **安装方式：** 手动安装到 `~/.claude/skills/academic-writing-workflow-zh/`
 - **说明：** 面向 AI/CS 论文写作全流程的中文主导技能，包括学术翻译（中英互译）、润色、去 AI 味、实验结果分析、图表标题生成、审稿视角检查、会议投稿准备
 
-### 13. Skill Vetter
+### 14. Skill Vetter
 
 - **来源：** OpenClaw / ClawHub
 - **安装方式：** 手动安装到 `~/.claude/skills/skill-vetter/`
@@ -246,7 +267,7 @@
 
 ## Claude Code 扩展工具
 
-### 14. ccstatusline
+### 15. ccstatusline
 
 - **来源仓库：** [sirmalloc/ccstatusline](https://github.com/sirmalloc/ccstatusline)
 - **npm 包：** `ccstatusline`
