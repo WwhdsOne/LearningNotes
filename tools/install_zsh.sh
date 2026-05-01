@@ -51,9 +51,8 @@ fi
 echo "4. Installing Oh My Zsh plugins..."
 ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
 
-if ! dir_exists "$ZSH_CUSTOM/plugins/zsh-autosuggestions"; then
-    git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-fi
+# Removed the zsh-autosuggestions plugin
+
 if ! dir_exists "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"; then
     git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
 fi
@@ -64,9 +63,9 @@ fi
 # Enable plugins in .zshrc (cross-platform fix)
 echo "5. Enabling plugins in .zshrc..."
 if [[ "$OS" == "Darwin" ]]; then
-    sed -i '' 's/plugins=(/plugins=(zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete /' ~/.zshrc
+    sed -i '' 's/plugins=(/plugins=(zsh-syntax-highlighting zsh-autocomplete /' ~/.zshrc
 else
-    sed -i 's/plugins=(/plugins=(zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete /' ~/.zshrc
+    sed -i 's/plugins=(/plugins=(zsh-syntax-highlighting zsh-autocomplete /' ~/.zshrc
 fi
 
 # 4. Install Starship
