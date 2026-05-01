@@ -37,7 +37,9 @@ fi
 
 # Set Zsh as default shell
 echo "2. Setting Zsh as the default shell..."
-chsh -s "$(which zsh)"
+if [ ! -f ~/.zshrc ]; then
+    touch ~/.zshrc
+fi
 
 # 2. Install Oh My Zsh
 echo "3. Installing Oh My Zsh..."
@@ -107,14 +109,20 @@ if [[ "$OS" == "Darwin" ]]; then
 elif [[ "$OS" == "Linux" ]]; then
     if command_exists apt; then
         apt update
-        apt install -y bat glow poppler-utils eza hexyl mediainfo exiftool chafa
+        apt install -y bat poppler-utils eza hexyl mediainfo exiftool chafa
+        # 8. Install glow (using curl)
+        curl -sSL https://github.com/charmbracelet/glow/releases/latest/download/glow_1.5.0_Linux_x86_64.deb -o glow.deb
+        sudo dpkg -i glow.deb
+        sudo apt-get install -f  # To fix any dependencies
+        # 9. Remove glow installation file (deb package)
+        rm glow.deb
     else
         echo "Unsupported Linux package manager."
         exit 1
     fi
 fi
 
-# 8. Create yazi.toml configuration file
+# 10. Create yazi.toml configuration file
 echo "11. Creating yazi.toml configuration file..."
 mkdir -p ~/.config/yazi
 cat <<EOL > ~/.config/yazi/yazi.toml
@@ -132,7 +140,7 @@ image_quality = 80
 image_filter = "lanczos3"
 EOL
 
-# 9. Source .zshrc
-echo "12. Applying changes..."
+# 11. Source .zshrc
+echo "13. Applying changes..."
 echo -e "\n✅ Installation completed successfully!"
 echo -e "⚠️ 请重启终端生效所有配置\n"
