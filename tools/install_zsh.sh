@@ -27,8 +27,8 @@ else
         brew install zsh
     elif [[ "$OS" == "Linux" ]]; then
         echo "Ubuntu/Debian detected. Installing Zsh using apt..."
-        sudo apt update
-        sudo apt install zsh -y
+        apt update
+        apt install -y zsh git curl
     else
         echo "Unsupported OS detected. Please install Zsh manually."
         exit 1
@@ -64,9 +64,9 @@ fi
 # Enable plugins in .zshrc (cross-platform fix)
 echo "5. Enabling plugins in .zshrc..."
 if [[ "$OS" == "Darwin" ]]; then
-    sed -i '' 's/plugins=(/plugins=(zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete /' ~/.zshrc
+    sed -i '' 's/plugins=(/plugins=(zsh-autosuggestions zsh-syntax-highlighting /' ~/.zshrc
 else
-    sed -i 's/plugins=(/plugins=(zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete /' ~/.zshrc
+    sed -i 's/plugins=(/plugins=(zsh-autosuggestions zsh-syntax-highlighting /' ~/.zshrc
 fi
 
 # 4. Install Starship
@@ -74,14 +74,7 @@ echo "6. Installing Starship..."
 if command_exists starship; then
     echo "Starship is already installed"
 else
-    if [[ "$OS" == "Darwin" ]]; then
-        brew install starship
-    elif [[ "$OS" == "Linux" ]]; then
-        curl -sS https://starship.rs/install.sh | sh
-    else
-        echo "Unsupported OS detected. Please install Starship manually."
-        exit 1
-    fi
+    curl -sS https://starship.rs/install.sh | sh -s -- --yes
 fi
 
 # Add Starship initialization to .zshrc
@@ -113,8 +106,8 @@ if [[ "$OS" == "Darwin" ]]; then
     brew install bat glow poppler eza hexyl mediainfo exiftool chafa
 elif [[ "$OS" == "Linux" ]]; then
     if command_exists apt; then
-        sudo apt update
-        sudo apt install -y bat glow poppler-utils eza hexyl mediainfo exiftool chafa
+        apt update
+        apt install -y bat glow poppler-utils eza hexyl mediainfo exiftool chafa
     else
         echo "Unsupported Linux package manager."
         exit 1
