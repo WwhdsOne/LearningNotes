@@ -35,7 +35,7 @@ else
     elif [[ "$OS" == "Linux" ]]; then
         echo "Ubuntu/Debian detected. Installing Zsh using apt..."
         $sudo_prefix apt update
-        $sudo_prefix apt install -y zsh git curl
+        $sudo_prefix apt install -y zsh git gpg
     else
         echo "Unsupported OS detected. Please install Zsh manually."
         exit 1
