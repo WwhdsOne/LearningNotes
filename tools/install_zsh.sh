@@ -13,6 +13,13 @@ dir_exists() {
 # Check the operating system
 OS=$(uname -s)
 
+# Check if sudo is available
+if command_exists sudo; then
+    sudo_prefix="sudo"
+else
+    sudo_prefix=""
+fi
+
 # 1. Install Zsh
 echo "1. Installing Zsh..."
 if command_exists zsh; then
@@ -22,13 +29,13 @@ else
         echo "macOS detected. Installing Zsh using Homebrew..."
         if ! command_exists brew; then
             echo "Homebrew not found, installing Homebrew..."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            $sudo_prefix /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
-        brew install zsh
+        $sudo_prefix brew install zsh
     elif [[ "$OS" == "Linux" ]]; then
         echo "Ubuntu/Debian detected. Installing Zsh using apt..."
-        apt update
-        apt install -y zsh git curl
+        $sudo_prefix apt update
+        $sudo_prefix apt install -y zsh git curl
     else
         echo "Unsupported OS detected. Please install Zsh manually."
         exit 1
@@ -110,12 +117,10 @@ elif [[ "$OS" == "Linux" ]]; then
     if command_exists apt; then
         apt update
         apt install -y bat poppler-utils eza hexyl mediainfo exiftool chafa
-        # 8. Install glow (using curl)
-        curl -sSL https://github.com/charmbracelet/glow/releases/latest/download/glow_1.5.0_Linux_x86_64.deb -o glow.deb
-        sudo dpkg -i glow.deb
-        sudo apt-get install -f  # To fix any dependencies
-        # 9. Remove glow installation file (deb package)
-        rm glow.deb
+        mkdir -p /etc/apt/keyrings
+        curl -fsSL https://repo.charm.sh/apt/gpg.key | $sudo_prefix gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | $sudo_prefix tee /etc/apt/sources.list.d/charm.list
+        apt update && apt install glow
     else
         echo "Unsupported Linux package manager."
         exit 1
@@ -141,6 +146,6 @@ image_filter = "lanczos3"
 EOL
 
 # 11. Source .zshrc
-echo "13. Applying changes..."
+echo "12. Applying changes..."
 echo -e "\n✅ Installation completed successfully!"
 echo -e "⚠️ 请重启终端生效所有配置\n"
