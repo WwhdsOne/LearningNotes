@@ -120,7 +120,7 @@ elif [[ "$OS" == "Linux" ]]; then
         mkdir -p /etc/apt/keyrings
         curl -fsSL https://repo.charm.sh/apt/gpg.key | $sudo_prefix gpg --dearmor -o /etc/apt/keyrings/charm.gpg
         echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | $sudo_prefix tee /etc/apt/sources.list.d/charm.list
-        apt update && apt install glow
+        $sudo_prefix apt update && $sudo_prefix apt install glow
     else
         echo "Unsupported Linux package manager."
         exit 1
