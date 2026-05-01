@@ -14,7 +14,7 @@ dir_exists() {
 OS=$(uname -s)
 
 # 1. Install Zsh
-echo "Installing Zsh..."
+echo "1. Installing Zsh..."
 if command_exists zsh; then
     echo "Zsh is already installed"
 else
@@ -36,11 +36,11 @@ else
 fi
 
 # Set Zsh as default shell
-echo "Setting Zsh as the default shell..."
+echo "2. Setting Zsh as the default shell..."
 chsh -s "$(which zsh)"
 
 # 2. Install Oh My Zsh
-echo "Installing Oh My Zsh..."
+echo "3. Installing Oh My Zsh..."
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 else
@@ -48,7 +48,7 @@ else
 fi
 
 # 3. Install Oh My Zsh plugins
-echo "Installing Oh My Zsh plugins..."
+echo "4. Installing Oh My Zsh plugins..."
 ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
 
 if ! dir_exists "$ZSH_CUSTOM/plugins/zsh-autosuggestions"; then
@@ -61,8 +61,8 @@ if ! dir_exists "$ZSH_CUSTOM/plugins/zsh-autocomplete"; then
     git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete "$ZSH_CUSTOM/plugins/zsh-autocomplete"
 fi
 
-# Enable plugins in .zshrc (跨平台修复)
-echo "Enabling plugins in .zshrc..."
+# Enable plugins in .zshrc (cross-platform fix)
+echo "5. Enabling plugins in .zshrc..."
 if [[ "$OS" == "Darwin" ]]; then
     sed -i '' 's/plugins=(/plugins=(zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete /' ~/.zshrc
 else
@@ -70,7 +70,7 @@ else
 fi
 
 # 4. Install Starship
-echo "Installing Starship..."
+echo "6. Installing Starship..."
 if command_exists starship; then
     echo "Starship is already installed"
 else
@@ -85,12 +85,13 @@ else
 fi
 
 # Add Starship initialization to .zshrc
+echo "7. Adding Starship initialization to .zshrc..."
 if ! grep -q 'eval "$(starship init zsh)"' ~/.zshrc; then
     echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 fi
 
 # 5. Install Nerd Font (Hack Nerd Font)
-echo "Installing Hack Nerd Font..."
+echo "8. Installing Hack Nerd Font..."
 if [[ "$OS" == "Darwin" ]]; then
     brew tap homebrew/cask-fonts
     brew install --cask font-hack-nerd-font
@@ -99,7 +100,7 @@ elif [[ "$OS" == "Linux" ]]; then
 fi
 
 # 6. Install Catppuccin Powerline theme for Starship
-echo "Configuring Catppuccin Powerline theme..."
+echo "9. Configuring Catppuccin Powerline theme..."
 mkdir -p ~/.config
 starship preset catppuccin-powerline -o ~/.config/starship.toml
 
@@ -107,7 +108,7 @@ echo -e "\nYou can change the Starship theme palette by editing ~/.config/starsh
 echo "Options: catppuccin_mocha, frappe, macchiato, latte"
 
 # 7. Install tools（已修复：poppler-utils → poppler）
-echo "Installing tools: bat, glow, poppler, eza, hexyl, mediainfo, exiftool, chafa..."
+echo "10. Installing tools: bat, glow, poppler, eza, hexyl, mediainfo, exiftool, chafa..."
 if [[ "$OS" == "Darwin" ]]; then
     brew install bat glow poppler eza hexyl mediainfo exiftool chafa
 elif [[ "$OS" == "Linux" ]]; then
@@ -121,7 +122,7 @@ elif [[ "$OS" == "Linux" ]]; then
 fi
 
 # 8. Create yazi.toml configuration file
-echo "Creating yazi.toml configuration file..."
+echo "11. Creating yazi.toml configuration file..."
 mkdir -p ~/.config/yazi
 cat <<EOL > ~/.config/yazi/yazi.toml
 [mgr]
@@ -139,6 +140,6 @@ image_filter = "lanczos3"
 EOL
 
 # 9. Source .zshrc
-echo "Applying changes..."
+echo "12. Applying changes..."
 echo -e "\n✅ Installation completed successfully!"
 echo -e "⚠️ 请重启终端生效所有配置\n"
