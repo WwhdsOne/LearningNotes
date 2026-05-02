@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boss 5×5 战场主题方案</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: #e2e8f0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 32px 20px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #f8fafc 20%, #94a3b8 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .page-header p {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-top: 6px;
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ===== Shared 5×5 grid ===== */
+  .theme-card {
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .theme-card__name {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .theme-card__sub {
+    font-size: 0.62rem;
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+
+  .boss-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 6px;
+    aspect-ratio: 1;
+    max-width: 100%;
+  }
+
+  .boss-cell {
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s;
+    min-height: 0;
+    aspect-ratio: 1;
+    font-size: 0.55rem;
+    font-weight: 700;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  .boss-cell:active {
+    transform: scale(0.94);
+  }
+
+  .boss-cell__type {
+    font-size: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+  }
+
+  .boss-cell__hp {
+    font-size: 0.6rem;
+    font-weight: 900;
+    font-family: 'SF Mono', 'Cascadia Code', monospace;
+  }
+
+  .boss-cell__bar {
+    width: 70%;
+    height: 3px;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+
+  .boss-cell__bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+
+  /* ===== Theme 1: Cyberpunk Neon ===== */
+  .theme--cyberpunk {
+    background: linear-gradient(180deg, #0c0a1d 0%, #1a0a2e 100%);
+    border: 1px solid rgba(168, 85, 247, 0.15);
+  }
+  .theme--cyberpunk .theme-card__name { color: #c084fc; }
+  .theme--cyberpunk .boss-cell {
+    background: rgba(20, 10, 40, 0.8);
+    border: 1.5px solid rgba(168, 85, 247, 0.2);
+    color: #e0d0ff;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.06);
+  }
+  .theme--cyberpunk .boss-cell:hover {
+    border-color: #a78bfa;
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.2), inset 0 0 18px rgba(168, 85, 247, 0.04);
+  }
+  .theme--cyberpunk .boss-cell--soft { border-color: rgba(74, 222, 128, 0.3); box-shadow: 0 0 10px rgba(74, 222, 128, 0.08); }
+  .theme--cyberpunk .boss-cell--soft:hover { border-color: #4ade80; box-shadow: 0 0 22px rgba(74, 222, 128, 0.25), inset 0 0 18px rgba(74, 222, 128, 0.05); }
+  .theme--cyberpunk .boss-cell--heavy { border-color: rgba(148, 163, 184, 0.25); }
+  .theme--cyberpunk .boss-cell--heavy:hover { border-color: #94a3b8; box-shadow: 0 0 18px rgba(148, 163, 184, 0.2); }
+  .theme--cyberpunk .boss-cell--weak { border-color: rgba(239, 68, 68, 0.35); box-shadow: 0 0 12px rgba(239, 68, 68, 0.1); }
+  .theme--cyberpunk .boss-cell--weak:hover { border-color: #ef4444; box-shadow: 0 0 24px rgba(239, 68, 68, 0.3); }
+  .theme--cyberpunk .boss-cell__bar { background: rgba(255,255,255,0.06); }
+  .theme--cyberpunk .boss-cell__bar-fill { background: linear-gradient(90deg, #8b5cf6, #a78bfa); box-shadow: 0 0 6px rgba(168,85,247,0.5); }
+
+  /* ===== Theme 2: Arcane Mystical ===== */
+  .theme--arcane {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid rgba(251, 191, 36, 0.1);
+  }
+  .theme--arcane .theme-card__name { color: #fbbf24; }
+  .theme--arcane .boss-grid {
+    gap: 8px;
+  }
+  .theme--arcane .boss-cell {
+    background: rgba(30, 30, 50, 0.7);
+    border: 1.5px solid rgba(251, 191, 36, 0.15);
+    color: #fef3c7;
+    border-radius: 6px;
+    position: relative;
+  }
+  .theme--arcane .boss-cell::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 3px;
+    border: 1px solid rgba(251, 191, 36, 0.06);
+    pointer-events: none;
+  }
+  .theme--arcane .boss-cell:hover {
+    border-color: #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.15), inset 0 0 20px rgba(251, 191, 36, 0.03);
+  }
+  .theme--arcane .boss-cell--soft { border-color: rgba(52, 211, 153, 0.2); }
+  .theme--arcane .boss-cell--soft:hover { border-color: #34d399; box-shadow: 0 0 20px rgba(52, 211, 153, 0.2); }
+  .theme--arcane .boss-cell--heavy { border-color: rgba(203, 213, 225, 0.2); }
+  .theme--arcane .boss-cell--weak { border-color: rgba(248, 113, 113, 0.25); }
+  .theme--arcane .boss-cell__bar-fill { background: linear-gradient(90deg, #d97706, #fbbf24); }
+
+  /* ===== Theme 3: Organic Horror ===== */
+  .theme--organic {
+    background: linear-gradient(180deg, #1a0a0a 0%, #0d0d0d 100%);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+  }
+  .theme--organic .theme-card__name { color: #f87171; }
+  .theme--organic .boss-cell {
+    background: radial-gradient(ellipse at 50% 50%, rgba(80, 20, 20, 0.4), rgba(20, 5, 5, 0.6));
+    border: 1.5px solid rgba(239, 68, 68, 0.15);
+    color: #fecaca;
+    animation: organicPulse 3s ease-in-out infinite;
+  }
+  .theme--organic .boss-cell:nth-child(odd) { animation-delay: -1.5s; }
+  .theme--organic .boss-cell:hover {
+    border-color: #ef4444;
+    box-shadow: 0 0 24px rgba(239, 68, 68, 0.2), inset 0 0 30px rgba(239, 68, 68, 0.05);
+  }
+  .theme--organic .boss-cell--soft { border-color: rgba(74, 222, 128, 0.2); }
+  .theme--organic .boss-cell--weak { border-color: rgba(251, 191, 36, 0.3); box-shadow: 0 0 14px rgba(251, 191, 36, 0.08); }
+  .theme--organic .boss-cell__bar-fill { background: linear-gradient(90deg, #dc2626, #f87171); }
+  @keyframes organicPulse {
+    0%, 100% { border-color: rgba(239, 68, 68, 0.12); }
+    50% { border-color: rgba(239, 68, 68, 0.22); }
+  }
+
+  /* ===== Theme 4: Glass Elegance ===== */
+  .theme--glass {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.5));
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+  }
+  .theme--glass .theme-card__name { color: #e2e8f0; }
+  .theme--glass .boss-cell {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    backdrop-filter: blur(4px);
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .theme--glass .boss-cell:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+  .theme--glass .boss-cell--soft { border-color: rgba(74, 222, 128, 0.25); }
+  .theme--glass .boss-cell--weak { border-color: rgba(239, 68, 68, 0.25); }
+  .theme--glass .boss-cell__bar { background: rgba(255,255,255,0.06); }
+  .theme--glass .boss-cell__bar-fill { background: rgba(255,255,255,0.5); }
+
+  /* ===== Theme 5: Industrial Forge ===== */
+  .theme--forge {
+    background: linear-gradient(180deg, #1c1917 0%, #292524 100%);
+    border: 1px solid rgba(120, 113, 108, 0.2);
+  }
+  .theme--forge .theme-card__name { color: #f59e0b; }
+  .theme--forge .boss-cell {
+    background: linear-gradient(180deg, #292524, #1c1917);
+    border: 2px solid #44403c;
+    color: #d6d3d1;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 2px 4px rgba(0,0,0,0.4);
+  }
+  .theme--forge .boss-cell:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .theme--forge .boss-cell--soft { border-color: #22c55e; }
+  .theme--forge .boss-cell--soft:hover { border-color: #4ade80; box-shadow: 0 0 16px rgba(74, 222, 128, 0.25); }
+  .theme--forge .boss-cell--heavy { border-color: #78716c; }
+  .theme--forge .boss-cell--weak { border-color: #dc2626; }
+  .theme--forge .boss-cell--weak:hover { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+  .theme--forge .boss-cell__bar-fill { background: linear-gradient(90deg, #d97706, #f59e0b); box-shadow: 0 0 8px rgba(245,158,11,0.4); }
+
+  /* ===== Theme 6: Cosmic Void ===== */
+  .theme--cosmic {
+    background: radial-gradient(ellipse at 30% 20%, #1a1040, #050510 70%);
+    border: 1px solid rgba(99, 102, 241, 0.12);
+  }
+  .theme--cosmic .theme-card__name { color: #818cf8; }
+  .theme--cosmic .boss-cell {
+    background: radial-gradient(ellipse at 60% 40%, rgba(99, 102, 241, 0.12), rgba(10, 10, 30, 0.6));
+    border: 1.5px solid rgba(99, 102, 241, 0.15);
+    color: #c7d2fe;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.04);
+  }
+  .theme--cosmic .boss-cell:hover {
+    border-color: #a5b4fc;
+    box-shadow: 0 0 28px rgba(129, 140, 248, 0.25), inset 0 0 24px rgba(99, 102, 241, 0.06);
+  }
+  .theme--cosmic .boss-cell--soft { border-color: rgba(52, 211, 153, 0.25); }
+  .theme--cosmic .boss-cell--heavy { border-color: rgba(148, 163, 184, 0.2); }
+  .theme--cosmic .boss-cell--weak { border-color: rgba(244, 114, 182, 0.3); box-shadow: 0 0 16px rgba(244, 114, 182, 0.08); }
+  .theme--cosmic .boss-cell__bar-fill { background: linear-gradient(90deg, #6366f1, #818cf8); box-shadow: 0 0 10px rgba(99,102,241,0.5); }
+
+  /* ===== Click damage pop ==== */
+  .damage-pop {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    font-weight: 900;
+    font-size: 0.7rem;
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+    animation: popUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+  }
+
+  .damage-pop--soft { color: #4ade80; }
+  .damage-pop--heavy { color: #94a3b8; }
+  .damage-pop--weak { color: #fbbf24; }
+
+  @keyframes popUp {
+    0% { opacity:0; transform: translate(-50%, -50%) scale(0.3); filter: brightness(1.8); }
+    12% { opacity:1; transform: translate(-50%, calc(-50% - 10px)) scale(1.2); filter: brightness(1.4); }
+    24% { transform: translate(-50%, calc(-50% - 26px)) scale(1); filter: brightness(1.1); }
+    70% { opacity:0.8; transform: translate(-50%, calc(-50% - 52px)) scale(1); }
+    100% { opacity:0; transform: translate(-50%, calc(-50% - 72px)) scale(0.85); }
+  }
+
+  /* Resp bar legend */
+  .resp-note {
+    text-align: center;
+    margin-top: 40px;
+    color: #475569;
+    font-size: 0.7rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Boss 5×5 战场主题方案</h1>
+  <p>每个新 Boss 随机分配一种视觉风格，保持新鲜感</p>
+</div>
+
+<div class="theme-grid" id="themeGrid"></div>
+
+<p class="resp-note">点击格子模拟伤害弹出 · 自适应布局 · 支持移动端</p>
+
+<script>
+  const themes = [
+    { id:'cyberpunk', name:'霓虹赛博', sub:'Cyberpunk Neon · 暗紫荧光', color:'#c084fc' },
+    { id:'arcane', name:'奥术结界', sub:'Arcane Mystical · 金色符文', color:'#fbbf24' },
+    { id:'organic', name:'血肉之渊', sub:'Organic Horror · 暗红脉动', color:'#f87171' },
+    { id:'glass', name:'冰霜镜面', sub:'Glass Elegance · 透亮悬浮', color:'#e2e8f0' },
+    { id:'forge', name:'锻炉铁砧', sub:'Industrial Forge · 金属厚重', color:'#f59e0b' },
+    { id:'cosmic', name:'虚空裂隙', sub:'Cosmic Void · 深空紫蓝', color:'#818cf8' },
+  ];
+
+  const partTypes = ['soft','heavy','weak','soft','heavy'];
+  const partNames = { soft:'软组织', heavy:'重甲', weak:'弱点' };
+  const partHP = { soft:'800/1000', heavy:'1200/1500', weak:'300/500' };
+  const partHPPercent = { soft:80, heavy:80, weak:60 };
+
+  let damageIdx = 0;
+  const damagePool = [42, 87, 156, 28, 315, 204, 99, 520, 73, 188];
+
+  const container = document.getElementById('themeGrid');
+
+  themes.forEach(theme => {
+    const card = document.createElement('div');
+    card.className = `theme-card theme--${theme.id}`;
+    card.innerHTML = `
+      <div>
+        <div class="theme-card__name">${theme.name}</div>
+        <div class="theme-card__sub">${theme.sub}</div>
+      </div>
+      <div class="boss-grid"></div>
+    `;
+
+    const grid = card.querySelector('.boss-grid');
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 5; col++) {
+        const idx = (row * 5 + col) % 5;
+        const type = partTypes[idx];
+        const cell = document.createElement('div');
+        cell.className = `boss-cell boss-cell--${type}`;
+        cell.innerHTML = `
+          <span class="boss-cell__type">${partNames[type]}</span>
+          <span class="boss-cell__hp">${partHP[type]}</span>
+          <div class="boss-cell__bar">
+            <div class="boss-cell__bar-fill" style="width:${partHPPercent[type]}%"></div>
+          </div>
+        `;
+        cell.addEventListener('click', (e) => {
+          const dmg = damagePool[damageIdx % damagePool.length];
+          damageIdx++;
+          const pop = document.createElement('span');
+          pop.className = `damage-pop damage-pop--${type}`;
+          pop.textContent = dmg + (Math.random() > 0.5 ? '!' : '');
+          cell.appendChild(pop);
+          setTimeout(() => pop.remove(), 1300);
+        });
+        grid.appendChild(cell);
+      }
+    }
+
+    container.appendChild(card);
+  });
+</script>
+</body>
+</html>

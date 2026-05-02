@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>崩塌效果 CSS 替代方案 Demo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+  body {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'DM Sans', 'PingFang SC', sans-serif;
+    padding: 32px;
+    min-height: 100vh;
+  }
+
+  h1 { font-family: 'Nunito', 'PingFang SC', sans-serif; font-size: 2rem; margin-bottom: 8px; }
+  .subtitle { color: #94a3b8; margin-bottom: 32px; }
+
+  .demo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 32px;
+    max-width: 1400px;
+  }
+
+  .demo-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .demo-card h3 { font-size: 1rem; color: #f1f5f9; text-align: center; }
+  .demo-card .desc { font-size: 0.8rem; color: #94a3b8; text-align: center; line-height: 1.5; }
+
+  /* 模拟 Boss 部位格子 */
+  .cell-wrapper {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .boss-cell {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #64748b;
+    overflow: hidden;
+  }
+
+  /* 原始图片效果（对照组） */
+  .crack--original {
+    position: absolute; inset: 0;
+    background: center / contain no-repeat url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><path d="M5 30 L18 10 L30 35 L42 8 L55 28" stroke="%23fbbf24" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.7"/><path d="M20 18 L22 8" stroke="%23fbbf24" stroke-width="1.2" fill="none" opacity="0.6"/><path d="M38 20 L44 6" stroke="%23fbbf24" stroke-width="1.2" fill="none" opacity="0.6"/><path d="M12 40 L6 48" stroke="%23fbbf24" stroke-width="1" fill="none" opacity="0.5"/><circle cx="18" cy="10" r="1.5" fill="%23fcd34d" opacity="0.8"/><circle cx="42" cy="8" r="1.2" fill="%23fcd34d" opacity="0.7"/></svg>');
+    opacity: 0.85;
+    animation: pulse 0.9s ease-in-out infinite alternate;
+    z-index: 3;
+  }
+
+  /* ========== 方案 1: 发光裂纹线 ========== */
+  .crack--glow-lines {
+    position: absolute; inset: 0; z-index: 3;
+  }
+  .crack--glow-lines::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      /* 主裂纹 */
+      linear-gradient(135deg, transparent calc(50% - 1px), rgba(251,191,36,0.8) calc(50% - 0.5px), rgba(252,211,77,0.9) 50%, transparent calc(50% + 1px)),
+      linear-gradient(45deg, transparent calc(35% - 1px), rgba(251,191,36,0.6) calc(35% - 0.5px), rgba(252,211,77,0.7) 35%, transparent calc(35% + 1px)),
+      linear-gradient(200deg, transparent calc(60% - 0.5px), rgba(251,191,36,0.5) 60%, transparent calc(60% + 0.5px));
+    animation: crack-glow-pulse 1.2s ease-in-out infinite alternate;
+  }
+  .crack--glow-lines::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(252,211,77,0.6) 0%, transparent 8%),
+      radial-gradient(circle at 70% 55%, rgba(252,211,77,0.5) 0%, transparent 6%),
+      radial-gradient(circle at 20% 70%, rgba(252,211,77,0.4) 0%, transparent 5%);
+    animation: crack-glow-spark 0.8s ease-in-out infinite alternate;
+  }
+  @keyframes crack-glow-pulse {
+    0% { opacity: 0.5; filter: drop-shadow(0 0 2px rgba(252,211,77,0.3)); }
+    100% { opacity: 0.9; filter: drop-shadow(0 0 5px rgba(252,211,77,0.6)); }
+  }
+  @keyframes crack-glow-spark {
+    0% { opacity: 0.4; }
+    100% { opacity: 0.8; }
+  }
+
+  /* ========== 方案 2: 碎片位移 ========== */
+  .crack--shatter {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  }
+  .crack--shatter::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 55%; height: 55%;
+    background: linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(252,211,77,0.15) 100%);
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 95%);
+    border-right: 1.5px solid rgba(251,191,36,0.5);
+    border-bottom: 1.5px solid rgba(251,191,36,0.5);
+    transform: translate(3px, 3px);
+    animation: shatter-top 1.5s ease-in-out infinite alternate;
+  }
+  .crack--shatter::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0; width: 55%; height: 55%;
+    background: linear-gradient(315deg, rgba(251,191,36,0.08) 0%, rgba(252,211,77,0.15) 100%);
+    clip-path: polygon(20% 0, 100% 10%, 100% 100%, 0 100%);
+    border-left: 1.5px solid rgba(251,191,36,0.5);
+    border-top: 1.5px solid rgba(251,191,36,0.5);
+    transform: translate(-3px, -3px);
+    animation: shatter-bottom 1.5s ease-in-out infinite alternate;
+  }
+  @keyframes shatter-top {
+    0% { transform: translate(0, 0); opacity: 0.6; }
+    100% { transform: translate(4px, 4px); opacity: 1; }
+  }
+  @keyframes shatter-bottom {
+    0% { transform: translate(0, 0); opacity: 0.6; }
+    100% { transform: translate(-4px, -4px); opacity: 1; }
+  }
+
+  /* ========== 方案 3: Glitch 切片位移 ========== */
+  .crack--glitch {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden;
+  }
+  .crack--glitch::before {
+    content: '';
+    position: absolute;
+    top: 15%; left: 0; right: 0; height: 25%;
+    background: linear-gradient(90deg,
+      transparent 0%, rgba(252,211,77,0.15) 20%, rgba(251,191,36,0.08) 50%, rgba(252,211,77,0.15) 80%, transparent 100%);
+    transform: translateX(-4px);
+    animation: glitch-slice-1 0.5s ease-in-out infinite alternate;
+    border-top: 1px solid rgba(251,191,36,0.4);
+    border-bottom: 1px solid rgba(251,191,36,0.4);
+  }
+  .crack--glitch::after {
+    content: '';
+    position: absolute;
+    top: 55%; left: 0; right: 0; height: 20%;
+    background: linear-gradient(90deg,
+      transparent 0%, rgba(252,211,77,0.1) 30%, rgba(251,191,36,0.06) 60%, transparent 100%);
+    transform: translateX(4px);
+    animation: glitch-slice-2 0.7s ease-in-out infinite alternate;
+    border-top: 1px solid rgba(251,191,36,0.3);
+    border-bottom: 1px solid rgba(251,191,36,0.3);
+  }
+  @keyframes glitch-slice-1 {
+    0% { transform: translateX(-2px); opacity: 0.5; }
+    100% { transform: translateX(3px); opacity: 0.9; }
+  }
+  @keyframes glitch-slice-2 {
+    0% { transform: translateX(2px); opacity: 0.4; }
+    100% { transform: translateX(-3px); opacity: 0.8; }
+  }
+
+  /* ========== 方案 4: 像素化崩解 ========== */
+  .crack--pixel-dissolve {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  }
+  .crack--pixel-dissolve::before {
+    content: '';
+    position: absolute; inset: 0;
+    --pixel-size: 6px;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent calc(var(--pixel-size) - 1px), rgba(252,211,77,0.3) var(--pixel-size)),
+      repeating-linear-gradient(90deg, transparent, transparent calc(var(--pixel-size) - 1px), rgba(251,191,36,0.3) var(--pixel-size));
+    mask-image: radial-gradient(ellipse at 40% 35%, black 20%, transparent 65%);
+    animation: pixel-flicker 1.8s steps(3) infinite;
+  }
+  .crack--pixel-dissolve::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(251,191,36,0.5) 0%, transparent 40%);
+    clip-path: polygon(
+      30% 15%, 50% 10%, 55% 30%, 70% 25%, 65% 45%,
+      80% 55%, 60% 65%, 65% 85%, 35% 80%, 25% 60%,
+      10% 50%, 20% 30%
+    );
+    animation: pixel-dissolve-pulse 1.2s ease-in-out infinite alternate;
+  }
+  @keyframes pixel-dissolve-pulse {
+    0% { opacity: 0.4; transform: scale(0.95); }
+    100% { opacity: 0.85; transform: scale(1.05); }
+  }
+  @keyframes pixel-flicker {
+    0%, 100% { opacity: 0.3; }
+    33% { opacity: 0.6; }
+    66% { opacity: 0.2; }
+  }
+
+  /* ========== 方案 5: 深渊内陷 ========== */
+  .crack--void-collapse {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    border-radius: 6px;
+    box-shadow:
+      inset 4px 4px 0 rgba(0,0,0,0.6),
+      inset -2px -2px 0 rgba(0,0,0,0.5),
+      inset 0 0 12px rgba(251,191,36,0.15);
+    background:
+      radial-gradient(ellipse at 35% 40%, rgba(239,68,68,0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 55%, rgba(251,191,36,0.15) 0%, transparent 45%);
+    animation: void-pulse 1s ease-in-out infinite alternate;
+  }
+  .crack--void-collapse::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: 2px;
+    clip-path: polygon(0% 0%, 70% 5%, 100% 30%, 90% 100%, 30% 95%, 0% 70%);
+    animation: void-border-pulse 0.8s ease-in-out infinite alternate;
+  }
+  @keyframes void-pulse {
+    0% { box-shadow: inset 3px 3px 0 rgba(0,0,0,0.5), inset 0 0 8px rgba(251,191,36,0.1); }
+    100% { box-shadow: inset 5px 5px 0 rgba(0,0,0,0.7), inset 0 0 16px rgba(251,191,36,0.2); }
+  }
+  @keyframes void-border-pulse {
+    0% { border-color: rgba(251,191,36,0.15); }
+    100% { border-color: rgba(251,191,36,0.4); }
+  }
+
+  /* ========== 方案 6: 冲击裂纹网 ========== */
+  .crack--impact-web {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    /* 冲击中心 */
+    background:
+      radial-gradient(circle at 45% 40%, rgba(252,211,77,0.3) 0%, rgba(251,191,36,0.1) 15%, transparent 35%);
+  }
+  .crack--impact-web::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      /* 放射状裂纹 */
+      conic-gradient(
+        from 15deg at 45% 40%,
+        transparent 0deg, rgba(251,191,36,0.4) 0.5deg, transparent 10deg,
+        transparent 50deg, rgba(251,191,36,0.35) 51deg, transparent 55deg,
+        transparent 90deg, rgba(251,191,36,0.5) 91deg, transparent 95deg,
+        transparent 140deg, rgba(251,191,36,0.3) 141deg, transparent 148deg,
+        transparent 200deg, rgba(251,191,36,0.45) 200.5deg, transparent 210deg,
+        transparent 270deg, rgba(251,191,36,0.35) 271deg, transparent 278deg,
+        transparent 320deg, rgba(251,191,36,0.4) 320.5deg, transparent 330deg,
+        transparent 360deg
+      );
+    -webkit-mask: radial-gradient(circle at 45% 40%, black 30%, transparent 75%);
+            mask: radial-gradient(circle at 45% 40%, black 30%, transparent 75%);
+    animation: impact-radiate 2s ease-in-out infinite;
+  }
+  .crack--impact-web::after {
+    content: '';
+    position: absolute;
+    top: 35%; left: 40%;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(252,211,77,0.8), rgba(251,191,36,0.4));
+    box-shadow: 0 0 8px rgba(251,191,36,0.5);
+    animation: impact-center 0.6s ease-in-out infinite alternate;
+  }
+  @keyframes impact-radiate {
+    0% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+    100% { opacity: 0.5; transform: scale(0.95); }
+  }
+  @keyframes impact-center {
+    0% { transform: scale(0.8); box-shadow: 0 0 4px rgba(251,191,36,0.3); }
+    100% { transform: scale(1.3); box-shadow: 0 0 12px rgba(251,191,36,0.6); }
+  }
+
+  /* ========== 方案 7: 放射裂纹 + 碎片崩开 ========== */
+  .crack--impact-shatter {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    overflow: hidden;
+    --cx: 42%;  /* 冲击中心 X */
+    --cy: 38%;  /* 冲击中心 Y */
+  }
+
+  /* 主层：放射状不规则裂纹 */
+  .crack--impact-shatter::before {
+    content: '';
+    position: absolute; inset: 0;
+    --line-color: rgba(255,255,255,0.55);
+    background: conic-gradient(
+      from 12deg at var(--cx) var(--cy),
+      /* 裂纹0: 粗主裂缝 12° */
+      transparent 0deg,                     var(--line-color) 0.5deg,  transparent 14deg,
+      /* 裂纹1: 72° */
+      transparent 70deg,                    var(--line-color) 71deg,   transparent 80deg,
+      /* 裂纹2: 140° 主裂缝 */
+      transparent 138deg,                   var(--line-color) 139.5deg,transparent 156deg,
+      /* 裂纹3: 195° */
+      transparent 193deg,                   var(--line-color) 194.5deg,transparent 205deg,
+      /* 裂纹4: 270° 粗 */
+      transparent 268deg,                   var(--line-color) 270deg,  transparent 282deg,
+      /* 裂纹5: 310° */
+      transparent 308deg,                   var(--line-color) 309deg,  transparent 318deg,
+      /* 裂纹6: 345° 细 */
+      transparent 343deg,                   var(--line-color) 344deg,  transparent 350deg,
+      transparent 360deg
+    );
+    -webkit-mask: radial-gradient(ellipse at var(--cx) var(--cy), black 18%, rgba(0,0,0,0.85) 55%, transparent 92%);
+            mask: radial-gradient(ellipse at var(--cx) var(--cy), black 18%, rgba(0,0,0,0.85) 55%, transparent 92%);
+    filter: drop-shadow(0 0 1.5px rgba(255,255,255,0.18));
+    animation: crack7-radiate 3s ease-in-out infinite alternate;
+  }
+
+  /* 辅层：碎片向外崩开 */
+  .crack--impact-shatter::after {
+    content: '';
+    position: absolute; inset: 0;
+    /* 碎片A: 左上区域 */
+    background:
+      linear-gradient(155deg, rgba(255,255,255,0.07) 0%, transparent 50%);
+    clip-path: polygon(
+      0% 0%,  52% 0%,  48% 30%,  var(--cx) var(--cy),
+      12% 28%, 0% 40%
+    );
+    border-right: 1px solid rgba(255,255,255,0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    /* 从中心向外推 */
+    transform: translate(-2px, -2px);
+    animation: shatter7-burst 2s ease-in-out infinite alternate;
+  }
+
+  /* 冲击闪光点 */
+  .crack--impact-shatter .impact-core {
+    position: absolute;
+    top: calc(var(--cy) - 3px); left: calc(var(--cx) - 3px);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(200,220,250,0.5) 55%, transparent 100%);
+    box-shadow:
+      0 0 3px rgba(255,255,255,0.5),
+      0 0 8px rgba(200,220,255,0.2);
+    animation: impact7-burst 0.55s ease-in-out infinite alternate;
+  }
+
+  @keyframes crack7-radiate {
+    0%   { opacity: 0.5; }
+    50%  { opacity: 0.78; }
+    100% { opacity: 0.55; }
+  }
+
+  @keyframes shatter7-burst {
+    0%   { transform: translate(0, 0); opacity: 0.4; }
+    100% { transform: translate(-3px, -3px); opacity: 0.8; }
+  }
+
+  @keyframes impact7-burst {
+    0%   { transform: scale(0.6); opacity: 0.4; }
+    100% { transform: scale(1.6); opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.7; filter: brightness(0.9); }
+    100% { opacity: 1; filter: brightness(1.2); }
+  }
+
+  /* 评级标记 */
+  .rating {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .rating--best { background: #065f46; color: #6ee7b7; }
+  .rating--good { background: #1e3a5f; color: #93c5fd; }
+  .rating--ok   { background: #3b2f1e; color: #fcd34d; }
+
+  .label-row { display: flex; align-items: center; gap: 8px; }
+
+  .pixel-canvas {
+    border: 1px solid #334155;
+    border-radius: 6px;
+    background: #1e293b;
+    image-rendering: pixelated;
+  }
+</style>
+</head>
+<body>
+
+<h1>部位崩塌效果 · CSS 替代方案</h1>
+<p class="subtitle">当前使用 crack-pattern-1.png 位图，以下为纯 CSS 方案。每个 cell 尺寸 90×90px（接近实际 Boss 部位格子）。</p>
+
+<div class="demo-grid">
+
+  <!-- 对照组：原图效果 -->
+  <div class="demo-card">
+    <div class="label-row"><h3>方案 0：原图（对照组）</h3></div>
+    <div class="cell-wrapper">
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--original"></div>
+      </div>
+    </div>
+    <p class="desc">当前 crack-pattern-1.png 位图叠加。依赖外部图片，缩放模糊，难以适配不同 skin。</p>
+  </div>
+
+  <!-- 方案 1: 发光裂纹线 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 1：发光裂纹线</h3>
+      <span class="rating rating--ok">简洁</span>
+    </div>
+    <div class="cell-wrapper">
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--glow-lines"></div>
+      </div>
+    </div>
+    <p class="desc">用 linear-gradient 画交叉裂纹 + 发光点。代码最轻，适合小尺寸，但裂纹位置偏固定。</p>
+  </div>
+
+  <!-- 方案 2: 碎片位移 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 2：碎片位移</h3>
+      <span class="rating rating--good">推荐</span>
+    </div>
+    <div class="cell-wrapper">
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--shatter"></div>
+      </div>
+    </div>
+    <p class="desc">clip-path 切两半，各自向外微移 + 边框发光。视觉冲击力强，"结构崩塌"语义清晰。</p>
+  </div>
+
+  <!-- 方案 3: Glitch 切片 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 3：Glitch 水平切片</h3>
+      <span class="rating rating--good">推荐</span>
+    </div>
+    <div class="cell-wrapper">
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--glitch"></div>
+      </div>
+    </div>
+    <p class="desc">两层水平条带左右错位 + 色散。故障美学，适合科技/赛博风格 Boss。动画辨识度高。</p>
+  </div>
+
+  <!-- 方案 4: 像素化崩解 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 4：像素化崩解</h3>
+      <span class="rating rating--good">推荐</span>
+    </div>
+    <div class="cell-wrapper">
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--pixel-dissolve"></div>
+      </div>
+    </div>
+    <p class="desc">像素网格蒙版 + 不规则多边形发光核心。像素风契合项目整体风格，steps() 动画有 retro 感。</p>
+  </div>
+
+  <!-- 方案 5: 深渊内陷 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 5：深渊内陷</h3>
+      <span class="rating rating--ok">深沉</span>
+    </div>
+    <div class="cell-wrapper">
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--void-collapse"></div>
+      </div>
+    </div>
+    <p class="desc">inset box-shadow 造成向内塌陷的深度感 + 红色暗光。适合表现"彻底摧毁"的终局状态。</p>
+  </div>
+
+  <!-- 方案 6: 冲击裂纹网 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 6：冲击裂纹网</h3>
+      <span class="rating rating--best">最佳</span>
+    </div>
+    <div class="cell-wrapper">
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--impact-web"></div>
+      </div>
+    </div>
+    <p class="desc">conic-gradient 放射裂纹 + 中心冲击闪光。最接近真实裂纹的 CSS 方案，动态感强，不同尺寸适配好。</p>
+  </div>
+
+  <!-- 方案 7: 冲击裂纹网 + 碎片位移复合 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 7：冲击裂纹网 + 碎片位移叠加</h3>
+      <span class="rating rating--best">首选</span>
+    </div>
+    <div class="cell-wrapper">
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--impact-shatter">
+          <span class="impact-core"></span>
+        </div>
+      </div>
+      <div class="boss-cell">
+        <span>重甲部位</span>
+        <div class="crack--impact-shatter" style="--cx:58%;--cy:52%;">
+          <span class="impact-core"></span>
+        </div>
+      </div>
+    </div>
+    <p class="desc"><b>放射裂纹 + 碎片崩开。</b>conic-gradient 7 条不规则放射裂纹从冲击点发散；::after clip-path 碎片向外微移（崩开感）；中心冲击闪光脉冲。左右两个 cell 展示不同冲击点（CSS 变量 --cx/--cy 控制）。</p>
+  </div>
+
+  <!-- 方案 8: 像素下坠 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 8：像素盾牌碎裂下坠</h3>
+      <span class="rating rating--good">物理感</span>
+    </div>
+    <div class="cell-wrapper">
+      <canvas id="c8-left"  class="pixel-canvas" width="90" height="90"></canvas>
+      <canvas id="c8-right" class="pixel-canvas" width="90" height="90"></canvas>
+    </div>
+    <p class="desc"><b>像素网格 → 盾牌形状 → 逐个像素下坠。</b>每个像素模拟重力 + 随机水平速度，碰撞底部后微弹。需 JS 驱动，适合 Canvas 实现。</p>
+  </div>
+
+  <!-- 方案 9: 像素爆裂 -->
+  <div class="demo-card">
+    <div class="label-row">
+      <h3>方案 9：像素盾牌爆裂四散</h3>
+      <span class="rating rating--best">冲击力最强</span>
+    </div>
+    <div class="cell-wrapper">
+      <canvas id="c9-left"  class="pixel-canvas" width="90" height="90"></canvas>
+      <canvas id="c9-right" class="pixel-canvas" width="90" height="90"></canvas>
+    </div>
+    <p class="desc"><b>像素网格 → 盾牌形状 → 每个像素从中心向外爆开。</b>径向速度 + 随机偏移 + 渐隐消失。视觉冲击力最强，"粉碎" 语义明确。</p>
+  </div>
+
+</div>
+
+<div style="margin-top:40px;padding:20px 24px;background:#1e293b;border:1px solid #334155;border-radius:12px;max-width:1400px;">
+  <h2 style="font-size:1.1rem;margin-bottom:12px;">总结对比</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+    <thead>
+      <tr style="text-align:left;border-bottom:1px solid #334155;">
+        <th style="padding:8px;">方案</th>
+        <th style="padding:8px;">大小</th>
+        <th style="padding:8px;">动画</th>
+        <th style="padding:8px;">像素风</th>
+        <th style="padding:8px;">可定制性</th>
+        <th style="padding:8px;">适合场景</th>
+      </tr>
+    </thead>
+    <tbody style="color:#94a3b8;">
+      <tr style="border-bottom:1px solid #1e293b;">
+        <td style="padding:8px;color:#fcd34d;">原图</td><td style="padding:8px;">有外部依赖</td><td style="padding:8px;">单属性 pulse</td><td style="padding:8px;">✅</td><td style="padding:8px;">需重绘 PNG</td><td style="padding:8px;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1e293b;">
+        <td style="padding:8px;color:#e2e8f0;">1. 裂纹线</td><td style="padding:8px;">~0.4 KB</td><td style="padding:8px;">发光 pulse</td><td style="padding:8px;">⚠️</td><td style="padding:8px;">改色/改角度</td><td style="padding:8px;">极简场景</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1e293b;">
+        <td style="padding:8px;color:#e2e8f0;">2. 碎片位移</td><td style="padding:8px;">~0.6 KB</td><td style="padding:8px;">碎片漂移</td><td style="padding:8px;">⚠️</td><td style="padding:8px;">clip-path + 颜色</td><td style="padding:8px;">崩塌感强烈</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1e293b;">
+        <td style="padding:8px;color:#e2e8f0;">3. Glitch 切片</td><td style="padding:8px;">~0.5 KB</td><td style="padding:8px;">条带错位</td><td style="padding:8px;">⚠️</td><td style="padding:8px;">颜色 + 条带位置</td><td style="padding:8px;">科技风 Boss</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1e293b;">
+        <td style="padding:8px;color:#e2e8f0;">4. 像素崩解</td><td style="padding:8px;">~0.5 KB</td><td style="padding:8px;">steps 闪烁</td><td style="padding:8px;">✅</td><td style="padding:8px;">像素尺寸 + 颜色</td><td style="padding:8px;">像素游戏风</td>
+      </tr>
+      <tr style="border-bottom:1px solid #1e293b;">
+        <td style="padding:8px;color:#e2e8f0;">5. 深渊内陷</td><td style="padding:8px;">~0.5 KB</td><td style="padding:8px;">深度 pulse</td><td style="padding:8px;">⚠️</td><td style="padding:8px;">阴影深度 + 颜色</td><td style="padding:8px;">彻底摧毁态</td>
+      </tr>
+      <tr>
+        <td style="padding:8px;color:#93c5fd;">6. 冲击裂纹网</td><td style="padding:8px;">~0.8 KB</td><td style="padding:8px;">放射 + 中心脉冲</td><td style="padding:8px;">✅</td><td style="padding:8px;">crack 角度 + 颜色</td><td style="padding:8px;">通用</td>
+      </tr>
+      <tr>
+        <td style="padding:8px;color:#6ee7b7;">7. 放射裂纹+碎片崩开</td><td style="padding:8px;">~0.9 KB</td><td style="padding:8px;">裂纹呼吸(3s) + 碎片崩开(2s) + 核心(0.55s)</td><td style="padding:8px;">✅</td><td style="padding:8px;">--cx/--cy 冲击点 + 裂纹角度</td><td style="padding:8px;">首选，崩塌感拉满</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+// ========== 像素物理引擎 ==========
+
+const PX = 6;        // 每像素尺寸
+const COLS = 15;     // 列数
+const ROWS = 15;     // 行数
+const W = COLS * PX; // 90
+const H = ROWS * PX; // 90
+
+// 银闪闪金属盾牌
+// 0=透明 1=暗钢边 2=深钢十字 3=高光边 4=亮银 5=浅银 6=中银 7=暗银 8=闪光白
+const SHIELD_PALETTE = [
+  '#00000000', // 0
+  '#1a1a1e',   // 1 暗钢边
+  '#3a3a44',   // 2 深钢十字
+  '#e8e8f4',   // 3 高光边框
+  '#e0e0ec',   // 4 亮银 (左上)
+  '#c0c0d0',   // 5 浅银 (右上)
+  '#9098a8',   // 6 中银 (左下)
+  '#787884',   // 7 暗银 (右下)
+  '#e8e8f4',   // 8 (同高光色)
+];
+
+// 对角渐变银盾 — 左上亮 → 右下暗，模拟金属光泽
+const SHIELD_DATA = [
+  //0 1 2 3 4 5 6 7 8 9 0 1 2 3 4
+  [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // 0  尖顶
+  [0,0,0,0,0,0,1,3,1,0,0,0,0,0,0], // 1
+  [0,0,0,0,0,1,4,2,5,1,0,0,0,0,0], // 2
+  [0,0,0,0,1,4,4,2,5,5,1,0,0,0,0], // 3
+  [0,0,0,1,4,4,4,2,5,5,5,1,0,0,0], // 4
+  [0,0,1,4,4,4,4,2,5,5,5,5,1,0,0], // 5
+  [0,1,4,4,4,4,4,2,5,5,5,5,5,1,0], // 6
+  [1,3,2,2,2,2,2,2,2,2,2,2,2,3,1], // 7  十字横条
+  [0,1,6,6,6,6,6,2,7,7,7,7,7,1,0], // 8
+  [0,0,1,6,6,6,6,2,7,7,7,7,1,0,0], // 9
+  [0,0,0,1,6,6,6,2,7,7,7,1,0,0,0], // 10
+  [0,0,0,0,1,6,6,2,7,7,1,0,0,0,0], // 11
+  [0,0,0,0,0,1,6,2,7,1,0,0,0,0,0], // 12
+  [0,0,0,0,0,0,1,3,1,0,0,0,0,0,0], // 13
+  [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // 14 底尖
+];
+
+function shieldColors() {
+  return SHIELD_DATA;
+}
+
+function createPixels(shield) {
+  const pixels = [];
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const ci = shield[y][x];
+      if (ci === 0) continue;
+      pixels.push({
+        ox: x * PX,
+        oy: y * PX,
+        x:  x * PX + PX/2,
+        y:  y * PX + PX/2,
+        vx: 0,
+        vy: 0,
+        opacity: 1,
+        color: SHIELD_PALETTE[ci],
+        landed: false,
+      });
+    }
+  }
+  return pixels;
+}
+
+function drawPixels(ctx, pixels) {
+  ctx.clearRect(0, 0, W, H);
+  for (const p of pixels) {
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(Math.round(p.x - PX/2), Math.round(p.y - PX/2), PX, PX);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ========== 方案 8: 像素下坠 ==========
+function animFalling(canvas) {
+  const ctx = canvas.getContext('2d');
+  const shield = shieldColors();
+  let pixels = createPixels(shield);
+  let running = true;
+
+  function reset() {
+    pixels = createPixels(shield);
+  }
+
+  function frame() {
+    if (!running) return;
+    let allDone = true;
+
+    for (const p of pixels) {
+      if (p.landed) continue;
+      allDone = false;
+      // 重力
+      p.vy += 0.35;
+      // 随机微漂
+      if (!p.landed) p.vx += (Math.random() - 0.5) * 0.3;
+      // 空气阻力
+      p.vx *= 0.995;
+      p.vy *= 0.995;
+      // 位移
+      p.x += p.vx;
+      p.y += p.vy;
+      // 底部碰撞
+      if (p.y >= H - PX/2) {
+        p.y = H - PX/2;
+        p.vy *= -0.3;
+        p.vx *= 0.7;
+        if (Math.abs(p.vy) < 0.5) {
+          p.vy = 0;
+          p.landed = true;
+        }
+      }
+      // 左右墙
+      if (p.x < PX/2) { p.x = PX/2; p.vx *= -0.5; }
+      if (p.x > W - PX/2) { p.x = W - PX/2; p.vx *= -0.5; }
+      // 落地后渐隐
+      if (p.landed) {
+        p.opacity = Math.max(0, p.opacity - 0.012);
+      }
+    }
+
+    drawPixels(ctx, pixels);
+
+    if (allDone || pixels.every(p => p.opacity <= 0)) {
+      setTimeout(() => { reset(); requestAnimationFrame(frame); }, 600);
+      return;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+  return () => { running = false; };
+}
+
+// ========== 方案 9: 像素爆裂 ==========
+function animExplode(canvas) {
+  const ctx = canvas.getContext('2d');
+  const shield = shieldColors();
+  const cx = W / 2, cy = H / 2;
+  let pixels = createPixels(shield);
+  let running = true;
+  let phaseTimer = 0;
+  let phase = 'idle'; // idle | explode | fade
+
+  function reset() {
+    pixels = createPixels(shield);
+    phase = 'idle';
+    phaseTimer = 0;
+  }
+
+  function frame() {
+    if (!running) return;
+    phaseTimer += 16; // ~60fps
+
+    // 阶段切换
+    if (phase === 'idle' && phaseTimer > 800) {
+      phase = 'explode';
+      phaseTimer = 0;
+      // 给每个像素赋予爆炸速度
+      for (const p of pixels) {
+        const dx = p.x - cx;
+        const dy = p.y - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+        const speed = 1.2 + Math.random() * 2.8;
+        p.vx = (dx / dist) * speed + (Math.random() - 0.5) * 1.5;
+        p.vy = (dy / dist) * speed + (Math.random() - 0.5) * 1.5;
+      }
+    }
+
+    if (phase === 'explode') {
+      let allGone = true;
+      for (const p of pixels) {
+        if (p.opacity <= 0) continue;
+        allGone = false;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+        // 飞出画布后加速隐去
+        if (p.x < -4 || p.x > W + 4 || p.y < -4 || p.y > H + 4) {
+          p.opacity = Math.max(0, p.opacity - 0.08);
+        } else if (phaseTimer > 300) {
+          p.opacity = Math.max(0, p.opacity - 0.015);
+        }
+      }
+      if (allGone || phaseTimer > 1800) {
+        setTimeout(() => { reset(); requestAnimationFrame(frame); }, 500);
+        return;
+      }
+    }
+
+    drawPixels(ctx, pixels);
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+  return () => { running = false; };
+}
+
+// ========== 启动所有 Canvas ==========
+animFalling(document.getElementById('c8-left'));
+animFalling(document.getElementById('c8-right'));
+animExplode(document.getElementById('c9-left'));
+animExplode(document.getElementById('c9-right'));
+</script>
+</body>
+</html>
