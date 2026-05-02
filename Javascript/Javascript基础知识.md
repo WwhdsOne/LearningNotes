@@ -1,3 +1,8 @@
+---
+tags:
+  - javascript
+---
+
 首先感谢 [现代 JavaScript 教程](https://zh.javascript.info/)
 
 ![image-20240323180236616](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240323180236616.png)
@@ -1742,3 +1747,7 @@ let result = arr.reduce((sum, current) => sum + current, 0);
 
 alert(result); // 15
 ```
+## 相关笔记
+  - [[Javascript中相似的概念 从]]
+  - [[关于Javascript中的this]]
+  - [[原型，继承]]

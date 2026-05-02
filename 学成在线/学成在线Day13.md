@@ -1,3 +1,9 @@
+---
+tags:
+  - 学成在线
+  - 微服务
+---
+
 # 学成在线Day13
 
 # 在线学习
@@ -647,4 +653,19 @@ docker run --name xuecheng-plus-checkcode -p 63075:63075 -idt checkcode:1.0
 如果出现`Error: Invalid or corrupt jarfile xuecheng-plus-checkcode.jar`
 
 那建议检查一下jar包完整性,最好是删掉原jar包重新往虚拟机发一遍
-
+## 相关笔记
+  - [[学成在线Day01]]
+  - [[学成在线Day02]]
+  - [[学成在线Day03]]
+  - [[学成在线Day04]]
+  - [[学成在线Day05]]
+  - [[学成在线Day06]]
+  - [[学成在线Day07]]
+  - [[学成在线Day08]]
+  - [[学成在线Day09]]
+  - [[学成在线Day10]]
+  - [[学成在线Day11]]
+  - [[学成在线Day12]]
+  - [[学成在线Day14]]
+  - [[学成在线项目待改进部分]]
+  - [[面试部分内容]]

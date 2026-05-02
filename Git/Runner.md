@@ -1,3 +1,8 @@
+---
+tags:
+  - git
+---
+
 
 # 1. 获取GITHUB仓库设置
 
@@ -325,3 +330,9 @@ docker run -d \
 <img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20250227173221399.png" alt="image-20250227173221399" style="zoom:50%;" />
 
 大功告成！
+## 相关笔记
+  - [[Git基础教程]]
+  - [[Git多仓库]]
+  - [[Git实用指令]]
+  - [[Git问题]]
+  - [[git常用]]

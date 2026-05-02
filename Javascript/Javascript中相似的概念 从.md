@@ -1,3 +1,8 @@
+---
+tags:
+  - javascript
+---
+
 # Rest语法 和 Spread语法
 
 Rest语法让函数可以在调用时传入任意数量参数

@@ -1,3 +1,8 @@
+---
+tags:
+  - docker
+---
+
 # 1.Docker是什么
 
 引用[菜鸟教程](https://www.runoob.com/docker/docker-tutorial.html)中的话
@@ -221,3 +226,5 @@ Hello, Wwh!
 OK！运行成功！
 
 上述两个接口对于公网也是开放的，欢迎体验。
+## 相关笔记
+  - [[Docker搭建RabbitMQ]]

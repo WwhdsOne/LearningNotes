@@ -1,3 +1,8 @@
+---
+tags:
+  - docker
+---
+
 # 1. 下载镜像
 
 ```bash
@@ -40,4 +45,5 @@ docker run -d --name=my_rabbitmq \
   -e RABBITMQ_DEFAULT_PASS=admin \
   rabbitmq:management
 ```
-
+## 相关笔记
+  - [[docker入门]]

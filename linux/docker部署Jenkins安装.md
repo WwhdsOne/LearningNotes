@@ -1,3 +1,8 @@
+---
+tags:
+  - linux
+---
+
 # 1. 安装jdk环境
 
 ## 1.1 下载jdk8
@@ -235,3 +240,7 @@ volumes:
 之后的部分可以查看小傅哥的网站学习
 
 [Jenkins | 小傅哥 bugstack 虫洞栈](https://bugstack.cn/md/road-map/jenkins.html)
+## 相关笔记
+  - [[syslog启动]]
+  - [[好用的命令工具]]
+  - [[问题合集]]

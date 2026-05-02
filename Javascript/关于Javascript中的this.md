@@ -1,3 +1,8 @@
+---
+tags:
+  - javascript
+---
+
 ## 方法中的 “this”
 
 **为了访问该对象，方法中可以使用 `this` 关键字。**
@@ -149,3 +154,7 @@ console.log(O.obj); // undefined
 所以这种情况下`O()`能正常打印出obj而非是undefined
 
 而O.obj仍然未定义因为箭头函数没有定义obj
+## 相关笔记
+  - [[Javascript中相似的概念 从]]
+  - [[Javascript基础知识]]
+  - [[原型，继承]]

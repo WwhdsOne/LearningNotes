@@ -1,3 +1,8 @@
+---
+tags:
+  - ai
+---
+
 # long 项目文档索引
 
 > 项目：Redis Vote Wall — Boss 点击放置游戏

@@ -1,3 +1,8 @@
+---
+tags:
+  - linux
+---
+
 # 1. 安装rsyslog
 
 ```bash
@@ -29,3 +34,7 @@ tail -f /var/log/syslog
 ```
 
 <img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20241023173313011.png" alt="image-20241023173313011" style="zoom:50%;" />
+## 相关笔记
+  - [[docker部署Jenkins安装]]
+  - [[好用的命令工具]]
+  - [[问题合集]]

@@ -1,3 +1,9 @@
+---
+tags:
+  - go
+  - golang
+---
+
 # 1. 设置zap参数
 
 ```yaml

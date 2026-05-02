@@ -1,3 +1,8 @@
+---
+tags:
+  - git
+---
+
 ### 常用语句
 
 ```shell
@@ -640,3 +645,9 @@ $ git apply --check ../sync.patch
 # 查看Git的版本
 $ git --version
 ```
+## 相关笔记
+  - [[Git基础教程]]
+  - [[Git多仓库]]
+  - [[Git实用指令]]
+  - [[Git问题]]
+  - [[Runner]]

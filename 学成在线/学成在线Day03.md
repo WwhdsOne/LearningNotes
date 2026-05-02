@@ -1,3 +1,9 @@
+---
+tags:
+  - 学成在线
+  - 微服务
+---
+
 <p align="center">感谢黑马程序员能提供的学成在线的教学视频</p>
 
 <div align="center"><img src="https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/image-20240412084117149.png" alt="image-20240412084117149" style="zoom:50%;" /></div>
@@ -174,4 +180,19 @@ from teachplan one
      left join teachplan two on two.parentid = one.id
      left join teachplan_media m1 on m1.teachplan_id = two.id
 ```
-
+## 相关笔记
+  - [[学成在线Day01]]
+  - [[学成在线Day02]]
+  - [[学成在线Day04]]
+  - [[学成在线Day05]]
+  - [[学成在线Day06]]
+  - [[学成在线Day07]]
+  - [[学成在线Day08]]
+  - [[学成在线Day09]]
+  - [[学成在线Day10]]
+  - [[学成在线Day11]]
+  - [[学成在线Day12]]
+  - [[学成在线Day13]]
+  - [[学成在线Day14]]
+  - [[学成在线项目待改进部分]]
+  - [[面试部分内容]]

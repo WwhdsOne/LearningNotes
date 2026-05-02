@@ -1,3 +1,8 @@
+---
+tags:
+  - git
+---
+
 # Git
 
 ![](https://wwhds-markdown-image.oss-cn-beijing.aliyuncs.com/gitlogo.png)
@@ -527,3 +532,9 @@ develop和master分支是不可删除的
  从master派生的分支，一般作为线上bug修复使用，修复测试完成后需要合并到master、test、develop分支。
 
 - 还有一些其他分支，在此不再详述，例如test分支（用于代码测试）、pre分支（预上线分支）等等。
+## 相关笔记
+  - [[Git多仓库]]
+  - [[Git实用指令]]
+  - [[Git问题]]
+  - [[Runner]]
+  - [[git常用]]

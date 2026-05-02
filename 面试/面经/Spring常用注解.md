@@ -1,3 +1,9 @@
+---
+tags:
+  - 面试
+  - 面经
+---
+
 # 1. @SpringBootApplication
 
 - @Target({ElementType.TYPE})：这个元注解表示该注解可以用在类、接口（包括注解类型）或枚举声明上。  
@@ -14,3 +20,15 @@
 - @Documented：这个元注解表示如果一个类型使用了被@Documented注解的注解进行注解，那么这个注解将会被包含在JavaDoc中。  
 - @Controller：这是Spring框架的注解，用于标记一个类为Spring MVC控制器。控制器负责处理用户请求。  
 - @ResponseBody：这是Spring框架的注解，用于表示控制器的方法返回的对象应该直接写入HTTP响应体中，而不是被视图解析器解析为一个视图。
+## 相关笔记
+  - [[2024-9-13牛客美团一面]]
+  - [[JAVA]]
+  - [[JVM]]
+  - [[JVM相关]]
+  - [[Part one]]
+  - [[Redis]]
+  - [[Spring]]
+  - [[mysql]]
+  - [[低层实现]]
+  - [[算法]]
+  - [[计算机网络]]
