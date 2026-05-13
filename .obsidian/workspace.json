@@ -11,10 +11,14 @@
             "id": "b145811153cc4d02",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "关系图谱"
+              "type": "markdown",
+              "state": {
+                "file": "AI/梯度下降.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "梯度下降"
             }
           }
         ]
@@ -175,8 +179,9 @@
       "bases:新建数据库": false
     }
   },
-  "active": "d64010993d7a1970",
+  "active": "b145811153cc4d02",
   "lastOpenFiles": [
+    "AI/梯度下降.md",
     "GO语言学习/fiber/API/可配置启动设置.md",
     "long-game/docs/superpowers/specs/2026-04-28-talent-system-rework-design.md",
     "long-game/docs/superpowers/specs/2026-04-27-boss-combo-collapse-fix-design.md",
@@ -209,7 +214,6 @@
     "long-game/docs/archive/implementation/2026-04-22-装备英雄成长重构落地说明-已废弃.md",
     "long-game/docs/archive/implementation/2026-04-22-hertz-后台分页改造-已废弃.md",
     "long-game/docs/archive/specs/2026-04-23-装备超标判定规程-已废弃.md",
-    "long-game/docs/archive/reports/2026-04-25-官方挂机与资料页标签实装核验-已废弃.md",
     "long-game/docs/demos/demo-sword-cursor.html",
     "long-game/docs/demos/demo-crack-effects.html",
     "long-game/docs/demos/boss-themes.html"
