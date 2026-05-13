@@ -1,0 +1,217 @@
+{
+  "main": {
+    "id": "197808783750b28a",
+    "type": "split",
+    "children": [
+      {
+        "id": "b65faa7a7bc7dba9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b145811153cc4d02",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "关系图谱"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4520b38b89593187",
+    "type": "split",
+    "children": [
+      {
+        "id": "35d6226155792ee4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d64010993d7a1970",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "2fd217e748b9d997",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "tag:#go",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "c2e10476f6bc5d6b",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "12d4b06fd9b7399e",
+    "type": "split",
+    "children": [
+      {
+        "id": "f8b4bf3da03241fb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "06313b2f4991aeef",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "反向链接"
+            }
+          },
+          {
+            "id": "122910a35e7a8a4b",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "出链"
+            }
+          },
+          {
+            "id": "7d10817ad86dea32",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "3512fee5cd86a18b",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "da8347528fe9c9dc",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "workspaces:管理工作区布局": false,
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "d64010993d7a1970",
+  "lastOpenFiles": [
+    "GO语言学习/fiber/API/可配置启动设置.md",
+    "long-game/docs/superpowers/specs/2026-04-28-talent-system-rework-design.md",
+    "long-game/docs/superpowers/specs/2026-04-27-boss-combo-collapse-fix-design.md",
+    "long-game/docs/superpowers/specs/2026-04-21-boss-pool-cycle-design.md",
+    "long-game/docs/superpowers/plans/2026-04-30-talent-v2-buff-and-damage-rework-plan.md",
+    "long-game/docs/superpowers/plans/2026-04-29-boss-visual-fx.md",
+    "long-game/docs/superpowers/plans/2026-04-28-talent-system-rework-plan.md",
+    "long-game/docs/superpowers/plans/2026-04-27-boss-combo-collapse-fix.md",
+    "long-game/docs/superpowers/plans/2026-04-25-boss-part-visual-click-model.md",
+    "long-game/docs/superpowers/plans/2026-04-21-boss-pool-cycle.md",
+    "long-game/docs/superpowers/plans/2026-04-17-nickname-sensitive-filter.md",
+    "long-game/docs/superpowers/specs",
+    "long-game/docs/superpowers/plans",
+    "long-game/docs/superpowers",
+    "long-game/docs/specs/2026-04-23-装备稀有度与成长数值规范.md",
+    "long-game/docs/specs",
+    "long-game/docs/reports/2026-04-29-天赋页规则与交互调整开发日志.md",
+    "long-game/docs/reports/2026-04-28-点击伤害链路与优化总结.md",
+    "long-game/docs/reports/2026-04-28-天赋成本调整总结.md",
+    "long-game/docs/reports/2026-04-25-Boss分区改造实施记录.md",
+    "long-game/docs/reports/2026-04-21-realtime-optimization-report.md",
+    "long-game/docs/reports",
+    "long-game/docs/archive/superpowers/specs/2026-04-15-redis-vote-wall-design-已废弃.md",
+    "long-game/docs/archive/superpowers/plans/2026-04-17-go-sse-migration-已废弃.md",
+    "long-game/docs/archive/superpowers/plans/2026-04-15-redis-vote-wall-已废弃.md",
+    "long-game/docs/archive/superpowers/specs",
+    "long-game/docs/archive/superpowers/plans",
+    "long-game/docs/archive/implementation/2026-04-24-单体版点击反脚本与官方挂机改造-已废弃.md",
+    "long-game/docs/archive/implementation/2026-04-23-公共态载荷瘦身优化-已废弃.md",
+    "long-game/docs/archive/implementation/2026-04-22-装备英雄成长重构落地说明-已废弃.md",
+    "long-game/docs/archive/implementation/2026-04-22-hertz-后台分页改造-已废弃.md",
+    "long-game/docs/archive/specs/2026-04-23-装备超标判定规程-已废弃.md",
+    "long-game/docs/archive/reports/2026-04-25-官方挂机与资料页标签实装核验-已废弃.md",
+    "long-game/docs/demos/demo-sword-cursor.html",
+    "long-game/docs/demos/demo-crack-effects.html",
+    "long-game/docs/demos/boss-themes.html"
+  ]
+}
