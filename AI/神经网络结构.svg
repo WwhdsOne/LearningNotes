@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 420" width="100%" role="img">
+  <title>全连接神经网络结构图</title>
+  <desc>展示输入层、两个隐藏层和输出层的全连接神经网络架构</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+      markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#888880"
+        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- 背景色块 -->
+  <rect x="30" y="50" width="120" height="280" rx="12" fill="#FCEBEB" stroke="#F09595" stroke-width="0.5"/>
+  <rect x="175" y="30" width="110" height="320" rx="12" fill="#E6F1FB" stroke="#85B7EB" stroke-width="0.5"/>
+  <rect x="325" y="30" width="110" height="320" rx="12" fill="#E6F1FB" stroke="#85B7EB" stroke-width="0.5"/>
+  <rect x="470" y="110" width="120" height="170" rx="12" fill="#EAF3DE" stroke="#97C459" stroke-width="0.5"/>
+
+  <!-- 输入层神经元 (3个) -->
+  <circle cx="90" cy="120" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+  <circle cx="90" cy="190" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+  <circle cx="90" cy="260" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+
+  <!-- 隐藏层1神经元 (4个) -->
+  <circle cx="230" cy="80"  r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+  <circle cx="230" cy="150" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+  <circle cx="230" cy="220" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+  <circle cx="230" cy="290" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+
+  <!-- 隐藏层2神经元 (4个) -->
+  <circle cx="380" cy="80"  r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+  <circle cx="380" cy="150" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+  <circle cx="380" cy="220" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+  <circle cx="380" cy="290" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+
+  <!-- 输出层神经元 (1个) -->
+  <circle cx="530" cy="195" r="22" fill="#ffffff" stroke="#444441" stroke-width="2"/>
+
+  <!-- 输入层 → 隐藏层1 连线 -->
+  <g stroke="#888880" stroke-width="1" fill="none" marker-end="url(#arrow)">
+    <line x1="112" y1="120" x2="208" y2="80"/>
+    <line x1="112" y1="120" x2="208" y2="150"/>
+    <line x1="112" y1="120" x2="208" y2="220"/>
+    <line x1="112" y1="120" x2="208" y2="290"/>
+    <line x1="112" y1="190" x2="208" y2="80"/>
+    <line x1="112" y1="190" x2="208" y2="150"/>
+    <line x1="112" y1="190" x2="208" y2="220"/>
+    <line x1="112" y1="190" x2="208" y2="290"/>
+    <line x1="112" y1="260" x2="208" y2="80"/>
+    <line x1="112" y1="260" x2="208" y2="150"/>
+    <line x1="112" y1="260" x2="208" y2="220"/>
+    <line x1="112" y1="260" x2="208" y2="290"/>
+  </g>
+
+  <!-- 隐藏层1 → 隐藏层2 连线 -->
+  <g stroke="#888880" stroke-width="1" fill="none" marker-end="url(#arrow)">
+    <line x1="252" y1="80"  x2="358" y2="80"/>
+    <line x1="252" y1="80"  x2="358" y2="150"/>
+    <line x1="252" y1="80"  x2="358" y2="220"/>
+    <line x1="252" y1="80"  x2="358" y2="290"/>
+    <line x1="252" y1="150" x2="358" y2="80"/>
+    <line x1="252" y1="150" x2="358" y2="150"/>
+    <line x1="252" y1="150" x2="358" y2="220"/>
+    <line x1="252" y1="150" x2="358" y2="290"/>
+    <line x1="252" y1="220" x2="358" y2="80"/>
+    <line x1="252" y1="220" x2="358" y2="150"/>
+    <line x1="252" y1="220" x2="358" y2="220"/>
+    <line x1="252" y1="220" x2="358" y2="290"/>
+    <line x1="252" y1="290" x2="358" y2="80"/>
+    <line x1="252" y1="290" x2="358" y2="150"/>
+    <line x1="252" y1="290" x2="358" y2="220"/>
+    <line x1="252" y1="290" x2="358" y2="290"/>
+  </g>
+
+  <!-- 隐藏层2 → 输出层 连线 -->
+  <g stroke="#888880" stroke-width="1" fill="none" marker-end="url(#arrow)">
+    <line x1="402" y1="80"  x2="508" y2="195"/>
+    <line x1="402" y1="150" x2="508" y2="195"/>
+    <line x1="402" y1="220" x2="508" y2="195"/>
+    <line x1="402" y1="290" x2="508" y2="195"/>
+  </g>
+
+  <!-- 层标签 -->
+  <text x="90"  y="375" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="500" fill="#A32D2D">input layer</text>
+  <text x="230" y="375" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="500" fill="#185FA5">hidden layer 1</text>
+  <text x="380" y="375" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="500" fill="#185FA5">hidden layer 2</text>
+  <text x="530" y="375" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="500" fill="#3B6D11">output layer</text>
+</svg>

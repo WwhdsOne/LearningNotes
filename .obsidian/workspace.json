@@ -175,8 +175,11 @@
       "bases:新建数据库": false
     }
   },
-  "active": "b145811153cc4d02",
+  "active": "d64010993d7a1970",
   "lastOpenFiles": [
+    "AI/神经网络结构.svg",
+    "AI/神经网络.md",
+    "AI/梯度下降~.md",
     "AI/梯度下降.md",
     "GO语言学习/fiber/API/可配置启动设置.md",
     "long-game/docs/superpowers/specs/2026-04-28-talent-system-rework-design.md",
@@ -207,9 +210,6 @@
     "long-game/docs/archive/superpowers/plans",
     "long-game/docs/archive/implementation/2026-04-24-单体版点击反脚本与官方挂机改造-已废弃.md",
     "long-game/docs/archive/implementation/2026-04-23-公共态载荷瘦身优化-已废弃.md",
-    "long-game/docs/archive/implementation/2026-04-22-装备英雄成长重构落地说明-已废弃.md",
-    "long-game/docs/archive/implementation/2026-04-22-hertz-后台分页改造-已废弃.md",
-    "long-game/docs/archive/specs/2026-04-23-装备超标判定规程-已废弃.md",
     "long-game/docs/demos/demo-sword-cursor.html",
     "long-game/docs/demos/demo-crack-effects.html",
     "long-game/docs/demos/boss-themes.html"
