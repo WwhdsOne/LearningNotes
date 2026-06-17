@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" font-family="Segoe UI, system-ui, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a5568"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3182ce"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="450" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#2d3748">Attentive Statistics Pooling — Architecture</text>
+
+  <!-- Box 1: Acoustic Features -->
+  <rect x="60" y="55" width="180" height="50" rx="8" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="150" y="78" text-anchor="middle" font-size="14" font-weight="600" fill="#2b6cb0">Acoustic Features</text>
+  <text x="150" y="95" text-anchor="middle" font-size="11" fill="#4a5568">MFCC (20/40-dim) · 10ms frame rate</text>
+
+  <!-- Arrow -->
+  <line x1="240" y1="80" x2="300" y2="80" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Box 2: TDNN Frame-level Extractor -->
+  <rect x="300" y="45" width="200" height="70" rx="8" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="400" y="68" text-anchor="middle" font-size="14" font-weight="600" fill="#2b6cb0">TDNN × 5 Layers</text>
+  <text x="400" y="85" text-anchor="middle" font-size="11" fill="#4a5568">512 nodes/layer · ReLU + BN</text>
+  <text x="400" y="102" text-anchor="middle" font-size="11" fill="#718096">Output: 1500-dim frame-level feat. h_t</text>
+
+  <!-- Arrow from TDNN splits to ASP -->
+  <line x1="500" y1="65" x2="550" y2="65" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="500" y1="95" x2="550" y2="95" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Box 3a: Attention Network (left path) -->
+  <rect x="550" y="45" width="170" height="40" rx="8" fill="#fefcbf" stroke="#d69e2e" stroke-width="1.5"/>
+  <text x="635" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="#744210">Attention Network</text>
+  <text x="635" y="78" text-anchor="middle" font-size="11" fill="#4a5568">FC(64, ReLU+BN) → scalar score</text>
+
+  <!-- Box 3b: Softmax (right of attention) -->
+  <rect x="740" y="45" width="130" height="40" rx="8" fill="#fefcbf" stroke="#d69e2e" stroke-width="1.5"/>
+  <text x="805" y="65" text-anchor="middle" font-size="13" font-weight="600" fill="#744210">Softmax</text>
+  <text x="805" y="80" text-anchor="middle" font-size="11" fill="#4a5568">α_t = exp(e_t)/Σexp(e_τ)</text>
+
+  <!-- Arrow: attention → softmax -->
+  <line x1="720" y1="65" x2="740" y2="65" stroke="#d69e2e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Box 3c: Weighted Mean -->
+  <rect x="550" y="110" width="140" height="40" rx="8" fill="#c6f6d5" stroke="#38a169" stroke-width="1.5"/>
+  <text x="620" y="130" text-anchor="middle" font-size="13" font-weight="600" fill="#22543d">Weighted Mean</text>
+  <text x="620" y="145" text-anchor="middle" font-size="11" fill="#4a5568">μ̃ = Σ α_t · h_t</text>
+
+  <!-- Box 3d: Weighted Std -->
+  <rect x="550" y="165" width="140" height="40" rx="8" fill="#c6f6d5" stroke="#38a169" stroke-width="1.5"/>
+  <text x="620" y="185" text-anchor="middle" font-size="13" font-weight="600" fill="#22543d">Weighted Std</text>
+  <text x="620" y="200" text-anchor="middle" font-size="11" fill="#4a5568">σ̃ = √(Σ α_t·h_t² − μ̃²)</text>
+
+  <!-- Arrow: softmax → mean & std -->
+  <line x1="805" y1="85" x2="805" y2="130" stroke="#d69e2e" stroke-width="1.5"/>
+  <line x1="805" y1="130" x2="690" y2="130" stroke="#d69e2e" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="805" y1="85" x2="805" y2="185" stroke="#d69e2e" stroke-width="1.5"/>
+  <line x1="805" y1="185" x2="690" y2="185" stroke="#d69e2e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Arrow: TDNN → mean & std (through attention) - already covered via split lines -->
+
+  <!-- Concatenation box -->
+  <rect x="550" y="235" width="140" height="40" rx="8" fill="#e9d8fd" stroke="#805ad5" stroke-width="1.5"/>
+  <text x="620" y="255" text-anchor="middle" font-size="13" font-weight="600" fill="#44337a">Concat</text>
+  <text x="620" y="270" text-anchor="middle" font-size="11" fill="#4a5568">[μ̃ ; σ̃] → 3000-dim</text>
+
+  <!-- Arrow: mean & std → concat -->
+  <line x1="620" y1="205" x2="620" y2="235" stroke="#38a169" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Arrow: concat → FC -->
+  <line x1="690" y1="255" x2="740" y2="255" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Box 4: FC Layers -->
+  <rect x="740" y="225" width="130" height="60" rx="8" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="805" y="248" text-anchor="middle" font-size="13" font-weight="600" fill="#2b6cb0">FC × 2 + Softmax</text>
+  <text x="805" y="265" text-anchor="middle" font-size="11" fill="#4a5568">512-dim bottleneck</text>
+  <text x="805" y="280" text-anchor="middle" font-size="11" fill="#718096">→ speaker embedding</text>
+
+  <!-- Gray area around ASP -->
+  <rect x="535" y="30" width="350" height="260" rx="12" fill="none" stroke="#a0aec0" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="550" y="43" font-size="11" fill="#718096" font-style="italic">Attentive Statistics Pooling (ASP) Layer</text>
+
+  <!-- Bottom: PLDA -->
+  <line x1="805" y1="285" x2="805" y2="320" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="740" y="320" width="130" height="35" rx="8" fill="#fff5f5" stroke="#e53e3e" stroke-width="1.5"/>
+  <text x="805" y="342" text-anchor="middle" font-size="13" font-weight="600" fill="#c53030">PLDA Scoring</text>
+
+  <!-- Data augmentation note -->
+  <text x="150" y="145" text-anchor="middle" font-size="11" fill="#718096" font-style="italic">Data augmentation:</text>
+  <text x="150" y="160" text-anchor="middle" font-size="11" fill="#718096" font-style="italic">Noise · Reverb · AMR coding</text>
+
+  <!-- Frame-length note -->
+  <text x="150" y="190" text-anchor="middle" font-size="11" fill="#718096" font-style="italic">Variable-length input</text>
+  <text x="150" y="205" text-anchor="middle" font-size="11" fill="#718096" font-style="italic">→ fixed-length embedding</text>
+</svg>
