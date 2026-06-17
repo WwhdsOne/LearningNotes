@@ -1,3 +1,22 @@
 .idea/
+.vscode/
+
+# macOS
 .DS_Store
-.vscode
+**/.DS_Store
+._*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Editor and tool caches
+*.swp
+*.swo
+*~
+.cache/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
