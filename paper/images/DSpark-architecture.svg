@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8f9ff"/>
+      <stop offset="100%" stop-color="#eef0ff"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4B6EF7"/>
+      <stop offset="100%" stop-color="#3A56D4"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00000018"/>
+    </filter>
+    <filter id="shadowLight" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#00000010"/>
+    </filter>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4B6EF7"/>
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7C3AED"/>
+    </marker>
+    <marker id="arrowTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0EA5E9"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981"/>
+    </marker>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="600" fill="url(#bgGrad)" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="36" text-anchor="middle" font-size="20" font-weight="bold" fill="#1E293B">DSpark Architecture — Semi-Autoregressive Speculative Decoding</text>
+  <line x1="150" y1="44" x2="750" y2="44" stroke="#CBD5E1" stroke-width="1"/>
+
+  <!-- ===== SECTION 1: TARGET LLM (Left) ===== -->
+  <rect x="20" y="70" width="210" height="280" rx="12" fill="white" stroke="#4B6EF7" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="20" y="70" width="210" height="42" rx="12" fill="url(#blueGrad)"/>
+  <rect x="20" y="98" width="210" height="14" fill="url(#blueGrad)"/>
+  <text x="125" y="97" text-anchor="middle" font-size="15" font-weight="bold" fill="white">Target LLM</text>
+
+  <!-- V4 Flash info -->
+  <rect x="32" y="122" width="186" height="50" rx="8" fill="#EFF6FF" stroke="#DBEAFE" stroke-width="1"/>
+  <text x="125" y="143" text-anchor="middle" font-size="11" font-weight="bold" fill="#1E40AF">DeepSeek-V4-Flash</text>
+  <text x="125" y="162" text-anchor="middle" font-size="10" fill="#3B82F6">284B total / 13B activated</text>
+
+  <!-- V4 Pro info -->
+  <rect x="32" y="180" width="186" height="50" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1"/>
+  <text x="125" y="201" text-anchor="middle" font-size="11" font-weight="bold" fill="#4338CA">DeepSeek-V4-Pro</text>
+  <text x="125" y="220" text-anchor="middle" font-size="10" fill="#6366F1">1.6T total / 49B activated</text>
+
+  <!-- MoE info -->
+  <rect x="32" y="240" width="186" height="34" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="125" y="258" text-anchor="middle" font-size="10" fill="#64748B">MoE · 1M context length</text>
+  <text x="125" y="271" text-anchor="middle" font-size="9" fill="#94A3B8">Multi-Head Latent Attention</text>
+
+  <!-- Frozen parameters note -->
+  <rect x="32" y="284" width="186" height="40" rx="6" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="125" y="300" text-anchor="middle" font-size="9" fill="#DC2626">Target frozen during</text>
+  <text x="125" y="314" text-anchor="middle" font-size="9" fill="#DC2626">draft model training</text>
+
+  <!-- ===== ARROW: Target → Draft ===== -->
+  <line x1="230" y1="210" x2="278" y2="210" stroke="#4B6EF7" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <text x="254" y="200" text-anchor="middle" font-size="9" fill="#4B6EF7" font-weight="bold">hidden</text>
+  <text x="254" y="236" text-anchor="middle" font-size="9" fill="#4B6EF7" font-weight="bold">anchor</text>
+
+  <!-- ===== SECTION 2: DSpark Draft Module (Center) ===== -->
+  <rect x="282" y="60" width="340" height="310" rx="12" fill="white" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="282" y="60" width="340" height="36" rx="12" fill="url(#purpleGrad)"/>
+  <rect x="282" y="82" width="340" height="14" fill="url(#purpleGrad)"/>
+  <text x="452" y="84" text-anchor="middle" font-size="14" font-weight="bold" fill="white">DSpark Draft Module (Semi-Autoregressive)</text>
+
+  <!-- Sub-section label: Parallel Stage -->
+  <rect x="298" y="106" width="308" height="120" rx="8" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="1.5"/>
+  <rect x="298" y="106" width="308" height="24" rx="8" fill="#EDE9FE"/>
+  <rect x="298" y="122" width="308" height="8" fill="#EDE9FE"/>
+  <text x="452" y="123" text-anchor="middle" font-size="11" font-weight="bold" fill="#6D28D9">① Parallel Draft Head (Block Generation)</text>
+  <text x="310" y="150" font-size="9" fill="#6D28D9">▸ Deep parallel backbone (DFlash-based, 5 MoE layers)</text>
+  <text x="310" y="168" font-size="9" fill="#6D28D9">▸ Single forward pass: anchor + γ−1 masks → γ draft logits</text>
+  <text x="310" y="186" font-size="9" fill="#6D28D9">▸ Block size (γ): 4~16 tokens per round</text>
+  <text x="310" y="204" font-size="9" fill="#6D28D9">▸ High throughput: O(1) draft latency (parallel)</text>
+  <text x="310" y="220" font-size="9" fill="#6D28D9">▸ Produces base logits U₁...Uᵧ + hidden states h₁...hᵧ</text>
+
+  <!-- Block label -->
+  <rect x="520" y="138" width="74" height="22" rx="11" fill="#7C3AED" opacity="0.15"/>
+  <text x="557" y="153" text-anchor="middle" font-size="9" font-weight="bold" fill="#7C3AED">Block: γ=5</text>
+
+  <!-- Sub-section label: Sequential Stage -->
+  <rect x="298" y="234" width="308" height="120" rx="8" fill="#FEFCE8" stroke="#FDE68A" stroke-width="1.5"/>
+  <rect x="298" y="234" width="308" height="24" rx="8" fill="#FEF9C3"/>
+  <rect x="298" y="250" width="308" height="8" fill="#FEF9C3"/>
+  <text x="452" y="251" text-anchor="middle" font-size="11" font-weight="bold" fill="#CA8A04">② Sequential Markov Head (Token Dependency)</text>
+  <text x="310" y="276" font-size="9" fill="#A16207">▸ Markov head: 1st-order transition bias B(x_{k-1}, x_k)</text>
+  <text x="310" y="294" font-size="9" fill="#A16207">▸ Low-rank factorization: B = W₁W₂ (r=256)</text>
+  <text x="310" y="312" font-size="9" fill="#A16207">▸ RNN head (optional): recurrent state over full prefix</text>
+  <text x="310" y="330" font-size="9" fill="#A16207">▸ Sequential loop: T_seq ≪ T_parallel (latency ~1.3% overhead)</text>
+  <text x="310" y="348" font-size="9" fill="#A16207">▸ Mitigates multi-modal collision (e.g. "of problem" → "of course")</text>
+
+  <!-- Semi-Autoregressive label -->
+  <rect x="440" y="364" width="160" height="22" rx="11" fill="#7C3AED" opacity="0.12"/>
+  <text x="520" y="379" text-anchor="middle" font-size="10" font-weight="bold" fill="#7C3AED">✦ Semi-Autoregressive</text>
+
+  <!-- ===== ARROW: Draft → Verification ===== -->
+  <line x1="622" y1="230" x2="670" y2="230" stroke="#7C3AED" stroke-width="2.5" marker-end="url(#arrowPurple)"/>
+  <text x="646" y="218" text-anchor="middle" font-size="9" fill="#7C3AED" font-weight="bold">draft</text>
+  <text x="646" y="252" text-anchor="middle" font-size="9" fill="#7C3AED" font-weight="bold">tokens</text>
+
+  <!-- ===== SECTION 3: Verification & Acceptance (Right) ===== -->
+  <rect x="676" y="70" width="208" height="280" rx="12" fill="white" stroke="#0EA5E9" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="676" y="70" width="208" height="36" rx="12" fill="url(#tealGrad)"/>
+  <rect x="676" y="92" width="208" height="14" fill="url(#tealGrad)"/>
+  <text x="780" y="93" text-anchor="middle" font-size="13" font-weight="bold" fill="white">Verification &amp; Acceptance</text>
+
+  <!-- Confidence Head -->
+  <rect x="688" y="116" width="184" height="50" rx="8" fill="#ECFEFF" stroke="#CFFAFE" stroke-width="1.5"/>
+  <text x="780" y="135" text-anchor="middle" font-size="10" font-weight="bold" fill="#0E7490">③ Confidence-Scheduled Verification</text>
+  <text x="780" y="153" text-anchor="middle" font-size="9" fill="#0891B2">Confidence head + STS calibration</text>
+
+  <!-- Hardware-Aware Prefix Scheduler -->
+  <rect x="688" y="174" width="184" height="58" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="780" y="193" text-anchor="middle" font-size="10" font-weight="bold" fill="#15803D">④ Hardware-Aware Prefix Scheduler</text>
+  <text x="780" y="210" text-anchor="middle" font-size="8" fill="#16A34A">Profiled SPS(B) capacity curve</text>
+  <text x="780" y="224" text-anchor="middle" font-size="8" fill="#16A34A">Greedy max throughput allocation</text>
+
+  <!-- Rejection Sampling -->
+  <rect x="688" y="240" width="184" height="58" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="780" y="259" text-anchor="middle" font-size="10" font-weight="bold" fill="#C2410C">⑤ Rejection Sampling</text>
+  <text x="780" y="276" text-anchor="middle" font-size="8" fill="#EA580C">Lossless — exact target distribution</text>
+  <text x="780" y="290" text-anchor="middle" font-size="8" fill="#EA580C">Accept prefix, reject + correct suffix</text>
+
+  <!-- Bonus token -->
+  <rect x="688" y="306" width="184" height="28" rx="6" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="780" y="324" text-anchor="middle" font-size="9" fill="#DC2626">+ 1 bonus token from target forward pass</text>
+
+  <!-- ===== BOTTOM SECTION: Performance Comparison ===== -->
+  <rect x="20" y="380" width="864" height="120" rx="12" fill="white" stroke="#E2E8F0" stroke-width="1.5" filter="url(#shadowLight)"/>
+
+  <!-- Title bar -->
+  <rect x="20" y="380" width="864" height="30" rx="12" fill="#F1F5F9"/>
+  <rect x="20" y="398" width="864" height="12" fill="#F1F5F9"/>
+  <text x="452" y="400" text-anchor="middle" font-size="12" font-weight="bold" fill="#334155">Performance: DSpark vs MTP-1 (Production Baseline)</text>
+
+  <!-- Flash model -->
+  <rect x="40" y="420" width="400" height="36" rx="8" fill="#EFF6FF" stroke="#DBEAFE" stroke-width="1"/>
+  <text x="240" y="438" text-anchor="middle" font-size="11" font-weight="bold" fill="#1E40AF">V4-Flash</text>
+  <text x="240" y="452" text-anchor="middle" font-size="10" fill="#3B82F6">User gen speed: +60% ~ +85% · Throughput: +51% (80 TPS SLA)</text>
+
+  <!-- Pro model -->
+  <rect x="460" y="420" width="404" height="36" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1"/>
+  <text x="662" y="438" text-anchor="middle" font-size="11" font-weight="bold" fill="#4338CA">V4-Pro</text>
+  <text x="662" y="452" text-anchor="middle" font-size="10" fill="#6366F1">User gen speed: +57% ~ +78% · Throughput: +52% (35 TPS SLA)</text>
+
+  <!-- Extreme SLA points -->
+  <rect x="40" y="462" width="200" height="30" rx="6" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="140" y="480" text-anchor="middle" font-size="9" fill="#DC2626">120 TPS SLA: +661% throughput</text>
+
+  <rect x="260" y="462" width="200" height="30" rx="6" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="360" y="480" text-anchor="middle" font-size="9" fill="#DC2626">Extends Pareto frontier ✓</text>
+
+  <rect x="480" y="462" width="200" height="30" rx="6" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="580" y="480" text-anchor="middle" font-size="9" fill="#DC2626">50 TPS SLA: +406% throughput</text>
+
+  <rect x="696" y="462" width="170" height="30" rx="6" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="781" y="480" text-anchor="middle" font-size="9" fill="#DC2626">Unlocks strict interactivity</text>
+
+  <!-- ===== BOTTOM BANNER: Open Source ===== -->
+  <rect x="20" y="520" width="864" height="60" rx="10" fill="url(#greenGrad)" opacity="0.9"/>
+  <text x="452" y="544" text-anchor="middle" font-size="13" font-weight="bold" fill="white">DeepSpec Open-Source Toolchain</text>
+  <text x="452" y="564" text-anchor="middle" font-size="10" fill="#D1FAE5">github.com/deepseek-ai/DeepSpec · MIT License · Supports Qwen3 &amp; Gemma</text>
+  <text x="452" y="576" text-anchor="middle" font-size="9" fill="#A7F3D0">Built-in drafters: DSpark · DFlash · Eagle3 · Data prep → Training → Evaluation</text>
+
+  <!-- Legend -->
+  <rect x="20" y="585" width="864" height="14" fill="none"/>
+  <circle cx="40" cy="592" r="4" fill="#4B6EF7"/>
+  <text x="50" y="595" font-size="8" fill="#64748B">Target</text>
+  <circle cx="100" cy="592" r="4" fill="#7C3AED"/>
+  <text x="110" y="595" font-size="8" fill="#64748B">Draft</text>
+  <circle cx="150" cy="592" r="4" fill="#0EA5E9"/>
+  <text x="160" y="595" font-size="8" fill="#64748B">Verification</text>
+  <circle cx="230" cy="592" r="4" fill="#10B981"/>
+  <text x="240" y="595" font-size="8" fill="#64748B">Open Source</text>
+  <text x="700" y="595" font-size="8" fill="#94A3B8">DSpark · DeepSeek · June 2026</text>
+</svg>
